@@ -6,12 +6,15 @@ YANKA, short for Your AI for Knowledge Access, is an intelligent, voice-enabled 
 Access to quality education remains a global challenge till date. This is especially true in multilingual or estranged regions. Many students and educators are dearth of tools that support their language and accessibility. YANKA is motivated by this vision to bridge this gap through AI-powered solution that makes learing more engagig and accessible for all.
 
 ## Features of the App
-- Multilingual conversational AI
-- Voice interaction
-- AI avatar video lessons
-- Personalized learning engine
-- Offline-first support
-- Teacher/Parent dashboards
+- **Multilingual Conversational AI** (text, voice, video; English, French, and local languages)
+- **Voice Interaction** - Speech-to-Text input, Text-to-Speech output  
+- **AI Avatar Video Lessons** – AI-generated video content with avatars  
+- **Personalized Learning Engine** – adapts dynamically to learner’s strengths/weaknesses 
+- **Offline-first Support** – caching + sync for low-connectivity areas
+- **Teacher/Parent Dashboards** - progress tracking & content assignment
+- **Gamification Layer** – badges, levels, rewards for motivation
+- **Real-Time Analytics** – engagement, completion, drop-off tracking
+- **Community Content Hub** – local educators can upload adapted lessons  
 
 ## Repo Structure
 - `frontend/` → Mobile & Web app (React/Flutter)
