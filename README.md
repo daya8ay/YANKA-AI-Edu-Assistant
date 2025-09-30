@@ -18,6 +18,8 @@ Access to quality education remains a global challenge till date. This is especi
 - `backend/` → APIs and cloud services
 - `ai/` → NLP, STT, TTS, video generation
 - `docs/` → Reports, sprint docs, designs
+  - Project Description
+  - Customer Archetypes & Use cases 
 
 ## Team Members
 - Aayush Bharti
