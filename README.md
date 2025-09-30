@@ -1,2 +1,29 @@
 # YANKA-AI-Edu-Assistant
 YANKA – AI-Powered Multilingual Educational Assistant
+YANKA, short for Your AI for Knowledge Access, is an intelligent, voice-enabled educational assistant that improves access to quality education in multilingual communities.
+
+## Features of the App
+- Multilingual conversational AI (English, French, African languages)
+- Voice interaction
+- AI avatar video lessons
+- Personalized learning engine
+- Offline-first support
+- Teacher/Parent dashboards
+
+## Repo Structure
+- `frontend/` → Mobile & Web app (React/Flutter)
+- `backend/` → APIs and cloud services
+- `ai/` → NLP, STT, TTS, video generation
+- `docs/` → Reports, sprint docs, designs
+
+## Team Members
+- Aayush Bharti
+- Dayanna Bay Esquer
+- Advikaa Kapil
+- Gursparsh Singh Sodhi
+- Ang Li
+
+## Tools
+- **Taiga Board:** https://tree.taiga.io/project/aayush-bharti-capstone-project-yanka/timeline 
+- **Reports:** `/docs/`
+- **Drive:** https://drive.google.com/drive/folders/1j4YZulil_YO-BAOFBNGmrlFO-g6PdmaX?usp=sharing 
