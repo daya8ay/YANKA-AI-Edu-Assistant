@@ -1,9 +1,12 @@
 # YANKA-AI-Edu-Assistant
 YANKA – AI-Powered Multilingual Educational Assistant
-YANKA, short for Your AI for Knowledge Access, is an intelligent, voice-enabled educational assistant that improves access to quality education in multilingual communities.
+YANKA, short for Your AI for Knowledge Access, is an intelligent, voice-enabled educational assistant that improves access to quality education in multilingual communities. The app delivers AI-generated content tailored to each learner's requirements.
+
+# Motivation
+
 
 ## Features of the App
-- Multilingual conversational AI (English, French, African languages)
+- Multilingual conversational AI
 - Voice interaction
 - AI avatar video lessons
 - Personalized learning engine
