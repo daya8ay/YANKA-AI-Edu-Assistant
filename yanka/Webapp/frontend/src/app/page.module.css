@@ -6,13 +6,10 @@
   --button-primary-hover: #383838;
   --button-secondary-hover: #f2f2f2;
 
-  display: grid;
-  grid-template-rows: 20px 1fr 20px;
-  align-items: center;
-  justify-items: center;
+  display: flex;
+  flex-direction: column;
   min-height: 100svh;
-  padding: 80px;
-  gap: 64px;
+  padding: 40px 80px;
   font-family: var(--font-geist-sans);
 }
 
@@ -31,7 +28,18 @@
   display: flex;
   flex-direction: column;
   gap: 32px;
-  grid-row-start: 2;
+  align-items: center;
+  max-width: 1200px;
+  margin: 0 auto;
+}
+
+.pageTitle {
+  font-size: 3rem;
+  font-weight: 700;
+  text-align: center;
+  margin: 0;
+  line-height: 1.2;
+  letter-spacing: -0.02em;
 }
 
 .main ol {
