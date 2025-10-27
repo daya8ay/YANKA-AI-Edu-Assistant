@@ -19,6 +19,7 @@ export default function NavBar() {
       <div className={styles.navLinks}>
         <Link href="/">Home</Link>
         <Link href="/avatar_creation">Avatar Creation</Link>
+        <Link href="/video">Video Creation</Link> 
       </div>
     </nav>
   );
