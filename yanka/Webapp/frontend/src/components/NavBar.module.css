@@ -1,0 +1,40 @@
+.navbar {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 0.5rem 1.5rem;  /* Reduced from 1rem 2rem */
+    background-color: #fff;
+    box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+    position: sticky;
+    top: 0;
+    z-index: 1000;
+  }
+  
+  .logoLink {
+    display: flex;
+    align-items: center;
+    text-decoration: none;
+  }
+  
+  .logo {
+    height: 100px;  /* Set a fixed height instead of auto */
+    width: auto;
+  }
+  
+  .navLinks {
+    display: flex;
+    gap: 1rem;  /* Reduced from 2rem */
+    align-items: center;
+  }
+  
+  .navLinks a {
+    text-decoration: none;
+    color: #333;
+    font-weight: 500;
+    font-size: 1.0rem;  /* Slightly smaller text */
+    transition: color 0.2s;
+  }
+  
+  .navLinks a:hover {
+    color: #0070f3;
+  }
