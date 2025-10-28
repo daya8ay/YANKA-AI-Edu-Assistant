@@ -1,7 +1,7 @@
-'use client';
+"use client";
 
-import React from 'react';
-import { useState } from 'react';
+import React from "react";
+import { useState } from "react";
 import styles from "./page.module.css";
 
 export default function Home() {

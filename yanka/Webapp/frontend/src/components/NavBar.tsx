@@ -1,16 +1,16 @@
-'use client';
+"use client";
 
-import Link from 'next/link';
-import Image from 'next/image';
-import styles from './NavBar.module.css';
+import Link from "next/link";
+import Image from "next/image";
+import styles from "./NavBar.module.css";
 
 export default function NavBar() {
   return (
     <nav className={styles.navbar}>
       <Link href="/" className={styles.logoLink}>
-        <Image 
+        <Image
           src="/logo1.svg"
-          alt="YANKA Logo" 
+          alt="YANKA Logo"
           width={150}
           height={50}
           className={styles.logo}
