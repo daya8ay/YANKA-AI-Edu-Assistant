@@ -43,7 +43,6 @@ const NavBar: React.FC = () => {
   useEffect(() => {
     const handleScroll = () => {
       const currentScroll = window.pageYOffset;
-      
       if (currentScroll <= 0) {
         setIsScrolled(false);
       } else if (currentScroll > lastScroll) {
@@ -51,7 +50,6 @@ const NavBar: React.FC = () => {
       } else {
         setIsScrolled(false);
       }
-      
       setLastScroll(currentScroll);
     };
 
@@ -74,7 +72,6 @@ const NavBar: React.FC = () => {
             YANKA<span className={styles.dot}>.</span>
           </div>
         </Link>
-        
         <nav>
           <ul>
             <li><Link href="/#features">Features</Link></li>
@@ -83,7 +80,7 @@ const NavBar: React.FC = () => {
             <li><Link href="/#pricing">Pricing & Plans</Link></li>
             <li><Link href="/#about">About</Link></li>
             <li><Link href="/avatar_creation">Avatar Creation</Link></li>
-            <li><Link href="/video">Video</Link></li>
+            <li><Link href="/video">Video Creation</Link></li>
             <li><Link href="/support">Support</Link></li>
             <li><Link href="/login" className={styles.btnLogin}>Login</Link></li>
             <li><Link href="/signup" className={styles.btnSignup}>Sign Up</Link></li>
@@ -100,7 +97,6 @@ const NavBar: React.FC = () => {
           </ul>
         </nav>
       </header>
-      
       <LanguageModal 
         isOpen={isLanguageModalOpen} 
         onClose={() => setIsLanguageModalOpen(false)} 
