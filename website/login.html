@@ -1,0 +1,64 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Login | YANKA</title>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="login.css">
+</head>
+<body>
+  <div class="login-container">
+    <div class="login-box">
+
+      <!-- LOGO -->
+      <img src="pics/Y_Logo.jpeg" alt="YANKA Logo" class="logo">
+
+      <h1>Welcome Back to <span>YANKA</span></h1>
+      <p class="subtitle">Log in to continue your AI-powered learning journey</p>
+
+      <form class="login-form">
+        <div class="form-group">
+          <label for="email">Email Address</label>
+          <input type="email" id="email" placeholder="Enter your email" required>
+        </div>
+
+        <div class="form-group password-group">
+          <label for="password">Password</label>
+          <div class="password-wrapper">
+            <input type="password" id="password" placeholder="Enter your password" required>
+          </div>
+        </div>
+
+        <button type="submit" class="login-btn">Login</button>
+      </form>
+
+      <div class="social-login">
+        <p>Or continue with</p>
+        <div class="social-icons">
+          <a href="#"><img src="pics/gmail.jpeg" alt="Login with Gmail"></a>
+          <a href="#"><img src="pics/fb.jpeg" alt="Login with Facebook"></a>
+          <a href="#"><img src="pics/linkedin.jpeg" alt="Login with LinkedIn"></a>
+        </div>
+      </div>
+
+      <p class="signup-link">
+        Don’t have an account? 
+        <a href="signup.html">Sign Up</a>
+      </p>
+
+      <p class="home-link">
+        <a href="index.html">← Back to Home</a>
+      </p>
+
+    </div>
+  </div>
+
+  <script>
+    function togglePassword() {
+      const password = document.getElementById("password");
+      password.type = password.type === "password" ? "text" : "password";
+    }
+  </script>
+</body>
+</html>

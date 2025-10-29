@@ -3,9 +3,6 @@
   --gray-alpha-200: rgba(var(--gray-rgb), 0.08);
   --gray-alpha-100: rgba(var(--gray-rgb), 0.05);
 
-  --button-primary-hover: #383838;
-  --button-secondary-hover: #f2f2f2;
-
   display: flex;
   flex-direction: column;
   min-height: 100svh;
@@ -18,9 +15,6 @@
     --gray-rgb: 255, 255, 255;
     --gray-alpha-200: rgba(var(--gray-rgb), 0.145);
     --gray-alpha-100: rgba(var(--gray-rgb), 0.06);
-
-    --button-primary-hover: #ccc;
-    --button-secondary-hover: #1a1a1a;
   }
 }
 
@@ -29,7 +23,7 @@
   flex-direction: column;
   gap: 32px;
   align-items: center;
-  max-width: 1200px;
+  width: 100%;
   margin: 0 auto;
 }
 
@@ -42,134 +36,318 @@
   letter-spacing: -0.02em;
 }
 
-.main ol {
-  font-family: var(--font-geist-mono);
-  padding-left: 0;
-  margin: 0;
-  font-size: 14px;
-  line-height: 24px;
-  letter-spacing: -0.01em;
-  list-style-position: inside;
+/* Customization Card */
+.customizationCard {
+  background: white;
+  border-radius: 16px;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+  padding: 24px;
+  width: 100%;
+  max-width: 600px;
+  margin-top: 32px;
 }
 
-.main li:not(:last-of-type) {
-  margin-bottom: 8px;
-}
-
-.main code {
-  font-family: inherit;
-  background: var(--gray-alpha-100);
-  padding: 2px 4px;
-  border-radius: 4px;
-  font-weight: 600;
-}
-
-.ctas {
-  display: flex;
-  gap: 16px;
-}
-
-.ctas a {
-  appearance: none;
-  border-radius: 128px;
-  height: 48px;
-  padding: 0 20px;
-  border: 1px solid transparent;
-  transition:
-    background 0.2s,
-    color 0.2s,
-    border-color 0.2s;
-  cursor: pointer;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  font-size: 16px;
-  line-height: 20px;
-  font-weight: 500;
-}
-
-a.primary {
-  background: var(--foreground);
-  color: var(--background);
-  gap: 8px;
-}
-
-a.secondary {
-  border-color: var(--gray-alpha-200);
-  min-width: 158px;
-}
-
-.footer {
-  grid-row-start: 3;
+/* Row to place two cards side by side */
+.cardRow {
   display: flex;
   gap: 24px;
+  align-items: flex-start;
+  width: 100%;
+  max-width: 1600px;
+  margin: 0 auto;
 }
 
-.footer a {
+.cardRow .customizationCard {
+  flex: 1 1 0;
+  max-width: none;
+  min-width: 0;
+}
+
+/* Main Tabs */
+.mainTabs {
   display: flex;
+  border-bottom: 1px solid #e5e5e5;
+  margin-bottom: 24px;
+}
+
+.mainTabButton {
+  background: none;
+  border: none;
+  padding: 12px 24px;
+  font-size: 16px;
+  font-weight: 500;
+  cursor: pointer;
+  color: #666;
+  transition: all 0.2s ease;
+  border-bottom: 2px solid transparent;
+  flex: 1;
+  text-align: center;
+}
+
+.mainTabButton:hover {
+  color: #333;
+}
+
+.activeMainTab {
+  color: #2563eb;
+  border-bottom-color: #2563eb;
+}
+
+/* Sub Tabs */
+.subTabs {
+  display: flex;
+  margin-bottom: 20px;
+}
+
+.subTabButton {
+  background: none;
+  border: none;
+  padding: 8px 16px;
+  font-size: 14px;
+  font-weight: 500;
+  cursor: pointer;
+  color: #666;
+  transition: all 0.2s ease;
+  border-bottom: 2px solid transparent;
+}
+
+.subTabButton:hover {
+  color: #333;
+}
+
+.activeSubTab {
+  color: #2563eb;
+  border-bottom-color: #2563eb;
+}
+
+/* Tab Content */
+.tabContent {
+  min-height: 300px;
+}
+
+.tabContent h3 {
+  margin: 0 0 16px 0;
+  font-size: 1.25rem;
+  font-weight: 600;
+  color: #333;
+}
+
+.tabContent h4 {
+  margin: 0 0 12px 0;
+  font-size: 1rem;
+  font-weight: 500;
+  color: #333;
+}
+
+/* Options Grid */
+.optionsGrid {
+  display: flex;
+  gap: 12px;
+  flex-wrap: wrap;
+}
+
+.optionButton {
+  background: none;
+  border: 1px solid #e5e5e5;
+  padding: 8px 16px;
+  border-radius: 8px;
+  font-size: 14px;
+  font-weight: 500;
+  cursor: pointer;
+  color: #666;
+  transition: all 0.2s ease;
+}
+
+.optionButton:hover {
+  border-color: #2563eb;
+  color: #2563eb;
+}
+
+.activeOption {
+  color: #2563eb;
+  border-color: #2563eb;
+  background-color: #eff6ff;
+}
+
+/* Toggle Buttons */
+.toggleButton {
+  background: none;
+  border: 1px solid #e5e5e5;
+  padding: 8px 14px;
+  border-radius: 9999px;
+  font-size: 14px;
+  font-weight: 600;
+  cursor: pointer;
+  color: #444;
+  transition: all 0.2s ease;
+  display: inline-flex;
   align-items: center;
   gap: 8px;
 }
 
-.footer img {
-  flex-shrink: 0;
+.toggleButton:hover {
+  border-color: #a3a3a3;
 }
 
-/* Enable hover only on non-touch devices */
-@media (hover: hover) and (pointer: fine) {
-  a.primary:hover {
-    background: var(--button-primary-hover);
-    border-color: transparent;
+.activeToggle {
+  color: #065f46;
+  border-color: #10b981;
+  background-color: #ecfdf5;
+}
+
+/* Color Picker Container */
+.colorPickerContainer {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 20px;
+  padding: 20px;
+}
+
+/* Section header with inline actions */
+.sectionHeader {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  margin: 12px 0;
+}
+
+.headerActions {
+  display: flex;
+  gap: 8px;
+}
+
+/* Selected Color Display */
+.selectedColorDisplay {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 14px;
+  color: #666;
+}
+
+.colorSwatch {
+  width: 24px;
+  height: 24px;
+  border-radius: 50%;
+  border: 2px solid #e5e5e5;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+/* React Colorful styles */
+.colorPickerContainer .react-colorful {
+  width: 200px !important;
+  height: 200px !important;
+}
+
+.colorPickerContainer .react-colorful__saturation {
+  border-radius: 8px 8px 0 0 !important;
+}
+
+.colorPickerContainer .react-colorful__hue {
+  border-radius: 0 0 8px 8px !important;
+}
+
+/* Dark mode support */
+@media (prefers-color-scheme: dark) {
+  .customizationCard {
+    background: #1a1a1a;
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
   }
 
-  a.secondary:hover {
-    background: var(--button-secondary-hover);
-    border-color: transparent;
+  .mainTabButton {
+    color: #ccc;
   }
 
-  .footer a:hover {
-    text-decoration: underline;
-    text-underline-offset: 4px;
+  .mainTabButton:hover {
+    color: #fff;
+  }
+
+  .subTabButton {
+    color: #ccc;
+  }
+
+  .subTabButton:hover {
+    color: #fff;
+  }
+
+  .tabContent h3,
+  .tabContent h4 {
+    color: #fff;
+  }
+
+  .optionButton {
+    border-color: #444;
+    color: #ccc;
+  }
+
+  .optionButton:hover {
+    border-color: #2563eb;
+    color: #2563eb;
+  }
+
+  .activeOption {
+    background-color: #1e3a8a;
+  }
+
+  .toggleButton {
+    border-color: #444;
+    color: #ccc;
+  }
+
+  .toggleButton:hover {
+    border-color: #777;
+  }
+
+  .activeToggle {
+    color: #a7f3d0;
+    border-color: #10b981;
+    background-color: rgba(16, 185, 129, 0.15);
+  }
+
+  .selectedColorDisplay {
+    color: #ccc;
+  }
+
+  .colorSwatch {
+    border-color: #444;
   }
 }
 
+/* Responsive design */
 @media (max-width: 600px) {
   .page {
     padding: 32px;
     padding-bottom: 80px;
   }
 
-  .main {
-    align-items: center;
+  .customizationCard {
+    margin: 16px;
+    padding: 16px;
   }
 
-  .main ol {
-    text-align: center;
-  }
-
-  .ctas {
+  .mainTabs {
     flex-direction: column;
   }
 
-  .ctas a {
-    font-size: 14px;
-    height: 40px;
-    padding: 0 16px;
+  .mainTabButton {
+    text-align: left;
+    border-bottom: none;
+    border-right: 2px solid transparent;
   }
 
-  a.secondary {
-    min-width: auto;
+  .activeMainTab {
+    border-bottom: none;
+    border-right-color: #2563eb;
   }
 
-  .footer {
-    flex-wrap: wrap;
-    align-items: center;
-    justify-content: center;
+  .optionsGrid {
+    flex-direction: column;
   }
-}
 
-@media (prefers-color-scheme: dark) {
-  .logo {
-    filter: invert();
+  .colorPickerContainer .react-colorful {
+    width: 150px !important;
+    height: 150px !important;
   }
 }
