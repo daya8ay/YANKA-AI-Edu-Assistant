@@ -1,0 +1,290 @@
+.page {
+  min-height: 100vh;
+  padding: 20px;
+  background: linear-gradient(115deg, #f8f2f2b5 0%, #8091ae 100%);
+}
+
+.main {
+  max-width: 1400px;
+  margin: 0 auto;
+  padding: 40px 20px;
+}
+
+.pageTitle {
+  font-family: 'Poppins', sans-serif;
+  font-size: 2.5rem;
+  color: #1E4386;
+  text-align: center;
+  margin-bottom: 40px;
+}
+
+.cardRow {
+  display: grid;
+  grid-template-columns: 1fr 2fr;
+  gap: 30px;
+  margin-top: 30px;
+}
+
+.customizationCard {
+  background: white;
+  border-radius: 16px;
+  padding: 30px;
+  box-shadow: 0 4px 12px rgba(30, 67, 134, 0.1);
+  min-height: 500px;
+}
+
+.customizationCard h3 {
+  font-family: 'Poppins', sans-serif;
+  font-size: 1.5rem;
+  color: #1E4386;
+  margin-bottom: 20px;
+}
+
+/* Tab Navigation */
+.tabs {
+  display: flex;
+  gap: 10px;
+  margin-bottom: 30px;
+  border-bottom: 2px solid #E6EEFF;
+  padding-bottom: 10px;
+}
+
+.mainTabButton {
+  padding: 10px 20px;
+  background: transparent;
+  border: none;
+  font-size: 1rem;
+  font-weight: 500;
+  color: #3B4F8E;
+  cursor: pointer;
+  border-radius: 8px 8px 0 0;
+  transition: all 0.3s;
+  position: relative;
+}
+
+.mainTabButton:hover {
+  background: #F5F8FD;
+  color: #1E4386;
+}
+
+.activeMainTab {
+  background: #E6EEFF;
+  color: #1E4386;
+  font-weight: 600;
+}
+
+.activeMainTab::after {
+  content: '';
+  position: absolute;
+  bottom: -12px;
+  left: 0;
+  right: 0;
+  height: 3px;
+  background: #2E5AA8;
+}
+
+/* Tab Content */
+.tabContent {
+  padding: 20px 0;
+}
+
+.section {
+  margin-bottom: 30px;
+}
+
+.section h4 {
+  font-family: 'Poppins', sans-serif;
+  font-size: 1.2rem;
+  color: #1E4386;
+  margin-bottom: 15px;
+}
+
+/* Color Picker */
+.colorPicker {
+  display: flex;
+  gap: 10px;
+  flex-wrap: wrap;
+  margin-top: 10px;
+}
+
+.colorOption {
+  width: 50px;
+  height: 50px;
+  border-radius: 50%;
+  border: 3px solid transparent;
+  cursor: pointer;
+  transition: all 0.3s;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1);
+}
+
+.colorOption:hover {
+  transform: scale(1.1);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+}
+
+.colorOption.selected {
+  border-color: #2E5AA8;
+  transform: scale(1.15);
+}
+
+/* Style Options */
+.styleOptions {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(120px, 1fr));
+  gap: 15px;
+  margin-top: 10px;
+}
+
+.styleOption {
+  padding: 15px;
+  background: #F5F8FD;
+  border: 2px solid transparent;
+  border-radius: 10px;
+  cursor: pointer;
+  text-align: center;
+  transition: all 0.3s;
+  font-weight: 500;
+  color: #3B4F8E;
+}
+
+.styleOption:hover {
+  background: #E6EEFF;
+  border-color: #2E5AA8;
+  transform: translateY(-2px);
+}
+
+.styleOption.selected {
+  background: #E6EEFF;
+  border-color: #2E5AA8;
+  color: #1E4386;
+  font-weight: 600;
+}
+
+/* Slider */
+.sliderContainer {
+  margin-top: 15px;
+}
+
+.slider {
+  width: 100%;
+  height: 8px;
+  border-radius: 5px;
+  background: #E6EEFF;
+  outline: none;
+  -webkit-appearance: none;
+  appearance: none;
+}
+
+.slider::-webkit-slider-thumb {
+  -webkit-appearance: none;
+  appearance: none;
+  width: 20px;
+  height: 20px;
+  border-radius: 50%;
+  background: #2E5AA8;
+  cursor: pointer;
+  transition: all 0.3s;
+}
+
+.slider::-webkit-slider-thumb:hover {
+  background: #1E4386;
+  transform: scale(1.2);
+}
+
+.slider::-moz-range-thumb {
+  width: 20px;
+  height: 20px;
+  border-radius: 50%;
+  background: #2E5AA8;
+  cursor: pointer;
+  border: none;
+  transition: all 0.3s;
+}
+
+.slider::-moz-range-thumb:hover {
+  background: #1E4386;
+  transform: scale(1.2);
+}
+
+.sliderLabel {
+  display: flex;
+  justify-content: space-between;
+  margin-bottom: 8px;
+  color: #3B4F8E;
+  font-size: 0.95rem;
+}
+
+/* Buttons */
+.buttonGroup {
+  display: flex;
+  gap: 15px;
+  margin-top: 30px;
+  padding-top: 20px;
+  border-top: 2px solid #E6EEFF;
+}
+
+.saveButton,
+.resetButton {
+  padding: 12px 30px;
+  border-radius: 8px;
+  font-weight: 600;
+  font-size: 1rem;
+  cursor: pointer;
+  transition: all 0.3s;
+  border: none;
+}
+
+.saveButton {
+  background: #2E5AA8;
+  color: white;
+  flex: 1;
+}
+
+.saveButton:hover {
+  background: #1E4386;
+}
+
+.resetButton {
+  background: #E6EEFF;
+  color: #3B4F8E;
+}
+
+.resetButton:hover {
+  background: #DCE6F7;
+  color: #1E4386;
+}
+
+/* Responsive Design */
+@media (max-width: 1024px) {
+  .cardRow {
+    grid-template-columns: 1fr;
+  }
+  
+  .pageTitle {
+    font-size: 2rem;
+  }
+}
+
+@media (max-width: 768px) {
+  .main {
+    padding: 20px 10px;
+  }
+  
+  .customizationCard {
+    padding: 20px;
+  }
+  
+  .tabs {
+    flex-wrap: wrap;
+  }
+  
+  .mainTabButton {
+    flex: 1;
+    min-width: 100px;
+  }
+  
+  .styleOptions {
+    grid-template-columns: repeat(auto-fill, minmax(100px, 1fr));
+  }
+}
+
