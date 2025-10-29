@@ -1,5 +1,6 @@
 import React from 'react';
-import styles from '../page.module.css';
+import styles from './video.module.css';
+import NavBar from '@/components/NavBar';
 
 export const metadata = {
   title: 'Video Creation - YANKA',
@@ -8,11 +9,14 @@ export const metadata = {
 
 const VideoCreation = () => {
   return (
-    <div className={styles.page}>
-      <main className={styles.main}>
-        <h1 className={styles.pageTitle}>Video Creation</h1>
-      </main>
-    </div>
+    <>
+      <NavBar />
+      <div className={styles.page}>
+        <main className={styles.main}>
+          <h1 className={styles.pageTitle}>Video Creation</h1>
+        </main>
+      </div>
+    </>
   );
 };
 

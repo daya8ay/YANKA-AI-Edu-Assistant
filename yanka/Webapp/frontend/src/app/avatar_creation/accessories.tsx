@@ -1,7 +1,7 @@
 "use client";
 
 import React, { useState } from "react";
-import styles from "../page.module.css";
+import styles from "./avatar.module.css";
 import { HexColorPicker } from "react-colorful";
 
 const Accessories = () => {
@@ -20,124 +20,50 @@ const Accessories = () => {
     const [scarfEnabled, setScarfEnabled] = useState(false);
     const [scarfColor, setScarfColor] = useState("#ffffff");
 
-    return (
-        <div className={styles.tabContent}>
-            <div className={styles.sectionHeader}>
-                <h3>Glasses</h3>
-                <div className={styles.headerActions}>
+    const renderAccessory = (
+        name: string,
+        enabled: boolean,
+        setEnabled: (value: boolean) => void,
+        color: string,
+        setColor: (value: string) => void
+    ) => (
+        <div className={styles.section}>
+            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '10px' }}>
+                <h4 style={{ margin: 0 }}>{name}</h4>
+                <div style={{ display: 'flex', gap: '10px' }}>
                     <button
-                        className={`${styles.optionButton} ${glassesEnabled ? styles.activeOption : ""}`}
-                        onClick={() => setGlassesEnabled(true)}
+                        className={`${styles.styleOption} ${enabled ? styles.selected : ""}`}
+                        onClick={() => setEnabled(true)}
+                        style={{ padding: '8px 16px', minWidth: '60px' }}
                     >
-                        ✓
+                        ✓ On
                     </button>
                     <button
-                        className={`${styles.optionButton} ${!glassesEnabled ? styles.activeOption : ""}`}
-                        onClick={() => setGlassesEnabled(false)}
+                        className={`${styles.styleOption} ${!enabled ? styles.selected : ""}`}
+                        onClick={() => setEnabled(false)}
+                        style={{ padding: '8px 16px', minWidth: '60px' }}
                     >
-                        ✕
-                    </button>
-                </div>
-            </div>
-            {glassesEnabled && (
-                <div className={styles.colorPickerContainer}>
-                    <HexColorPicker color={glassesColor} onChange={setGlassesColor} />
-                </div>
-            )}
-
-            <div className={styles.sectionHeader}>
-                <h3>Earrings</h3>
-                <div className={styles.headerActions}>
-                    <button
-                        className={`${styles.optionButton} ${earringsEnabled ? styles.activeOption : ""}`}
-                        onClick={() => setEarringsEnabled(true)}
-                    >
-                        ✓
-                    </button>
-                    <button
-                        className={`${styles.optionButton} ${!earringsEnabled ? styles.activeOption : ""}`}
-                        onClick={() => setEarringsEnabled(false)}
-                    >
-                        ✕
+                        ✕ Off
                     </button>
                 </div>
             </div>
-            {earringsEnabled && (
-                <div className={styles.colorPickerContainer}>
-                    <HexColorPicker color={earringsColor} onChange={setEarringsColor} />
-                </div>
-            )}
-
-            <div className={styles.sectionHeader}>
-                <h3>Necklace</h3>
-                <div className={styles.headerActions}>
-                    <button
-                        className={`${styles.optionButton} ${necklaceEnabled ? styles.activeOption : ""}`}
-                        onClick={() => setNecklaceEnabled(true)}
-                    >
-                        ✓
-                    </button>
-                    <button
-                        className={`${styles.optionButton} ${!necklaceEnabled ? styles.activeOption : ""}`}
-                        onClick={() => setNecklaceEnabled(false)}
-                    >
-                        ✕
-                    </button>
-                </div>
-            </div>
-            {necklaceEnabled && (
-                <div className={styles.colorPickerContainer}>
-                    <HexColorPicker color={necklaceColor} onChange={setNecklaceColor} />
-                </div>
-            )}
-
-            <div className={styles.sectionHeader}>
-                <h3>Hat</h3>
-                <div className={styles.headerActions}>
-                    <button
-                        className={`${styles.optionButton} ${hatEnabled ? styles.activeOption : ""}`}
-                        onClick={() => setHatEnabled(true)}
-                    >
-                        ✓
-                    </button>
-                    <button
-                        className={`${styles.optionButton} ${!hatEnabled ? styles.activeOption : ""}`}
-                        onClick={() => setHatEnabled(false)}
-                    >
-                        ✕
-                    </button>
-                </div>
-            </div>
-            {hatEnabled && (
-                <div className={styles.colorPickerContainer}>
-                    <HexColorPicker color={hatColor} onChange={setHatColor} />
-                </div>
-            )}
-
-            <div className={styles.sectionHeader}>
-                <h3>Scarf</h3>
-                <div className={styles.headerActions}>
-                    <button
-                        className={`${styles.optionButton} ${scarfEnabled ? styles.activeOption : ""}`}
-                        onClick={() => setScarfEnabled(true)}
-                    >
-                        ✓
-                    </button>
-                    <button
-                        className={`${styles.optionButton} ${!scarfEnabled ? styles.activeOption : ""}`}
-                        onClick={() => setScarfEnabled(false)}
-                    >
-                        ✕
-                    </button>
-                </div>
-            </div>
-            {scarfEnabled && (
-                <div className={styles.colorPickerContainer}>
-                    <HexColorPicker color={scarfColor} onChange={setScarfColor} />
+            {enabled && (
+                <div style={{ marginTop: '15px' }}>
+                    <HexColorPicker color={color} onChange={setColor} />
                 </div>
             )}
         </div>
-    )
-}
+    );
+
+    return (
+        <div className={styles.tabContent}>
+            {renderAccessory("Glasses", glassesEnabled, setGlassesEnabled, glassesColor, setGlassesColor)}
+            {renderAccessory("Earrings", earringsEnabled, setEarringsEnabled, earringsColor, setEarringsColor)}
+            {renderAccessory("Necklace", necklaceEnabled, setNecklaceEnabled, necklaceColor, setNecklaceColor)}
+            {renderAccessory("Hat", hatEnabled, setHatEnabled, hatColor, setHatColor)}
+            {renderAccessory("Scarf", scarfEnabled, setScarfEnabled, scarfColor, setScarfColor)}
+        </div>
+    );
+};
 
 export default Accessories;
