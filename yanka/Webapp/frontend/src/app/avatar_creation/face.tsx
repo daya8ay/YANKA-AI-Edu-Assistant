@@ -1,7 +1,7 @@
 "use client";
 
 import React, { useState } from "react";
-import styles from "../page.module.css";
+import styles from "./avatar.module.css";
 import { HexColorPicker } from "react-colorful";
 
 const Face = () => {
@@ -18,24 +18,28 @@ const Face = () => {
 
     return (
         <div className={styles.tabContent}>
-            <h3>Eye Color</h3>
-            <div className={styles.colorPickerContainer}>
-                <HexColorPicker color={eyeColor} onChange={setEyeColor} />
+            <div className={styles.section}>
+                <h4>Eye Color</h4>
+                <div style={{ marginTop: '15px' }}>
+                    <HexColorPicker color={eyeColor} onChange={setEyeColor} />
+                </div>
             </div>
 
-            <h3>Facial Hair</h3>
-            <div className={styles.optionsGrid}>
-                {facialHairOptions.map((option) => (
-                    <button
-                        key={option.id}
-                        onClick={() => setFacialHair(option.id)}
-                        className={`${styles.optionButton} ${
-                            facialHair === option.id ? styles.activeOption : ""
-                        }`}
-                    >
-                        {option.label}
-                    </button>
-                ))}
+            <div className={styles.section}>
+                <h4>Facial Hair</h4>
+                <div className={styles.styleOptions}>
+                    {facialHairOptions.map((option) => (
+                        <button
+                            key={option.id}
+                            onClick={() => setFacialHair(option.id)}
+                            className={`${styles.styleOption} ${
+                                facialHair === option.id ? styles.selected : ""
+                            }`}
+                        >
+                            {option.label}
+                        </button>
+                    ))}
+                </div>
             </div>
         </div>
     )

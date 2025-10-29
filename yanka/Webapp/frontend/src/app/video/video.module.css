@@ -1,0 +1,21 @@
+/* Page wrapper */
+.page {
+  min-height: 100vh;
+  padding: 20px;
+  background: linear-gradient(115deg, #f8f2f2b5 0%, #8091ae 100%);
+}
+
+/* Main content area */
+.main {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 60px 20px;
+}
+
+/* Centered page title like avatar creation */
+.pageTitle {
+  font-family: 'Poppins', sans-serif;
+  font-size: 2.5rem;
+  color: #1E4386;
+  text-align: center;
+}
