@@ -20,6 +20,7 @@ export default function NavBar() {
         <Link href="/">Home</Link>
         <Link href="/avatar_creation">Avatar Creation</Link>
         <Link href="/support">Support</Link>
+        <Link href="/video">Video Creation</Link>
       </div>
     </nav>
   );
