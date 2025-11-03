@@ -87,7 +87,7 @@ CREATE TABLE LearningProgress (
 );
 
 CREATE TABLE UserAnalytics (
-    event_id SERIAL PRIMARY KEY.
+    event_id SERIAL PRIMARY KEY,
     event_type VARCHAR(50),
     details JSONB
 );
