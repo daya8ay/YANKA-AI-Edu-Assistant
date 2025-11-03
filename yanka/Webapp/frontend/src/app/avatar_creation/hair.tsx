@@ -1,12 +1,12 @@
 "use client";
 
 import React, { useState } from "react";
-import styles from "../page.module.css";
+import styles from "./avatar.module.css";
 import { HexColorPicker } from "react-colorful";
 
 const Hair = () => {
     const [hairColor, setHairColor] = useState("#ffffff");
-    const [hairLength, setHairLength] = useState("");
+    const [hairLength, setHairLength] = useState("Short");
     const [shortHairStyle, setShortHairStyle] = useState("Bob");
     const [longHairStyle, setLongHairStyle] = useState("Straight");
 
@@ -38,37 +38,57 @@ const Hair = () => {
     ];
     
     return (
-        <div>
-            <h3>Hair Length</h3>
-            <div className={styles.optionsGrid}>
-                {hairLengthOptions.map((hairLengthOption) => (
-                    <button key={hairLengthOption.id} onClick={() => setHairLength(hairLengthOption.id)} className={styles.optionButton}>
-                        {hairLengthOption.label}
-                    </button>
-                ))}
+        <div className={styles.tabContent}>
+            <div className={styles.section}>
+                <h4>Hair Length</h4>
+                <div className={styles.styleOptions}>
+                    {hairLengthOptions.map((hairLengthOption) => (
+                        <button 
+                            key={hairLengthOption.id} 
+                            onClick={() => setHairLength(hairLengthOption.id)} 
+                            className={`${styles.styleOption} ${hairLength === hairLengthOption.id ? styles.selected : ""}`}
+                        >
+                            {hairLengthOption.label}
+                        </button>
+                    ))}
+                </div>
             </div>
-            <h3>Hair Style</h3>
-            {hairLength == "Short" && (
-                <div className={styles.optionsGrid}>
-                    {shortHairStyleOptions.map((shortHairStyleOption) => (
-                        <button key={shortHairStyleOption.id} onClick={() => setShortHairStyle(shortHairStyleOption.id)} className={styles.optionButton}>
-                            {shortHairStyleOption.label}
-                        </button>
-                    ))}
+
+            <div className={styles.section}>
+                <h4>Hair Style</h4>
+                {hairLength === "Short" && (
+                    <div className={styles.styleOptions}>
+                        {shortHairStyleOptions.map((shortHairStyleOption) => (
+                            <button 
+                                key={shortHairStyleOption.id} 
+                                onClick={() => setShortHairStyle(shortHairStyleOption.id)} 
+                                className={`${styles.styleOption} ${shortHairStyle === shortHairStyleOption.id ? styles.selected : ""}`}
+                            >
+                                {shortHairStyleOption.label}
+                            </button>
+                        ))}
+                    </div>
+                )}
+                {hairLength === "Long" && (
+                    <div className={styles.styleOptions}>
+                        {longHairStyleOptions.map((longHairStyleOption) => (
+                            <button 
+                                key={longHairStyleOption.id} 
+                                onClick={() => setLongHairStyle(longHairStyleOption.id)} 
+                                className={`${styles.styleOption} ${longHairStyle === longHairStyleOption.id ? styles.selected : ""}`}
+                            >
+                                {longHairStyleOption.label}
+                            </button>
+                        ))}
+                    </div>
+                )}
+            </div>
+
+            <div className={styles.section}>
+                <h4>Hair Color</h4>
+                <div style={{ marginTop: '15px' }}>
+                    <HexColorPicker color={hairColor} onChange={setHairColor} />
                 </div>
-            )}
-            {hairLength == "Long" && (
-                <div className={styles.optionsGrid}>
-                    {longHairStyleOptions.map((longHairStyleOption) => (
-                        <button key={longHairStyleOption.id} onClick={() => setLongHairStyle(longHairStyleOption.id)} className={styles.optionButton}>
-                            {longHairStyleOption.label}
-                        </button>
-                    ))}
-                </div>
-            )}
-            <h3>Hair Color</h3>
-            <div className={styles.colorPickerContainer}>
-                <HexColorPicker color={hairColor} onChange={setHairColor} />
             </div>
         </div>
     )

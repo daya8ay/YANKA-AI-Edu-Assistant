@@ -1,0 +1,179 @@
+.signupContainer {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    width: 100%;
+    min-height: 100vh;
+    background: linear-gradient(135deg, #828793, #6c7bb7, #102153);
+    animation: fadeIn 0.8s ease;
+}
+
+@keyframes fadeIn {
+    from { 
+        opacity: 0; 
+        transform: translateY(10px); 
+    }
+    to { 
+        opacity: 1; 
+        transform: translateY(0); 
+    }
+}
+
+.signupBox {
+    background: #ffffff;
+    padding: 1rem 2rem;
+    border-radius: 12px;
+    box-shadow: 0 8px 30px rgba(0, 0, 0, 0.15);
+    max-width: 400px;
+    width: 90%;
+    text-align: center;
+}
+
+.logo {
+    width: 100px;
+    height: 100px;
+}
+
+.signupBox h1 {
+    font-weight: 700;
+    color: #0f1c44;
+    margin-bottom: 0.4rem;
+}
+
+.signupBox h1 span {
+    color: #deba42; /* gold accent */
+}
+
+.subtitle {
+    color: #555;
+    margin-bottom: 1.5rem;
+    font-size: 0.95rem;
+}
+
+.signupForm {
+    display: flex;
+    flex-direction: column;
+    gap: 1.2rem;
+}
+
+.formGroup {
+    text-align: left;
+}
+
+.formGroup label {
+    display: block;
+    font-weight: 600;
+    color: #243b82;
+    margin-bottom: 0.4rem;
+    font-size: 0.9rem;
+}
+
+.formGroup input {
+    width: 100%;
+    padding: 0.8rem;
+    border: 1px solid #ccc;
+    border-radius: 8px;
+    font-size: 0.95rem;
+    outline: none;
+    transition: 0.3s ease;
+}
+
+.formGroup input:focus {
+    border-color: #243b82;
+    box-shadow: 0 0 5px rgba(36, 59, 130, 0.3);
+}
+
+.passwordWrapper {
+    position: relative;
+}
+
+.passwordWrapper input {
+    width: 100%;
+    padding-right: 2.5rem;
+}
+
+.togglePassword {
+    position: absolute;
+    top: 50%;
+    right: 0.8rem;
+    transform: translateY(-50%);
+    cursor: pointer;
+    font-size: 1.1rem;
+    color: #555;
+}
+
+.signupBtn {
+    background: linear-gradient(135deg, #243b82, #0f1c44);
+    color: #fff;
+    padding: 0.9rem;
+    border: none;
+    border-radius: 8px;
+    font-size: 1rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: 0.3s ease;
+}
+
+.signupBtn:hover {
+    background: linear-gradient(135deg, #1b2a67, #0d1633);
+}
+
+.socialSignup {
+    margin-top: 1.5rem;
+}
+
+.socialSignup p {
+    color: #777;
+    margin-bottom: 0.7rem;
+    font-size: 0.9rem;
+}
+
+.socialIcons {
+    display: flex;
+    justify-content: center;
+    gap: 1rem;
+}
+
+.socialIcons img {
+    width: 38px;
+    height: 38px;
+    border-radius: 50%;
+    cursor: pointer;
+    transition: transform 0.3s ease;
+    border: 1px solid #ddd;
+}
+
+.socialIcons img:hover {
+    transform: scale(1.1);
+}
+
+.loginLink {
+    margin-top: 1.5rem;
+    color: #555;
+    font-size: 0.9rem;
+}
+
+.loginLink a {
+    color: #243b82;
+    font-weight: 600;
+    text-decoration: none;
+}
+
+.loginLink a:hover {
+    text-decoration: underline;
+}
+
+.homeLink {
+    margin-top: 0.8rem;
+}
+
+.homeLink a {
+    color: #555;
+    font-size: 0.85rem;
+    text-decoration: none;
+}
+
+.homeLink a:hover {
+    text-decoration: underline;
+}
+

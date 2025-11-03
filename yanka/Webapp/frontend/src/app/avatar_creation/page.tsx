@@ -1,14 +1,15 @@
 "use client";
 
 import React, { useState } from "react";
-import styles from "../page.module.css";
+import NavBar from "@/components/NavBar";
+import styles from "./avatar.module.css";
 import Face from "./face";
 import Hair from "./hair";
 import Clothing from "./clothing";
 import Accessories from "./accessories";
 
 const AvatarCreation = () => {
-  const [currentTab, setCurrentTab] = useState("Appearance");
+  const [currentTab, setCurrentTab] = useState("Face");
 
   const tabs = [
     { id: "Face", label: "Face" },
@@ -38,36 +39,39 @@ const AvatarCreation = () => {
   };
 
   return (
-    <div className={styles.page}>
-      <main className={styles.main}>
-        <h1 className={styles.pageTitle}>Create Your AI Avatar</h1>
+    <>
+      <NavBar />
+      <div className={styles.page}>
+        <main className={styles.main}>
+          <h1 className={styles.pageTitle}>Create Your AI Avatar</h1>
 
-        <div className={styles.cardRow}>
-          <div className={styles.customizationCard}>
-            <h3>Preview</h3>
-            <p style={{ color: '#666', margin: 0 }}>Coming soon</p>
-          </div>
-
-          <div className={styles.customizationCard}>
-            <div className={styles.tabs}>
-              {tabs.map((tab) => (
-                <button
-                  key={tab.id}
-                  onClick={() => setCurrentTab(tab.id)}
-                  className={`${styles.mainTabButton} ${
-                    currentTab === tab.id ? styles.activeMainTab : ""
-                  }`}
-                >
-                  {tab.label}
-                </button>
-              ))}
+          <div className={styles.cardRow}>
+            <div className={styles.customizationCard}>
+              <h3>Preview</h3>
+              <p style={{ color: '#666', margin: 0 }}>Coming soon</p>
             </div>
 
-            {renderTabContent()}
+            <div className={styles.customizationCard}>
+              <div className={styles.tabs}>
+                {tabs.map((tab) => (
+                  <button
+                    key={tab.id}
+                    onClick={() => setCurrentTab(tab.id)}
+                    className={`${styles.mainTabButton} ${
+                      currentTab === tab.id ? styles.activeMainTab : ""
+                    }`}
+                  >
+                    {tab.label}
+                  </button>
+                ))}
+              </div>
+
+              {renderTabContent()}
+            </div>
           </div>
-        </div>
-      </main>
-    </div>
+        </main>
+      </div>
+    </>
   );
 };
 
