@@ -14,8 +14,6 @@ const SupportPage = () => {
       <NavBar />
       <div className={styles.page}>
         <main className={styles.main}>
-          <h1 className={styles.pageTitle}>Hello, User!</h1>
-          {/* <p>Welcome to the Customer Support page.</p> */}
           <h2 className={styles.leftText}>How can we help?</h2>
           <input
             type="text"
@@ -23,6 +21,25 @@ const SupportPage = () => {
             className={styles.searchBox}
           />
         </main>
+          <div className={styles.suggestions}>
+            <h3>New to Yanka?</h3>
+            {/* You can add more content here */}
+        </div>
+        <div className={styles.imageRow}>
+        <div className={styles.imageItem}>
+          <img src="/pics/support-img1.jpg" alt="Image 1" />
+          <p>Getting started with Yanka</p>
+        </div>
+        <div className={styles.imageItem}>
+          <img src="/pics/support-img3.jpg" alt="Image 2" />
+          <p>Video Tutorials</p>
+        </div>
+        <div className={styles.imageItem}>
+          <img src="/pics/support-img2.webp" alt="Image 3" />
+          <p>Navigating the Yanka interface</p>
+        </div>
+      </div>
+
       </div>
     </>
   );
