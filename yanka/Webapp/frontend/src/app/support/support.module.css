@@ -23,13 +23,26 @@
       --button-secondary-hover: #1a1a1a;
     }
   }
+
+  .supportContainer {
+    height: 100vh;
+    overflow-y: auto;
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    padding: 20px 30px;
+    box-sizing: border-box;
+  }
+  
+  
   
   .main {
     display: flex;
     flex-direction: column;
-    gap: 12px;         /* spacing between heading and input */
-    padding-top: 5px;  /*add padding to push content down*/
+    gap: 12px;         
+    padding-top: 5px; 
     font-size: 30px;
+    padding-left: 50px;
   }
   
   
@@ -55,35 +68,43 @@
   
 
 .leftText {
-  text-align: left; /* ensures heading is left-aligned */
+  text-align: left;
 }
 
 .suggestions{
-  font-size: 30px;
+  font-size: 35px;
   padding-top: 100px;
+  padding-left: 50px;
 }
 
 .imageRow {
   display: flex;
-  justify-content: flex-start;  /* or center */
-  align-items: flex-start;      /* align items at top */
-  gap: 20px;                    /* spacing between items */
+  justify-content: flex-start;
+  align-items: flex-start;      
+  gap: 20px;                    
+  padding-left: 50px;
 }
 
 .imageItem {
   display: flex;
-  flex-direction: column;       /* stack image above text */
-  align-items: center;          /* center text under image */
+  flex-direction: column;      
+  align-items: center;
 }
 
 .imageItem img {
-  width: 420px;                 /* adjust size */
-  height: 300px;
+  width: 400px;                 
+  height: 280px;
   border-radius: 8px;
 }
 
 .imageItem p {
-  margin-top: 8px;              /* spacing between image and text */
-  font-size: 14px;
+  margin-top: 5px;              
+  font-size: 20px;
   text-align: center;
+  font-family:'Times New Roman', Times, serif;
+}
+
+.imageItem img:hover {
+  transform: scale(1.1);
+  cursor: pointer;
 }
