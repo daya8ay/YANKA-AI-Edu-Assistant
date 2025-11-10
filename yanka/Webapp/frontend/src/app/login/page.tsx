@@ -3,16 +3,19 @@
 import React, { useState } from "react";
 import Link from "next/link";
 import Image from "next/image";
+import { useRouter } from "next/navigation"; // ✅ Import router
 import styles from "./login.module.css";
 
 export default function Login() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+  const router = useRouter(); // ✅ Initialize router
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    // Handle login logic here
+    // For now, skip authentication
     console.log("Login:", { email, password });
+    router.push("/dashboard"); // ✅ Redirect to dashboard
   };
 
   return (
@@ -28,9 +31,11 @@ export default function Login() {
         />
 
         <h1>
-          Welcome Back to <span>YANKA</span>
+          Welcome Back
         </h1>
-        <p className={styles.subtitle}>Log in to continue your AI-powered learning journey</p>
+        <p className={styles.subtitle}>
+          Log in to your AI-powered portfolio
+        </p>
 
         <form className={styles.loginForm} onSubmit={handleSubmit}>
           <div className={styles.formGroup}>
@@ -41,7 +46,6 @@ export default function Login() {
               placeholder="Enter your email"
               value={email}
               onChange={(e) => setEmail(e.target.value)}
-              required
             />
           </div>
 
@@ -54,7 +58,6 @@ export default function Login() {
                 placeholder="Enter your password"
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
-                required
               />
             </div>
           </div>
@@ -68,35 +71,19 @@ export default function Login() {
           <p>Or continue with</p>
           <div className={styles.socialIcons}>
             <a href="#">
-              <Image 
-                src="/pics/gmail.jpeg" 
-                alt="Login with Gmail" 
-                width={38} 
-                height={38}
-              />
+              <Image src="/pics/gmail.jpeg" alt="Login with Gmail" width={38} height={38} />
             </a>
             <a href="#">
-              <Image 
-                src="/pics/fb.jpeg" 
-                alt="Login with Facebook" 
-                width={38} 
-                height={38}
-              />
+              <Image src="/pics/fb.jpeg" alt="Login with Facebook" width={38} height={38} />
             </a>
             <a href="#">
-              <Image 
-                src="/pics/linkedin.jpeg" 
-                alt="Login with LinkedIn" 
-                width={38} 
-                height={38}
-              />
+              <Image src="/pics/linkedin.jpeg" alt="Login with LinkedIn" width={38} height={38} />
             </a>
           </div>
         </div>
 
         <p className={styles.signupLink}>
-          Don&apos;t have an account?{" "}
-          <Link href="/signup">Sign Up</Link>
+          Don&apos;t have an account? <Link href="/signup">Sign Up</Link>
         </p>
 
         <p className={styles.homeLink}>
@@ -106,4 +93,3 @@ export default function Login() {
     </div>
   );
 }
-
