@@ -1,7 +1,7 @@
 "use client";
 
 import React, { useState } from "react";
-import NavBar from "@/components/NavBar";
+import DashboardNavBar from "@/components/DashboardNavBar";
 import styles from "./avatar.module.css";
 import Face from "./face";
 import Hair from "./hair";
@@ -40,7 +40,7 @@ const AvatarCreation = () => {
 
   return (
     <>
-      <NavBar />
+      <DashboardNavBar />
       <div className={styles.page}>
         <main className={styles.main}>
           <h1 className={styles.pageTitle}>Create Your AI Avatar</h1>

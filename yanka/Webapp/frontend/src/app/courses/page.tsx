@@ -2,7 +2,7 @@
 
 import React from "react";
 import Link from "next/link";
-import NavBar from "@/components/NavBar";
+import DashboardNavBar from "@/components/DashboardNavBar";
 import styles from "./courses.module.css";
 
 export default function Courses() {
@@ -41,7 +41,7 @@ export default function Courses() {
 
   return (
     <>
-      <NavBar />
+      <DashboardNavBar />
       
       <main className={styles.coursesMain}>
         <section className={styles.coursesHeader}>
