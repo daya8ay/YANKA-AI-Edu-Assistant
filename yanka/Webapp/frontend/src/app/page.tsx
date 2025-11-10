@@ -18,8 +18,8 @@ export default function Home() {
             Reimagining Education with <span>AI</span>
           </h1>
           <p>
-            YANKA unifies learning, research, and creativity into one intelligent 
-            ecosystem — built to empower students and educators worldwide.
+            Yanka unifies learning, research, and creativity into one intelligent 
+            ecosystem built to empower students and educators worldwide.
           </p>
           <div className={styles.heroButtons}>
             <Link href="/signup" className={styles.btnPrimary}>
@@ -43,9 +43,9 @@ export default function Home() {
 
       {/* Features Section */}
       <section id="features" className={styles.features}>
-        <h2>What YANKA Offers</h2>
+        <h2>What Yanka Offers</h2>
         <p className={styles.subtitle}>
-          From secondary school learning to advanced university research — all in one place.
+          From secondary school learning to advanced university research, all in one place.
         </p>
         <div className={styles.featureGrid}>
           <div className={styles.featureCard}>
@@ -57,7 +57,7 @@ export default function Home() {
           <div className={styles.featureCard}>
             <h3>AI Subject Tutors</h3>
             <p>
-              Interactive, curriculum-aligned tutoring for every subject — available anytime, anywhere.
+              Interactive, curriculum-aligned tutoring for every subject, available anytime, anywhere.
             </p>
           </div>
           <div className={styles.featureCard}>
@@ -80,7 +80,7 @@ export default function Home() {
         <div className={styles.suiteOverlay}></div>
         
         <div className={styles.suiteHeader}>
-          <h2>YANKA Academic & School Suite</h2>
+          <h2>Academic & School Suite</h2>
           <p>
             Empowering the next generation of learners through adaptive, AI-powered education.
           </p>
@@ -106,7 +106,7 @@ export default function Home() {
 
       {/* Pricing & Plans Section */}
       <section id="pricing" className={styles.pricing}>
-        <h2>Choose Your YANKA Plan</h2>
+        <h2>Choose Your Plan</h2>
         <p className={styles.subtitle}>
           Flexible plans designed for every learner, from students to institutions.
         </p>
@@ -116,12 +116,12 @@ export default function Home() {
           <div className={styles.planCard}>
             <Image 
               src="/pics/pic1.jpeg" 
-              alt="YANKA Learn" 
+              alt="Learn" 
               width={70} 
               height={70} 
               className={styles.planIcon}
             />
-            <h3>YANKA Learn</h3>
+            <h3>Learn</h3>
             <p className={styles.price}>Free</p>
             <ul>
               <li>AI chatbot access</li>
@@ -139,12 +139,12 @@ export default function Home() {
           <div className={`${styles.planCard} ${styles.highlight}`}>
             <Image 
               src="/pics/pic2.jpeg" 
-              alt="YANKA Plus" 
+              alt="Plus" 
               width={70} 
               height={70} 
               className={styles.planIcon}
             />
-            <h3>YANKA Plus</h3>
+            <h3>Plus</h3>
             <p className={styles.price}>$9.99/mo</p>
             <ul>
               <li>Unlimited AI tutor sessions</li>
@@ -154,7 +154,7 @@ export default function Home() {
               <li>Advanced study analytics</li>
             </ul>
             <Link href="/signup" className={`${styles.btnGreen} ${styles.small}`}>
-              Upgrade to YANKA Plus
+              Upgrade to Plus
             </Link>
           </div>
 
@@ -163,22 +163,22 @@ export default function Home() {
             <div className={styles.recommendedBadge}>Recommended</div>
             <Image 
               src="/pics/pic3.jpeg" 
-              alt="YANKA Scholar" 
+              alt="Scholar" 
               width={70} 
               height={70} 
               className={styles.planIcon}
             />
-            <h3>YANKA Scholar</h3>
+            <h3>Scholar</h3>
             <p className={styles.price}>$24.99/mo</p>
             <ul>
-              <li>All YANKA Plus features</li>
+              <li>All Plus features</li>
               <li>Full Academic & Research Suite</li>
               <li>Collaboration tools</li>
               <li>Priority support</li>
               <li>Document cloud backup</li>
             </ul>
             <Link href="/signup" className={`${styles.btnPurple} ${styles.small}`}>
-              Upgrade to YANKA Scholar
+              Upgrade to Scholar
             </Link>
           </div>
 
@@ -186,12 +186,12 @@ export default function Home() {
           <div className={styles.planCard}>
             <Image 
               src="/pics/pic4.jpeg" 
-              alt="YANKA Institution" 
+              alt="Institution" 
               width={70} 
               height={70} 
               className={styles.planIcon}
             />
-            <h3>YANKA Institution</h3>
+            <h3>Institution</h3>
             <p className={styles.price}>Starting at $2,499/mo</p>
             <ul>
               <li>Full academic + learning ecosystem</li>
@@ -211,7 +211,7 @@ export default function Home() {
       <section id="about" className={styles.about}>
         <h2>Building the Future of Learning</h2>
         <p>
-          YANKA is more than a tool — it&apos;s a lifelong academic companion. Our mission 
+          Yanka is more than a tool, it&apos;s a lifelong academic companion. Our mission 
           is to empower students and researchers everywhere with intelligent, ethical, 
           and inclusive AI solutions.
         </p>
