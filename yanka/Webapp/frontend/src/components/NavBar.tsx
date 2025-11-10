@@ -69,18 +69,15 @@ const NavBar: React.FC = () => {
             className={styles.logoImg}
           />
           <div className={styles.logoText}>
-            YANKA<span className={styles.dot}>.</span>
+          <span className={styles.dot}></span>
           </div>
         </Link>
         <nav>
           <ul>
             <li><Link href="/#features">Features</Link></li>
             <li><Link href="/#institutions">Institutions</Link></li>
-            <li><Link href="/courses">Courses</Link></li>
             <li><Link href="/#pricing">Pricing & Plans</Link></li>
             <li><Link href="/#about">About</Link></li>
-            <li><Link href="/avatar_creation">Avatar Creation</Link></li>
-            <li><Link href="/video">Video Creation</Link></li>
             <li><Link href="/support">Support</Link></li>
             <li><Link href="/login" className={styles.btnLogin}>Login</Link></li>
             <li><Link href="/signup" className={styles.btnSignup}>Sign Up</Link></li>

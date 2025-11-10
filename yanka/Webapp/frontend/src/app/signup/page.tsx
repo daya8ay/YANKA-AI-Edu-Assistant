@@ -3,17 +3,20 @@
 import React, { useState } from "react";
 import Link from "next/link";
 import Image from "next/image";
+import { useRouter } from "next/navigation"; // ✅ import this
 import styles from "./signup.module.css";
 
 export default function SignUp() {
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+  const router = useRouter(); // ✅ initialize router
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    // Handle signup logic here
+    // For now, skip validation and go to dashboard
     console.log("SignUp:", { name, email, password });
+    router.push("/dashboard"); // ✅ navigate to dashboard
   };
 
   return (
@@ -27,11 +30,8 @@ export default function SignUp() {
           height={100} 
           className={styles.logo}
         />
-
-        <h1>
-          Join <span>YANKA</span>
-        </h1>
-        <p className={styles.subtitle}>Empowering your academic journey with AI</p>
+        
+        <p className={styles.subtitle}>Empower your academic journey with AI</p>
 
         <form className={styles.signupForm} onSubmit={handleSubmit}>
           <div className={styles.formGroup}>
@@ -42,7 +42,6 @@ export default function SignUp() {
               placeholder="Enter your full name"
               value={name}
               onChange={(e) => setName(e.target.value)}
-              required
             />
           </div>
 
@@ -54,7 +53,6 @@ export default function SignUp() {
               placeholder="Enter your email"
               value={email}
               onChange={(e) => setEmail(e.target.value)}
-              required
             />
           </div>
 
@@ -67,7 +65,6 @@ export default function SignUp() {
                 placeholder="Create a password"
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
-                required
               />
             </div>
           </div>
@@ -81,37 +78,20 @@ export default function SignUp() {
           <p>Or sign up with</p>
           <div className={styles.socialIcons}>
             <a href="#">
-              <Image 
-                src="/pics/gmail.jpeg" 
-                alt="Sign up with Gmail" 
-                width={38} 
-                height={38}
-              />
+              <Image src="/pics/gmail.jpeg" alt="Gmail" width={38} height={38} />
             </a>
             <a href="#">
-              <Image 
-                src="/pics/fb.jpeg" 
-                alt="Sign up with Facebook" 
-                width={38} 
-                height={38}
-              />
+              <Image src="/pics/fb.jpeg" alt="Facebook" width={38} height={38} />
             </a>
             <a href="#">
-              <Image 
-                src="/pics/linkedin.jpeg" 
-                alt="Sign up with LinkedIn" 
-                width={38} 
-                height={38}
-              />
+              <Image src="/pics/linkedin.jpeg" alt="LinkedIn" width={38} height={38} />
             </a>
           </div>
         </div>
 
         <p className={styles.loginLink}>
-          Already have an account?{" "}
-          <Link href="/login">Log in</Link>
+          Already have an account? <Link href="/login">Log in</Link>
         </p>
-
         <p className={styles.homeLink}>
           <Link href="/">← Back to Home</Link>
         </p>
@@ -119,4 +99,3 @@ export default function SignUp() {
     </div>
   );
 }
-

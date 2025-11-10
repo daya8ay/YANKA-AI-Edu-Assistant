@@ -1,0 +1,97 @@
+.navbar {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 18px 60px;
+  background-color: #ffffff;
+  position: sticky;
+  top: 0;
+  z-index: 1000;
+  box-shadow: 0 2px 12px rgba(30, 67, 134, 0.08);
+  transition: transform 0.3s ease;
+}
+
+.navbar.scrollDown {
+  transform: translateY(-100%);
+}
+
+.logoContainer {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  text-decoration: none;
+}
+
+.logoImg {
+  width: 60px;
+  height: 50px;
+  object-fit: contain;
+}
+
+.logoText {
+  font-family: 'Poppins', sans-serif;
+  font-weight: 700;
+  font-size: 1.6rem;
+  color: #1E4386;
+}
+
+.navbar ul {
+  list-style: none;
+  display: flex;
+  gap: 24px;
+  align-items: center;
+}
+
+.navbar a {
+  text-decoration: none;
+  color: #1E4386;
+  font-weight: 500;
+  transition: color 0.3s;
+}
+
+.navbar a:hover {
+  color: #4678CC;
+}
+
+.logoutBtn {
+  border: 1px solid #1E4386;
+  color: #1E4386;
+  padding: 8px 16px;
+  border-radius: 6px;
+  transition: all 0.3s;
+}
+
+.logoutBtn:hover {
+  background: #1E4386;
+  color: white;
+}
+
+.userAvatar {
+  border-radius: 50%;
+  border: 2px solid #1E4386;
+  cursor: pointer;
+  transition: transform 0.2s ease;
+}
+
+.userAvatar:hover {
+  transform: scale(1.1);
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+  .navbar {
+    flex-direction: column;
+    align-items: flex-start;
+    padding: 16px 24px;
+  }
+
+  .navbar ul {
+    flex-wrap: wrap;
+    gap: 16px;
+    margin-top: 10px;
+  }
+
+  .logoText {
+    font-size: 1.3rem;
+  }
+}
