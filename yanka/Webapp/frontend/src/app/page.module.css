@@ -4,7 +4,7 @@
     align-items: center;
     justify-content: space-between;
     padding: 80px 100px;
-    background: linear-gradient(115deg, #ffffff 0%, #8091ae 100%);
+    background: linear-gradient(115deg, #ffffff 0%, #4c7fe0 100%);
 }
 
 .heroContent {
@@ -14,17 +14,17 @@
 .heroContent h1 {
     font-family: 'Poppins', sans-serif;
     font-size: 2.8rem;
-    color: #1E4386;
+    color: #0047ac;
 }
 
 .heroContent h1 span {
-    color: #2E5AA8;
+    color: #4c7fe0;
 }
 
 .heroContent p {
     margin-top: 20px;
     line-height: 1.6;
-    color: #3B4F8E;
+    color: #003a8a;
 }
 
 .heroButtons {
@@ -43,21 +43,21 @@
 }
 
 .btnPrimary {
-    background: #1E4386;
+    background: #0047ac;
     color: white;
 }
 
 .btnPrimary:hover {
-    background: #2E5AA8;
+   background: #003a8a;
 }
 
 .btnSecondary {
-    border: 1px solid #1E4386;
-    color: #1E4386;
+    border: 1px solid #0047ac;
+    color: #0047ac;
 }
 
 .btnSecondary:hover {
-    background: #1E4386;
+    background: #0047ac;
     color: white;
 }
 
@@ -70,7 +70,7 @@
     width: 100%;
     height: auto;
     border-radius: 12px;
-    box-shadow: 0 8px 20px rgba(30, 67, 134, 0.1);
+    box-shadow: 0 8px 20px rgba(0, 71, 172, 0.1);
     animation: fadeInUp 1s ease-in-out;
 }
 
@@ -96,11 +96,11 @@
 .features h2 {
     font-family: 'Poppins', sans-serif;
     font-size: 2rem;
-    color: #1E4386;
+    color: #0047ac;
 }
 
 .subtitle {
-    color: #3B4F8E;
+    color: #003a8a;
     margin: 10px 0 40px 0;
 }
 
@@ -114,13 +114,13 @@
     background: white;
     padding: 30px;
     border-radius: 10px;
-    box-shadow: 0 4px 12px rgba(30, 67, 134, 0.08);
+    box-shadow: 0 4px 12px rgba(0, 71, 172, 0.08);
     transition: transform 0.3s, box-shadow 0.3s;
 }
 
 .featureCard:hover {
     transform: translateY(-6px);
-    box-shadow: 0 8px 16px rgba(30, 67, 134, 0.12);
+    box-shadow: 0 8px 16px rgba(0, 71, 172, 0.12);
 }
 
 /* ---------- Academic Suite ---------- */
@@ -137,8 +137,7 @@
     content: "";
     position: absolute;
     inset: 0;
-    background: linear-gradient(135deg, #1E4386 0%, #2E5AA8 50%, #4678CC 100%);
-    filter: blur(6px) brightness(0.8);
+    background: linear-gradient(#0547a4 0%, #0047ac 50%, #88a5db 100%);
     z-index: 0;
 }
 
@@ -210,20 +209,20 @@
 
 .suiteCard:hover h3,
 .suiteCard:hover p {
-    color: #0a2540;
+    color: #002c6b;
 }
 
 /* ---------- Pricing Section ---------- */
 .pricing {
     text-align: center;
     padding: 100px 60px;
-    background: linear-gradient(115deg, #ffffff 0%, #b3c4e2 100%);
+    background: linear-gradient(115deg, #ffffff 0%, #a3b8df 100%);
 }
 
 .pricing h2 {
     font-family: 'Poppins', sans-serif;
     font-size: 2.2rem;
-    color: #1E4386;
+    color: #0047ac;
 }
 
 .pricingGrid {
@@ -249,23 +248,23 @@
 .planCard ul {
     list-style: none;
     padding-left: 0;
-    color: #3B4F8E;
+    color: #003a8a;
     text-align: left;
     margin-top: 15px;
 }
 
 .planCard:hover {
     transform: translateY(-6px);
-    box-shadow: 0 8px 20px rgba(30, 67, 134, 0.12);
+    box-shadow: 0 8px 20px rgba(0, 71, 172, 0.12);
 }
 
 .planCard.highlight {
-    border: 2px solid #2E5AA8;
+    border: 2px solid #0047ac;
     background: #F5F9FF;
 }
 
 .planCard.recommended {
-    border: 2px solid #6B5DEB;
+    border: 2px solid #4c7fe0;
     background: #F3F1FF;
 }
 
@@ -280,7 +279,7 @@
     position: absolute;
     top: -12px;
     right: -12px;
-    background: #6B5DEB;
+    background: #0047ac;
     color: white;
     font-size: 0.8rem;
     font-weight: 600;
@@ -291,7 +290,7 @@
 .price {
     font-size: 1.6rem;
     font-weight: 700;
-    color: #1E4386;
+    color: #0047ac;
     margin: 10px 0 20px;
 }
 
@@ -315,31 +314,31 @@
 
 /* Button colors */
 .btnPrimary.small {
-    background: #1E4386;
+    background: #0047ac;
     color: white;
 }
 
 .btnSecondary.small {
     border: 1px solid #1E4386;
-    color: #1E4386;
+    color: #142d5c;
 }
 
 .btnSecondary.small:hover {
-    background: #1E4386;
+    background: #2868c2;
     color: white;
 }
 
 .btnGreen.small {
-    background: #28a745;
+    background: #218838;
     color: white;
 }
 
 .btnGreen.small:hover {
-    background: #218838;
+    background: #28a745;
 }
 
 .btnPurple.small {
-    background: #6B5DEB;
+    background: #3c3099;
     color: white;
 }
 

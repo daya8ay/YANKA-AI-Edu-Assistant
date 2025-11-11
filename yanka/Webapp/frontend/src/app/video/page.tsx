@@ -1,7 +1,7 @@
 "use client";
 
 import React, { useState } from "react";
-import NavBar from "@/components/NavBar";
+import DashboardNavBar from "@/components/DashboardNavBar";
 import styles from "../page.module.css";
 
 const VideoCreation = () => {
@@ -27,7 +27,7 @@ const VideoCreation = () => {
 
   return (
     <>
-      <NavBar />
+      <DashboardNavBar />
       <div className={styles.page} style={{ marginTop: "100px" }}>
         <main className={styles.main} style={{ display: "flex", gap: "2rem", width: "100%" }}>
           <div
