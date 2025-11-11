@@ -9,7 +9,7 @@
     display: flex;
     flex-direction: column;
     min-height: 100svh;
-    padding: 40px 80px;
+    padding: 30px 30px;
     font-family: var(--font-geist-sans);
   }
   
@@ -23,10 +23,28 @@
       --button-secondary-hover: #1a1a1a;
     }
   }
+
+  .supportContainer {
+    height: 100vh;
+    overflow-y: auto;
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    padding: 20px 30px;
+    box-sizing: border-box;
+  }
+  
+  
   
   .main {
-    text-align: center;
+    display: flex;
+    flex-direction: column;
+    gap: 12px;         
+    padding-top: 5px; 
+    font-size: 30px;
+    padding-left: 50px;
   }
+  
   
   .pageTitle {
     font-size: 2rem;
@@ -34,23 +52,162 @@
   }
 
   .searchBox {
-    width: 100%;             
-    padding: 0.8rem 1rem;             
-    font-size: 1.1rem;        
-    margin-top: 0.5rem;
-    border: 1px solid #ccc;   
-    border-radius: 8px;
-    background-color: #ffffff; 
-    color: #000000;           
+    display: block;
+    width: 1000px;                     
+    height: 50px;                    
+    padding: 8px 12px;
+    font-size: 16px;
+    border: 1.5px solid var(--gray-alpha-200); 
+    border-radius: 4px;
+    margin-top: 12px;
+    text-align: left;
+    background-color: #adc3de; 
+    color: #000000;             
     box-sizing: border-box;
-    min-height: 3rem;         
   }
   
-  .searchBox:focus {
-    outline: none;
-    border-color: #0070f3; 
-    box-shadow: 0 0 0 2px rgba(0, 112, 243, 0.2);
+
+.leftText {
+  text-align: left;
+}
+
+.suggestions{
+  font-size: 35px;
+  padding-top: 100px;
+  padding-left: 50px;
+}
+
+.imageRow {
+  display: flex;
+  justify-content: flex-start;
+  align-items: flex-start;      
+  gap: 20px;                    
+  padding-left: 50px;
+}
+
+.imageItem {
+  display: flex;
+  flex-direction: column;      
+  align-items: center;
+}
+
+.imageItem img {
+  width: 400px;                 
+  height: 280px;
+  border-radius: 8px;
+}
+
+.imageItem p {
+  margin-top: 5px;              
+  font-size: 20px;
+  text-align: center;
+  font-family:'Times New Roman', Times, serif;
+}
+
+.imageItem img:hover {
+  transform: scale(1.1);
+  cursor: pointer;
+}
+
+.chatButton {
+  position: fixed;
+  bottom: 20px;
+  right: 20px;
+  width: 60px;
+  height: 60px;
+  border-radius: 50%;
+  background-color: #0070f3;
+  color: white;
+  font-size: 24px;
+  border: none;
+  cursor: pointer;
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
+  transition: transform 0.2s ease, background-color 0.3s ease;
+  z-index: 1000;
+}
+
+.chatButton:hover {
+  background-color: #005bb5;
+  transform: scale(1.05);
+}
+
+.chatBox {
+  position: fixed;
+  bottom: 90px;
+  right: 20px;
+  width: 280px;
+  height: 380px;
+  background: white;
+  border: 1px solid #ddd;
+  border-radius: 12px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  z-index: 1000;
+  animation: fadeInUp 0.3s ease;
+}
+
+.messages {
+  padding: 10px;
+  flex: 1; 
+  overflow-y: auto;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.userMessage {
+  align-self: flex-start;
+  background-color: #f0f0f0;
+  color: #333;
+  padding: 8px 12px;
+  border-radius: 12px;
+  max-width: 80%;
+}
+
+.botMessage {
+  align-self: flex-end;
+  background-color: #0070f3;
+  color: white;
+  padding: 8px 12px;
+  border-radius: 12px;
+  max-width: 80%;
+}
+
+.inputArea {
+  display: flex;
+  border-top: 1px solid #ddd;
+}
+
+.inputArea input {
+  flex: 1;
+  border: none;
+  padding: 10px;
+  font-size: 14px;
+  outline: none;
+}
+
+.inputArea button {
+  background-color: #0070f3;
+  color: white;
+  border: none;
+  padding: 0 16px;
+  cursor: pointer;
+  font-weight: 500;
+}
+
+.inputArea button:hover {
+  background-color: #005bb5;
+}
+
+@keyframes fadeInUp {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
   }
-  
-  
-  
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
