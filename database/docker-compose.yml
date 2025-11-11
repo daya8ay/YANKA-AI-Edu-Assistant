@@ -1,0 +1,14 @@
+services:
+  db:
+    image: postgres:16
+    restart: always
+    container_name: yanka_postgres_db
+    environment:
+      POSTGRES_USER: yanka_user
+      POSTGRES_PASSWORD: yanka_password
+      POSTGRES_DB: yanka_dev
+    ports:
+      - "5432:5432"
+    volumes:
+      - ./db-data:/var/lib/postgresql/data
+      - ./init.sql:/docker-entrypoint-initdb.d/init.sql
