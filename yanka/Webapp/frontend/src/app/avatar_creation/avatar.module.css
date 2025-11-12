@@ -23,6 +23,7 @@
   grid-template-columns: 1fr 2fr;
   gap: 30px;
   margin-top: 30px;
+  align-items: start;
 }
 
 .customizationCard {
@@ -33,7 +34,18 @@
   min-height: 500px;
 }
 
-.customizationCard h3 {
+.previewCard {
+  background: white;
+  border-radius: 16px;
+  padding: 30px;
+  box-shadow: 0 4px 12px rgba(30, 67, 134, 0.1);
+  height: 500px;
+  display: flex;
+  flex-direction: column;
+}
+
+.customizationCard h3,
+.previewCard h3 {
   font-family: 'Poppins', sans-serif;
   font-size: 1.5rem;
   color: #1E4386;
@@ -44,7 +56,7 @@
 .tabs {
   display: flex;
   gap: 10px;
-  margin-bottom: 30px;
+  margin-bottom: 10px;
   border-bottom: 2px solid #E6EEFF;
   padding-bottom: 10px;
 }
@@ -86,6 +98,51 @@
 /* Tab Content */
 .tabContent {
   padding: 20px 0;
+}
+
+/* Sub Tabs */
+.subTabs {
+  display: flex;
+  gap: 6px;
+  margin-bottom: 20px;
+  border-bottom: 1px solid #E6EEFF;
+  padding-bottom: 6px;
+}
+
+.subTabButton {
+  padding: 6px 12px;
+  background: transparent;
+  border: none;
+  font-size: 0.8rem;
+  font-weight: 500;
+  color: #6B7FA8;
+  cursor: pointer;
+  border-radius: 4px;
+  transition: all 0.2s;
+  position: relative;
+}
+
+.subTabButton:hover {
+  background: #F5F8FD;
+  color: #3B4F8E;
+}
+
+.activeSubTab {
+  background: #F0F4FB;
+  color: #1E4386;
+  font-weight: 600;
+  font-size: 0.82rem;
+}
+
+.activeSubTab::after {
+  content: '';
+  position: absolute;
+  bottom: -7px;
+  left: 12px;
+  right: 12px;
+  height: 2px;
+  background: #2E5AA8;
+  border-radius: 2px;
 }
 
 .section {
@@ -156,6 +213,72 @@
 .styleOption.selected {
   background: #E6EEFF;
   border-color: #2E5AA8;
+  color: #1E4386;
+  font-weight: 600;
+}
+
+/* Image Options */
+.imageOptions {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(100px, 1fr));
+  gap: 15px;
+  margin-top: 10px;
+}
+
+.imageOption {
+  padding: 10px;
+  background: #F5F8FD;
+  border: 3px solid transparent;
+  border-radius: 12px;
+  cursor: pointer;
+  text-align: center;
+  transition: all 0.3s;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 8px;
+  min-height: 100px;
+  position: relative;
+}
+
+.imageOption:hover {
+  background: #E6EEFF;
+  border-color: #6B7FA8;
+  transform: translateY(-2px);
+  box-shadow: 0 4px 8px rgba(30, 67, 134, 0.15);
+}
+
+.imageOption.selected {
+  background: #E6EEFF;
+  border-color: #2E5AA8;
+  box-shadow: 0 4px 12px rgba(30, 67, 134, 0.2);
+}
+
+.imageOption.noneOption {
+  justify-content: center;
+  font-weight: 500;
+  color: #3B4F8E;
+}
+
+.imageOption.noneOption.selected {
+  color: #1E4386;
+  font-weight: 600;
+}
+
+.optionImage {
+  width: 80px;
+  height: 80px;
+  object-fit: contain;
+  filter: drop-shadow(0 2px 4px rgba(0, 0, 0, 0.1));
+}
+
+.optionLabel {
+  font-size: 0.85rem;
+  color: #3B4F8E;
+  font-weight: 500;
+}
+
+.imageOption.selected .optionLabel {
   color: #1E4386;
   font-weight: 600;
 }
@@ -285,6 +408,115 @@
   
   .styleOptions {
     grid-template-columns: repeat(auto-fill, minmax(100px, 1fr));
+  }
+}
+
+/* Chat Button and Box */
+.chatButton {
+  position: fixed;
+  bottom: 20px;
+  right: 20px;
+  width: 60px;
+  height: 60px;
+  border-radius: 50%;
+  background-color: #1e4386;
+  color: white;
+  font-size: 24px;
+  border: none;
+  cursor: pointer;
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.25);
+  transition: transform 0.2s ease, background-color 0.3s ease;
+  z-index: 1000;
+}
+
+.chatButton:hover {
+  background-color: #003366;
+  transform: scale(1.05);
+}
+
+.chatBox {
+  position: fixed;
+  bottom: 90px;
+  right: 20px;
+  width: 300px;
+  height: 400px;
+  background: white;
+  border: 1px solid #ddd;
+  border-radius: 12px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  z-index: 1000;
+  animation: fadeInUp 0.3s ease;
+}
+
+.messages {
+  padding: 10px;
+  flex: 1;
+  overflow-y: auto;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.userMessage {
+  align-self: flex-end;
+  background-color: #1e4386;
+  color: white;
+  padding: 8px 12px;
+  border-radius: 12px 12px 0 12px;
+  max-width: 80%;
+  font-size: 14px;
+  line-height: 1.4;
+}
+
+.botMessage {
+  align-self: flex-start;
+  background-color: #f1f1f1;
+  color: #333;
+  padding: 8px 12px;
+  border-radius: 12px 12px 12px 0;
+  max-width: 80%;
+  font-size: 14px;
+  line-height: 1.4;
+}
+
+.inputArea {
+  display: flex;
+  border-top: 1px solid #ddd;
+}
+
+.inputArea input {
+  flex: 1;
+  border: none;
+  padding: 10px;
+  font-size: 14px;
+  outline: none;
+}
+
+.inputArea button {
+  background-color: #1e4386;
+  color: white;
+  border: none;
+  padding: 0 16px;
+  cursor: pointer;
+  font-weight: 500;
+  transition: background-color 0.2s ease;
+}
+
+.inputArea button:hover {
+  background-color: #003366;
+}
+
+@keyframes fadeInUp {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
   }
 }
 

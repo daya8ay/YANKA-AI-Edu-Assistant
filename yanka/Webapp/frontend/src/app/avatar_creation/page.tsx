@@ -7,6 +7,7 @@ import Face from "./face";
 import Hair from "./hair";
 import Clothing from "./clothing";
 import Accessories from "./accessories";
+import AvatarChat from "./AvatarChat";
 
 const AvatarCreation = () => {
   const [currentTab, setCurrentTab] = useState("Face");
@@ -46,7 +47,7 @@ const AvatarCreation = () => {
           <h1 className={styles.pageTitle}>Create Your AI Avatar</h1>
 
           <div className={styles.cardRow}>
-            <div className={styles.customizationCard}>
+            <div className={styles.previewCard}>
               <h3>Preview</h3>
               <p style={{ color: '#666', margin: 0 }}>Coming soon</p>
             </div>
@@ -71,6 +72,8 @@ const AvatarCreation = () => {
           </div>
         </main>
       </div>
+
+      <AvatarChat />
     </>
   );
 };
