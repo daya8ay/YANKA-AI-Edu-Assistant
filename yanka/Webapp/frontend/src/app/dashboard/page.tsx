@@ -3,6 +3,7 @@
 import React from "react";
 import DashboardNavBar from "@/components/DashboardNavBar";
 import Image from "next/image";
+import Footer from "@/components/Footer"; // ✅ Import Footer component
 import styles from "./page.module.css";
 
 export default function Dashboard() {
@@ -107,6 +108,8 @@ export default function Dashboard() {
   </div>
 </section>
       </main>
+      {/* ✅ Footer at the bottom */}
+      <Footer />
     </>
   );
 }

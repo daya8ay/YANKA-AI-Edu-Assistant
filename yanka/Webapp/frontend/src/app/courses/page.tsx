@@ -3,6 +3,7 @@
 import React from "react";
 import Link from "next/link";
 import DashboardNavBar from "@/components/DashboardNavBar";
+import Footer from "@/components/Footer"; // ✅ import the shared Footer
 import styles from "./courses.module.css";
 
 export default function Courses() {
@@ -72,18 +73,8 @@ export default function Courses() {
           </Link>
         </section>
       </main>
-
-      {/* Footer */}
-      <footer className={styles.footer}>
-        <div className={styles.footerContent}>
-          <p>© 2025 YANKA | Powered by Kimuntu Power Inc.</p>
-          <div className={styles.footerLinks}>
-            <Link href="#">Privacy Policy</Link>
-            <Link href="#">Terms of Service</Link>
-            <Link href="#">Licensing</Link>
-          </div>
-        </div>
-      </footer>
+      {/* ✅ Global Footer */}
+      <Footer />
     </>
   );
 }

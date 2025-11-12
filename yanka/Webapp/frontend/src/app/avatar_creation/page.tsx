@@ -2,6 +2,7 @@
 
 import React, { useState } from "react";
 import DashboardNavBar from "@/components/DashboardNavBar";
+import Footer from "@/components/Footer"; // ✅ Import Footer component
 import styles from "./avatar.module.css";
 import Face from "./face";
 import Hair from "./hair";
@@ -74,6 +75,8 @@ const AvatarCreation = () => {
       </div>
 
       <AvatarChat />
+      {/* ✅ Footer at the bottom */}
+      <Footer />
     </>
   );
 };

@@ -4,6 +4,7 @@ import React from "react";
 import Link from "next/link";
 import Image from "next/image";
 import NavBar from "@/components/NavBar";
+import Footer from "@/components/Footer"; // ✅ Import your Footer component
 import styles from "./page.module.css";
 
 export default function Home() {
@@ -207,6 +208,61 @@ export default function Home() {
         </div>
       </section>
 
+{/* Blog / Insights Section */}
+<section className={styles.blogs} id="blogs">
+  <h2>From Our Learners</h2>
+  <p className={styles.subtitle}>
+    Thoughts, insights, and stories from our learners and educators.
+  </p>
+
+  <div className={styles.blogCarousel}>
+    {[
+      {
+        user: "Emma Johnson",
+        handle: "@emma_learning",
+        text: "YANKA helped me summarize 40 pages of research into key insights in minutes. Game changer for thesis writing!",
+        time: "2h ago",
+      },
+      {
+        user: "Liam Carter",
+        handle: "@liam_studies",
+        text: "The AI tutor adjusts perfectly to my pace — it feels like a personal mentor guiding me through complex topics.",
+        time: "5h ago",
+      },
+      {
+        user: "Sophia Lee",
+        handle: "@sophia_reads",
+        text: "The new video lesson feature is amazing! It made my presentations more interactive and fun.",
+        time: "1d ago",
+      },
+      {
+        user: "Ethan Wright",
+        handle: "@ethan_creates",
+        text: "Created my first AI-assisted research draft today using YANKA. It’s efficient, intuitive, and powerful!",
+        time: "3d ago",
+      },
+      {
+        user: "Olivia Brown",
+        handle: "@olivia_inspires",
+        text: "Education should be intelligent, accessible, and inclusive — that’s exactly what YANKA is building.",
+        time: "1w ago",
+      },
+    ].map((post, i) => (
+      <div key={i} className={styles.blogCard}>
+        <div className={styles.blogHeader}>
+          <div className={styles.avatar}></div>
+          <div>
+            <h4>{post.user}</h4>
+            <p>{post.handle}</p>
+          </div>
+        </div>
+        <p className={styles.blogText}>{post.text}</p>
+        <span className={styles.blogTime}>{post.time}</span>
+      </div>
+    ))}
+  </div>
+</section>
+
       {/* About Section */}
       <section id="about" className={styles.about}>
         <h2>Building the Future of Learning</h2>
@@ -221,21 +277,12 @@ export default function Home() {
           target="_blank"
           rel="noopener noreferrer"
         >
-          Read More
+           Read More
         </a>
       </section>
 
       {/* Footer */}
-      <footer className={styles.footer}>
-        <div className={styles.footerContent}>
-          <p>© 2025 YANKA | Powered by Kimuntu Power Inc.</p>
-          <div className={styles.footerLinks}>
-            <Link href="#">Privacy Policy</Link>
-            <Link href="#">Terms of Service</Link>
-            <Link href="#">Licensing</Link>
-          </div>
-        </div>
-      </footer>
+      <Footer />
     </>
   );
 }

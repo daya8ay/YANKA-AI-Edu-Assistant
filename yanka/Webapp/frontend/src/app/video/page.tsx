@@ -2,6 +2,7 @@
 
 import React, { useState } from "react";
 import DashboardNavBar from "../../components/DashboardNavBar";
+import Footer from "@/components/Footer"; // ✅ import the shared Footer
 import VideoChat from "./VideoChat";
 import styles from "../page.module.css";
 
@@ -273,6 +274,8 @@ const VideoCreation = () => {
       </div>
 
       <VideoChat />
+      {/* ✅ Shared Footer at the bottom */}
+      <Footer />
     </>
   );
 };

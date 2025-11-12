@@ -77,6 +77,7 @@ const NavBar: React.FC = () => {
             <li><Link href="/#features">Features</Link></li>
             <li><Link href="/#institutions">Institutions</Link></li>
             <li><Link href="/#pricing">Pricing & Plans</Link></li>
+            <li><Link href="/#blogs">From Our Learners</Link></li> {/* ✅ Updated link */}
             <li><Link href="/#about">About</Link></li>
             <li><Link href="/support">Support</Link></li>
             <li><Link href="/login" className={styles.btnLogin}>Login</Link></li>
