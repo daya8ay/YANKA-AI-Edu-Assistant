@@ -7,6 +7,7 @@ import Face from "./face";
 import Hair from "./hair";
 import Clothing from "./clothing";
 import Accessories from "./accessories";
+import AvatarChat from "./AvatarChat";
 
 const AvatarCreation = () => {
   const [currentTab, setCurrentTab] = useState("Face");
@@ -71,6 +72,8 @@ const AvatarCreation = () => {
           </div>
         </main>
       </div>
+
+      <AvatarChat />
     </>
   );
 };
