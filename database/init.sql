@@ -39,7 +39,6 @@ CREATE TABLE User_Organizations (
     PRIMARY KEY (user_id, organization_id)
 );
 
--- 2. Content & AI Generation
 CREATE TABLE SourceContent (
     content_id SERIAL PRIMARY KEY,
     creator_id INTEGER NOT NULL REFERENCES Users(user_id),

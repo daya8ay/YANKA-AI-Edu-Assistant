@@ -370,33 +370,97 @@
     margin: 0 auto 30px;
 }
 
-/* ---------- Footer ---------- */
-.footer {
-    background: #1E4386;
-    color: white;
-    padding: 20px 60px;
+/* ---------- Blogs / Insights Section ---------- */
+.blogs {
+  padding: 100px 60px;
+  background: #f9fbff;
+  text-align: center;
 }
 
-.footerContent {
-    display: flex;
-    justify-content: space-between;
-    flex-wrap: wrap;
-    align-items: center;
+.blogs h2 {
+  font-family: "Poppins", sans-serif;
+  font-size: 2rem;
+  color: #0047ac;
+  margin-bottom: 10px;
 }
 
-.footerLinks {
-    display: flex;
-    gap: 20px;
+.blogCarousel {
+  display: flex;
+  overflow-x: auto;
+  scroll-snap-type: x mandatory;
+  gap: 20px;
+  padding: 30px 0;
+  scrollbar-width: thin;
 }
 
-.footerLinks a {
-    color: #DCE6F7;
-    text-decoration: none;
-    transition: color 0.3s;
+.blogCarousel::-webkit-scrollbar {
+  height: 8px;
 }
 
-.footerLinks a:hover {
-    color: white;
+.blogCarousel::-webkit-scrollbar-thumb {
+  background-color: rgba(0, 71, 172, 0.3);
+  border-radius: 10px;
+}
+
+.blogCard {
+  background: white;
+  flex: 0 0 320px;
+  border-radius: 12px;
+  box-shadow: 0 2px 10px rgba(0, 71, 172, 0.08);
+  padding: 20px;
+  scroll-snap-align: start;
+  text-align: left;
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+.blogCard:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 6px 18px rgba(0, 71, 172, 0.12);
+}
+
+.blogHeader {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-bottom: 12px;
+}
+
+.avatar {
+  width: 42px;
+  height: 42px;
+  border-radius: 50%;
+  background: linear-gradient(135deg, #0047ac, #4c7fe0);
+}
+
+.blogHeader h4 {
+  margin: 0;
+  color: #1e3a8a;
+  font-weight: 600;
+  font-size: 1rem;
+}
+
+.blogHeader p {
+  margin: 0;
+  color: #6b7280;
+  font-size: 0.85rem;
+}
+
+.blogText {
+  color: #374151;
+  font-size: 0.95rem;
+  line-height: 1.5;
+  margin-bottom: 10px;
+  font-family: "Inter", sans-serif;
+}
+
+.blogTime {
+  font-size: 0.8rem;
+  color: #9ca3af;
+}
+
+.blogCarousel {
+  scroll-behavior: smooth;
+  -webkit-overflow-scrolling: touch;
 }
 
 /* ---------- Responsive ---------- */
