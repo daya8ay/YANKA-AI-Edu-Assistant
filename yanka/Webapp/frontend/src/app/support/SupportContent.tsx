@@ -33,7 +33,7 @@ const SupportContent: React.FC = () => {
       </main>
 
       <div className={styles.suggestions}>
-        <h3>New to Yanka?</h3>
+        <h3>New?</h3>
       </div>
 
       <div className={styles.imageRow}>
@@ -41,7 +41,7 @@ const SupportContent: React.FC = () => {
           <Link href="/#pricing">
             <img src="/pics/support-img1.jpg" alt="Image 1" />
           </Link>
-          <p>Getting started with Yanka</p>
+          <p>Getting started</p>
         </div>
         <div className={styles.imageItem}>
           <img src="/pics/support-img3.jpg" alt="Image 2" />
@@ -49,7 +49,7 @@ const SupportContent: React.FC = () => {
         </div>
         <div className={styles.imageItem}>
           <img src="/pics/support-img2.webp" alt="Image 3" />
-          <p>Navigating the Yanka interface</p>
+          <p>Navigating the interface</p>
         </div>
       </div>
 

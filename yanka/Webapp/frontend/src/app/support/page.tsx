@@ -9,11 +9,13 @@ export const metadata = {
 
 export default function SupportPage() {
   return (
-    <>
+    <div className={styles.pageWrapper}>
       <NavBar />
-      <div className={styles.supportContainer}>
+
+      <div className={styles.page}>
         <SupportContent />
       </div>
-    </>
+    </div>
   );
 }
+
