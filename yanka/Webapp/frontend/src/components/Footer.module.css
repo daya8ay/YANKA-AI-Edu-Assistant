@@ -1,7 +1,7 @@
 .footer {
-  background: linear-gradient(180deg, #002b6d 0%, #0156b7 100%);
+  background: #0041ad;
   color: #f4f8ff;
-  padding: 60px 80px 30px;
+  padding: 40px 80px 30px;
   font-family: 'Inter', sans-serif;
 }
 
@@ -14,6 +14,7 @@
 
 .logoSection {
   display: flex;
+  justify-content: center; 
   align-items: center;
   gap: 12px;
 }

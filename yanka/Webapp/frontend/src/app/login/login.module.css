@@ -4,7 +4,7 @@
     align-items: center;
     width: 100%;
     min-height: 100vh;
-    background: linear-gradient(135deg, #828793, #6c7bb7, #102153);
+    background: #0041ad;
     animation: fadeIn 0.8s ease;
 }
 
@@ -30,19 +30,14 @@
 }
 
 .logo {
-    width: 100px;
+    width: 130px;
     height: 100px;
-    margin-bottom: 1rem;
 }
 
 .loginBox h1 {
     font-weight: 700;
-    color: #0f1c44;
+    color: #0041ad;
     margin-bottom: 0.4rem;
-}
-
-.loginBox h1 span {
-    color: #deba42; /* gold accent */
 }
 
 .subtitle {
@@ -104,7 +99,7 @@
 }
 
 .loginBtn {
-    background: linear-gradient(135deg, #243b82, #0f1c44);
+    background: #0041ad;
     color: #fff;
     padding: 0.9rem;
     border: none;
