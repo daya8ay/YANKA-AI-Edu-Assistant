@@ -42,68 +42,125 @@ export default function Home() {
         </div>
       </section>
 
-      {/* Features Section */}
-      <section id="features" className={styles.features}>
-        <h2>What Yanka Offers</h2>
-        <p className={styles.subtitle}>
-          From secondary school learning to advanced university research, all in one place.
-        </p>
-        <div className={styles.featureGrid}>
-          <div className={styles.featureCard}>
-            <h3>AI Study Companion</h3>
-            <p>
-              Personalized study plans, adaptive progress tracking, and smart reminders to stay ahead.
-            </p>
-          </div>
-          <div className={styles.featureCard}>
-            <h3>AI Subject Tutors</h3>
-            <p>
-              Interactive, curriculum-aligned tutoring for every subject, available anytime, anywhere.
-            </p>
-          </div>
-          <div className={styles.featureCard}>
-            <h3>Research Suite</h3>
-            <p>
-              Thesis Builder, Literature Review Assistant, and Plagiarism Shield for academic excellence.
-            </p>
-          </div>
-          <div className={styles.featureCard}>
-            <h3>AI Video & Summaries</h3>
-            <p>
-              Turn lectures and notes into concise summaries or AI-generated educational videos.
-            </p>
-          </div>
-        </div>
-      </section>
+{/* About Section */}
+<section id="about" className={styles.about}>
+  
+  {/* Background Video */}
+  <video
+    className={styles.aboutVideo}
+    src="/video/home.mp4"
+    autoPlay
+    loop
+    muted
+    playsInline
+  />
 
-      {/* Academic Suite Section */}
-      <section className={styles.academicSuite} id="institutions">
-        <div className={styles.suiteOverlay}></div>
-        
-        <div className={styles.suiteHeader}>
-          <h2>Academic & School Suite</h2>
-          <p>
-            Empowering the next generation of learners through adaptive, AI-powered education.
-          </p>
-        </div>
+  {/* Translucent Overlay */}
+  <div className={styles.aboutOverlay}></div>
 
-        <div className={styles.suiteGrid}>
-          <div className={styles.suiteCard}>
-            <h3>Smart Learning Tools</h3>
-            <p>AI-driven assessments and personalized feedback for every student.</p>
-          </div>
+  {/* Content */}
+  <div className={styles.aboutContent}>
+    <h2>Building the Future of Learning</h2>
+    <p>
+      We are more than a tool, it&apos;s a lifelong academic companion. Our mission 
+      is to empower students and researchers everywhere with intelligent, ethical, 
+      and inclusive AI solutions.
+    </p>
+    <a 
+      href="https://docs.google.com/document/d/1c4hNj9rRmWOMxIMIKmEEnjyS6mzK2mot1TvQaPebMtc/edit?tab=t.0" 
+      className={styles.btnPrimary}
+      target="_blank"
+      rel="noopener noreferrer"
+    >
+      Read More
+    </a>
+  </div>
 
-          <div className={styles.suiteCard}>
-            <h3>Data Insights</h3>
-            <p>Powerful analytics for teachers and administrators to improve outcomes.</p>
-          </div>
+</section>
 
-          <div className={styles.suiteCard}>
-            <h3>Collaboration Hub</h3>
-            <p>Bridging communication between parents, students, and educators seamlessly.</p>
-          </div>
-        </div>
-      </section>
+{/* Features Section */}
+<section id="features" className={styles.features}>
+  <h2>What We Offer</h2>
+  <p className={styles.subtitle}>
+    Powerful AI tools for learning, teaching, research, and content creation all in one platform.
+  </p>
+
+  <div className={styles.featureGrid}>
+
+    <div className={styles.featureCard}>
+      <h3>AI Learning & Tutoring</h3>
+      <p>
+        Smart planners, curriculum-aligned tutors, instant homework help, and real-time multilingual interaction to enhance study and revision.
+      </p>
+    </div>
+
+    <div className={styles.featureCard}>
+      <h3>AI Content & Course Creation</h3>
+      <p>
+        Instantly turn text into videos with AI avatars, convert documents into multilingual explainers, and build courses to teach or monetize globally.
+      </p>
+    </div>
+
+    <div className={styles.featureCard}>
+      <h3>Academic Research Suite</h3>
+      <p>
+        Thesis Builder, literature review automation, academic writing support, and integrity protection for advanced research.
+      </p>
+    </div>
+
+    <div className={styles.featureCard}>
+      <h3>Teacher & Institution Tools</h3>
+      <p>
+        AI-generated lessons, smart analytics, global translation, and seamless LMS integration for efficient education management.
+      </p>
+    </div>
+
+    </div>
+</section>
+
+{/* Academic Suite Section */}
+<section className={styles.academicSuite} id="institutions">
+  <div className={styles.suiteOverlay}></div>
+
+  <div className={styles.suiteHeader}>
+    <h2>Academic & School Suite</h2>
+    <p>Your all-in-one AI ecosystem for learning, research & academic growth.</p>
+  </div>
+
+  <div className={styles.suiteGrid}>
+
+    <div className={styles.suiteCard}>
+      <h3>🏫 Smart Learning Hub</h3>
+      <p>Study Planner • Subject Tutors • Homework Help • Summaries</p>
+    </div>
+
+    <div className={styles.suiteCard}>
+      <h3>🎓 Research Suite</h3>
+      <p>Thesis Builder • Lit Reviews • Academic Writing • Data Analysis</p>
+    </div>
+
+    <div className={styles.suiteCard}>
+      <h3>🎤 AI Presentations</h3>
+      <p>Defense Prep • Slide Decks • Avatar Videos • Multilingual Explainables</p>
+    </div>
+
+    <div className={styles.suiteCard}>
+      <h3>🌐 Marketplace</h3>
+      <p>Create, share & sell AI-powered courses in 100+ languages</p>
+    </div>
+
+    <div className={styles.suiteCard}>
+      <h3>📊 Institutional Insights</h3>
+      <p>Dashboards • Analytics • LMS Integration • White-Label Suites</p>
+    </div>
+
+    <div className={styles.suiteCard}>
+      <h3>🔒 Integrity & Ethics</h3>
+      <p>Plagiarism Shield • Citation Fixer • Secure Data • Compliance</p>
+    </div>
+
+  </div>
+</section>
 
       {/* Pricing & Plans Section */}
       <section id="pricing" className={styles.pricing}>
@@ -208,6 +265,60 @@ export default function Home() {
         </div>
       </section>
 
+{/* ---------- Marketplace Preview Section ---------- */}
+<section className={styles.marketplacePreview} id="marketplace">
+  <h2>Marketplace</h2>
+  <p className={styles.marketplaceDescription}>
+  Explore a curated collection of skill-building courses from expert creators.
+  Learn what matters, level up thoughtfully, and unlock your potential.
+</p>
+
+  {/* Search Bar */}
+  <div
+    className={styles.searchWrapper}
+    onClick={() => window.location.href = "/signup"}
+  >
+    <span className={styles.searchIcon}>🔍</span>
+    <input
+      type="text"
+      placeholder="Search for courses"
+      className={styles.searchInput}
+      readOnly
+    />
+  </div>
+
+  <div className={styles.marketplaceGrid}>
+    {[
+      { title: "AI for Everyone", teacher: "Schan Gya", price: "$30", img: "/pics/ai.jpeg" },
+      { title: "Beginners Spanish", teacher: "Rujeta", price: "$20", img: "/pics/spanish.jpeg" },
+      { title: "Data Science", teacher: "Rolan", price: "$30", img: "/pics/data.jpeg" },
+      { title: "Project Management", teacher: "Sach", price: "$25", img: "/pics/pm.jpeg" },
+      { title: "Digital Marketing", teacher: "Dami", price: "$35", img: "/pics/marketing.jpeg" },
+      { title: "English Literature", teacher: "English", price: "$20", img: "/pics/english.jpeg" }
+    ].map((course, index) => (
+      <div
+        key={index}
+        className={styles.courseCard}
+        onClick={() => window.location.href = "/signup"}
+      >
+        <img src={course.img} className={styles.courseImage} />
+        <div className={styles.courseInfo}>
+          <h3>{course.title}</h3>
+          <p className={styles.teacher}>{course.teacher}</p>
+          <p className={styles.price}>{course.price}</p>
+        </div>
+      </div>
+    ))}
+  </div>
+
+  <button
+    className={styles.viewAllBtn}
+    onClick={() => window.location.href = "/signup"}
+  >
+    View All Courses →
+  </button>
+</section>
+
 {/* Blog / Insights Section */}
 <section className={styles.blogs} id="blogs">
   <h2>From Our Learners</h2>
@@ -261,25 +372,61 @@ export default function Home() {
       </div>
     ))}
   </div>
+
+    <Link href="/signup">
+    <button className={styles.registerBtn}>Register Now</button>
+  </Link>
 </section>
 
-      {/* About Section */}
-      <section id="about" className={styles.about}>
-        <h2>Building the Future of Learning</h2>
-        <p>
-          Yanka is more than a tool, it&apos;s a lifelong academic companion. Our mission 
-          is to empower students and researchers everywhere with intelligent, ethical, 
-          and inclusive AI solutions.
-        </p>
-        <a 
-          href="https://docs.google.com/document/d/1c4hNj9rRmWOMxIMIKmEEnjyS6mzK2mot1TvQaPebMtc/edit?tab=t.0" 
-          className={styles.btnPrimary}
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-           Read More
-        </a>
-      </section>
+{/* Contact Section */}
+<section id="contact" className={styles.contactSection}>
+  <h2>Contact Us</h2>
+  <p className={styles.subtitle}>
+    Have questions? We're here to help you learn, grow, and succeed.
+  </p>
+
+  <div className={styles.contactContainer}>
+    
+    {/* Left Image */}
+    <div className={styles.contactImageWrapper}>
+      <Image
+        src="/pics/classroom.jpeg"
+        alt="Classroom"
+        width={500}
+        height={400}
+        className={styles.contactImage}
+      />
+    </div>
+
+    {/* Right Form */}
+    <form className={styles.contactForm}>
+      <div className={styles.formGroup}>
+        <label>Name</label>
+        <input type="text" placeholder="Enter your name" required />
+      </div>
+
+      <div className={styles.formGroup}>
+        <label>Email</label>
+        <input type="email" placeholder="Enter your email" required />
+      </div>
+
+      <div className={styles.formGroup}>
+        <label>Phone</label>
+        <input type="tel" placeholder="Enter your phone number" />
+      </div>
+
+      <div className={styles.formGroup}>
+        <label>Message</label>
+        <textarea placeholder="Write your message..." rows={4}></textarea>
+      </div>
+
+      <button type="submit" className={styles.btnPrimary}>
+        Submit
+      </button>
+    </form>
+
+  </div>
+</section>
 
       {/* Footer */}
       <Footer />

@@ -28,8 +28,8 @@ const DashboardNavBar: React.FC = () => {
         <Image
           src="/pics/Y_Logo.jpeg"
           alt="YANKA Logo"
-          width={42}
-          height={42}
+          width={80}      // increased
+          height={80}     // increased
           className={styles.logoImg}
         />
       </Link>

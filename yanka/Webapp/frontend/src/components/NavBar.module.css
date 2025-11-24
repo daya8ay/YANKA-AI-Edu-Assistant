@@ -16,28 +16,18 @@
     transform: translateY(-100%);
 }
 
-.logoContainer {
-    display: flex;
-    align-items: center;
-    gap: 10px;
-    text-decoration: none;
+.logoContainer { 
+  display: flex; 
+  align-items: center; 
+  gap: 10px; 
+  text-decoration: none; 
 }
 
 .logoImg {
-    width: 80px;
-    height: 60px;
-    object-fit: contain;
-}
-
-.logoText {
-    font-family: 'Poppins', sans-serif;
-    font-weight: 700;
-    font-size: 1.8rem;
-    color: #1E4386;
-}
-
-.logoText .dot {
-    color: #2E5AA8;
+  width: auto;          /* let the aspect ratio stay correct */
+  height: 60px;         /* increase for more prominence */
+  object-fit: contain;
+  max-height: 60px;      /* this sets the actual visible size */
 }
 
 /* Navbar links */
@@ -50,30 +40,30 @@
 
 .navbar a {
     text-decoration: none;
-    color: #1E4386;
+    color: #0041ad;
     font-weight: 500;
     transition: color 0.3s;
 }
 
 .navbar a:hover {
-    color: #4678CC;
+    color: #e9df13;
 }
 
 .btnLogin {
     border: 1px solid #1E4386;
-    color: #1E4386;
+    color: #0041ad;
     padding: 8px 16px;
     border-radius: 6px;
     transition: all 0.3s;
 }
 
 .btnLogin:hover {
-    background: #1E4386;
+    background: #0041ad;
     color: white !important;
 }
 
 .btnSignup {
-    background-color: #1E4386;
+    background-color: #0041ad;
     color: white !important;
     padding: 8px 16px;
     border-radius: 6px;
@@ -81,7 +71,7 @@
 }
 
 .btnSignup:hover {
-    background-color: #2E5AA8;
+    background-color: #0c2d62;
 }
 
 /* Globe Icon */
