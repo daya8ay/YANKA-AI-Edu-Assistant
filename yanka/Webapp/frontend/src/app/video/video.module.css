@@ -132,3 +132,42 @@ section div > div:hover {
     transform: translateY(0);
   }
 }
+
+.summaryBox {
+  margin-top: 20px;
+  background: #f9fafb;
+  border-radius: 8px;
+  padding: 16px;
+  border: 1px solid #e5e7eb;
+  animation: fadeSlideDown 0.4s ease;
+}
+
+@keyframes fadeSlideDown {
+  from {
+    opacity: 0;
+    transform: translateY(-8px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.stackContainer {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+  transition: all 0.4s ease;   
+}
+
+.infoCard {
+  background: #f9fafb;
+  border-radius: 8px;
+  padding: 16px;
+  border: 1px solid #e5e7eb;
+}
+
+.tipList {
+  padding-left: 22px; 
+  margin: 0;
+}

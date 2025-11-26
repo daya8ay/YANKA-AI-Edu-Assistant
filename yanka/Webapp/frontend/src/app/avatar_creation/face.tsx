@@ -5,7 +5,8 @@ import styles from "./avatar.module.css";
 import { HexColorPicker } from "react-colorful";
 
 const Face = () => {
-    const [activeSubTab, setActiveSubTab] = useState("Skin");
+    const [activeSubTab, setActiveSubTab] = useState("Face");
+    const [faceType, setFaceType] = useState("Face 1");
     const [skinColor, setSkinColor] = useState("#fdbcb4");
     const [eyeShape, setEyeShape] = useState("Round");
     const [eyeColor, setEyeColor] = useState("#895129");
@@ -13,8 +14,17 @@ const Face = () => {
     const [eyebrowColor, setEyebrowColor] = useState("#895129");
 
     const subTabs = [
+        { id: "Face", label: "Face" },
         { id: "Skin", label: "Skin" },
         { id: "Eye", label: "Eye" },
+    ];
+
+    const faceTypeOptions = [
+        { id: "Face 1", label: "Face 1" },
+        { id: "Face 2", label: "Face 2" },
+        { id: "Face 3", label: "Face 3" },
+        { id: "Face 4", label: "Face 4" },
+        { id: "Face 5", label: "Face 5" },
     ];
 
     const skinColorOptions = [
@@ -38,6 +48,27 @@ const Face = () => {
         { id: "Thin", label: "Thin" },
         { id: "Thick", label: "Thick" },
     ]
+
+    const renderFaceContent = () => (
+        <>
+            <div className={styles.section}>
+                <h4>Face Type</h4>
+                <div className={styles.styleOptions}>
+                    {faceTypeOptions.map((option) => (
+                        <button
+                            key={option.id}
+                            onClick={() => setFaceType(option.id)}
+                            className={`${styles.styleOption} ${
+                                faceType === option.id ? styles.selected : ""
+                            }`}
+                        >
+                            {option.label}
+                        </button>
+                    ))}
+                </div>
+            </div>
+        </>
+    );
 
     const renderSkinContent = () => (
         <>
@@ -124,6 +155,7 @@ const Face = () => {
                 ))}
             </div>
 
+            {activeSubTab === "Face" && renderFaceContent()}
             {activeSubTab === "Skin" && renderSkinContent()}
             {activeSubTab === "Eye" && renderEyeContent()}
         </div>
