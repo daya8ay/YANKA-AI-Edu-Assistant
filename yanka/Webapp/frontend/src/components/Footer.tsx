@@ -14,8 +14,8 @@ const Footer: React.FC = () => {
           <Image
             src="/pics/white_logo.jpeg"
             alt="YANKA Logo"
-            width={150}
-            height={100}
+            width={160}
+            height={90}
             className={styles.logo}
           />
         </div>

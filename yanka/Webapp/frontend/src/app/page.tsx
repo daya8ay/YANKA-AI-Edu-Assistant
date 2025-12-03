@@ -1,6 +1,6 @@
 "use client";
 
-import React from "react";
+import React, { useEffect } from "react";  // <-- add useEffect
 import Link from "next/link";
 import Image from "next/image";
 import NavBar from "@/components/NavBar";
@@ -8,6 +8,19 @@ import Footer from "@/components/Footer"; // ✅ Import your Footer component
 import styles from "./page.module.css";
 
 export default function Home() {
+  
+  useEffect(() => {
+    const video = document.querySelector(`.${styles.heroVideo}`);
+    const btn = document.getElementById("muteBtn");
+
+    if (video && btn) {
+      btn.onclick = () => {
+        video.muted = !video.muted;
+        btn.textContent = video.muted ? "🔇" : "🔊";
+      };
+    }
+  }, []);
+
   return (
     <>
       <NavBar />
@@ -31,14 +44,20 @@ export default function Home() {
             </Link>
           </div>
         </div>
-        <div className={styles.heroImage}>
-          <Image
-            src="/pics/AI_Avatar.jpeg"
-            alt="AI Avatar"
-            width={500}
-            height={500}
-            className={styles.heroAvatar}
-          />
+          <div className={styles.heroVideoContainer}>
+            <video
+              className={styles.heroVideo}
+              src="/video/intro.mp4"
+              autoPlay
+              loop
+              muted
+              playsInline
+            />
+
+            {/* Mute/Unmute Button */}
+            <button className={styles.muteButton} id="muteBtn">
+              🔇
+            </button>
         </div>
       </section>
 
@@ -127,7 +146,7 @@ export default function Home() {
     <p>Your all-in-one AI ecosystem for learning, research & academic growth.</p>
   </div>
 
-  <div className={styles.suiteGrid}>
+  <div className={styles.suiteScroll}>
 
     <div className={styles.suiteCard}>
       <h3>🏫 Smart Learning Hub</h3>
@@ -267,11 +286,12 @@ export default function Home() {
 
 {/* ---------- Marketplace Preview Section ---------- */}
 <section className={styles.marketplacePreview} id="marketplace">
-  <h2>Marketplace</h2>
+  <h2 className={styles.marketplaceTitle}>Marketplace</h2>
+
   <p className={styles.marketplaceDescription}>
-  Explore a curated collection of skill-building courses from expert creators.
-  Learn what matters, level up thoughtfully, and unlock your potential.
-</p>
+    Explore a curated collection of skill-building courses from expert creators.
+    Learn what matters, level up thoughtfully, and unlock your potential.
+  </p>
 
   {/* Search Bar */}
   <div
@@ -287,7 +307,8 @@ export default function Home() {
     />
   </div>
 
-  <div className={styles.marketplaceGrid}>
+  {/* Horizontal Scroll Wrapper */}
+  <div className={styles.horizontalScroll}>
     {[
       { title: "AI for Everyone", teacher: "Schan Gya", price: "$30", img: "/pics/ai.jpeg" },
       { title: "Beginners Spanish", teacher: "Rujeta", price: "$20", img: "/pics/spanish.jpeg" },
@@ -378,6 +399,38 @@ export default function Home() {
   </Link>
 </section>
 
+{/* Sponsors Section */}
+<section className={styles.sponsorSection}>
+  <h2>Our Partners</h2>
+
+  <div className={styles.sponsorSlider}>
+    <div className={styles.sponsorTrack}>
+      {[
+        "/pics/logo_1.jpeg",
+        "/pics/logo_2.jpeg",
+        "/pics/logo_3.jpeg",
+        "/pics/logo_4.jpeg",
+      ].map((logo, i) => (
+        <div key={i} className={styles.sponsorLogo}>
+          <img src={logo} alt={`Sponsor ${i}`} />
+        </div>
+      ))}
+
+      {/* Duplicate for seamless infinite loop */}
+      {[
+        "/pics/logo_1.jpeg",
+        "/pics/logo_2.jpeg",
+        "/pics/logo_3.jpeg",
+        "/pics/logo_4.jpeg",
+      ].map((logo, i) => (
+        <div key={i + 4} className={styles.sponsorLogo}>
+          <img src={logo} alt={`Sponsor duplicate ${i}`} />
+        </div>
+      ))}
+    </div>
+  </div>
+</section>
+
 {/* Contact Section */}
 <section id="contact" className={styles.contactSection}>
   <h2>Contact Us</h2>
@@ -385,20 +438,7 @@ export default function Home() {
     Have questions? We're here to help you learn, grow, and succeed.
   </p>
 
-  <div className={styles.contactContainer}>
-    
-    {/* Left Image */}
-    <div className={styles.contactImageWrapper}>
-      <Image
-        src="/pics/classroom.jpeg"
-        alt="Classroom"
-        width={500}
-        height={400}
-        className={styles.contactImage}
-      />
-    </div>
-
-    {/* Right Form */}
+  <div className={styles.contactCenter}>
     <form className={styles.contactForm}>
       <div className={styles.formGroup}>
         <label>Name</label>
@@ -424,7 +464,6 @@ export default function Home() {
         Submit
       </button>
     </form>
-
   </div>
 </section>
 
