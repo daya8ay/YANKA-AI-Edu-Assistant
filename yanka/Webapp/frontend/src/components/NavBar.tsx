@@ -61,17 +61,18 @@ const NavBar: React.FC = () => {
     <>
       <header className={`${styles.navbar} ${isScrolled ? styles.scrollDown : ""}`}>
         <Link href="/" className={styles.logoContainer}>
-          <Image 
-            src="/pics/Y_Logo.jpeg" 
-            alt="YANKA Logo" 
-            width={42} 
-            height={42} 
-            className={styles.logoImg}
-          />
-          <div className={styles.logoText}>
-          <span className={styles.dot}></span>
+          <div className={styles.logoWrapper}>
+            <Image 
+              src="/pics/Y_Logo.jpeg" 
+              alt="YANKA Logo" 
+              width={42} 
+              height={42} 
+              className={styles.logoImg}
+            />
+            <span className={styles.logoSubtitle}>Yanka AI</span>
           </div>
         </Link>
+
         <nav>
           <ul>
             <li><Link href="/#about">About</Link></li>
@@ -95,6 +96,7 @@ const NavBar: React.FC = () => {
           </ul>
         </nav>
       </header>
+
       <LanguageModal 
         isOpen={isLanguageModalOpen} 
         onClose={() => setIsLanguageModalOpen(false)} 
