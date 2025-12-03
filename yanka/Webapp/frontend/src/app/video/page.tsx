@@ -15,6 +15,9 @@ const VideoCreation = () => {
   const [videoType, setVideoType] = useState("");
   const [customVideoType, setCustomVideoType] = useState("");
   const [showSummary, setShowSummary] = useState(false);
+  const [language, setLanguage] = useState("english");
+  const [subtitle, setSubtitle] = useState("none");
+  const [avatar, setAvatar] = useState("");
 
   const handleSubmit = async () => {
     if (!title) {
@@ -181,7 +184,7 @@ const VideoCreation = () => {
             display: "flex",
             gap: "2rem",
             width: "100%",
-            alignItems: "flex-start", 
+            alignItems: "stretch",
           }}
         >
           <div
@@ -217,21 +220,22 @@ const VideoCreation = () => {
                   How This Works
                 </h3>
                 <ul className={styles.tipList} style={{ color: "#4B5563", fontSize: "0.9rem", lineHeight: "1.6" }}>
-                  <li>1. Upload or write your lesson content</li>
-                  <li>2. Choose your avatar and languages</li>
-                  <li>3. Select the video type you want</li>
-                  <li>4. Generate a multilingual AI-powered lesson</li>
+                  <li> Upload or write your lesson content</li>
+                  <li> Choose your avatar and languages</li>
+                  <li> Select the video type you want</li>
+                  <li> Generate a multilingual AI-powered lesson</li>
                 </ul>
               </div>
+              <div className={styles.divider}></div>
               {showSummary && (
                 <div className={`${styles.infoCard} ${styles.summaryBox}`}>
                   <h3 style={{ color: "#1E3A8A", marginBottom: "10px", fontSize: "1rem" }}>
                     Video Settings Summary
                   </h3>
                   <p style={{ color: "#4B5563", fontSize: "0.9rem", lineHeight: "1.6" }}>
-                    Avatar: <strong>Not selected</strong><br />
-                    Language: <strong>English</strong><br />
-                    Subtitles: <strong>No subtitles</strong><br />
+                    Avatar: <strong>{avatar || "Not selected"}</strong><br />
+                    Language: <strong>{language}</strong><br />
+                    Subtitles: <strong>{subtitle}</strong><br />
                     Video Type: <strong>{videoType || "None selected"}</strong><br />
                     Script: <strong>{script ? "Provided" : "Not provided"}</strong>
                   </p>
@@ -266,6 +270,8 @@ const VideoCreation = () => {
             />
             <label>Choose Avatar</label>
             <select
+              value={avatar}
+              onChange={(e) => setAvatar(e.target.value)}
               style={{
                 width: "100%",
                 padding: "10px",
@@ -289,6 +295,8 @@ const VideoCreation = () => {
             </p>
             <label>Video Language</label>
             <select
+              value={language}
+              onChange={(e) => setLanguage(e.target.value)}
               style={{
                 width: "100%",
                 padding: "10px",
@@ -316,6 +324,8 @@ const VideoCreation = () => {
             </select>
             <label>Subtitles</label>
             <select
+              value={subtitle}
+              onChange={(e) => setSubtitle(e.target.value)}
               style={{
                 width: "100%",
                 padding: "10px",

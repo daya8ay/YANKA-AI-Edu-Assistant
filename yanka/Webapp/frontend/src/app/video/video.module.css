@@ -142,6 +142,7 @@ section div > div:hover {
   animation: fadeSlideDown 0.4s ease;
 }
 
+
 @keyframes fadeSlideDown {
   from {
     opacity: 0;
@@ -157,17 +158,42 @@ section div > div:hover {
   display: flex;
   flex-direction: column;
   gap: 20px;
-  transition: all 0.4s ease;   
+  transition: all 0.4s ease;
+  
+  max-width: 420px;
+  margin: 0 auto;
 }
 
 .infoCard {
   background: #f9fafb;
   border-radius: 8px;
-  padding: 16px;
+  padding: 24px 32px;
   border: 1px solid #e5e7eb;
+
+  margin-left: 12px;
+  margin-right: 12px;
 }
 
 .tipList {
   padding-left: 22px; 
   margin: 0;
+}
+.divider {
+  height: 1px;
+  width: 90%;
+  margin: 12px auto 20px auto;
+  background: linear-gradient(to right, transparent, #c5c5c5, transparent);
+}
+
+
+.infoCard h3 {
+  text-align: center;
+}
+
+.tipList li {
+  margin-bottom: 6px;
+}
+
+.infoCard {
+  background: #ffffff;
 }
