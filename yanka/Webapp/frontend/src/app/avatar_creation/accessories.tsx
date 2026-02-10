@@ -37,14 +37,14 @@ const Accessories = () => {
                         onClick={() => setGlassesEnabled(true)}
                         style={{ padding: '8px 16px', minWidth: '60px' }}
                     >
-                        ✓ On
+                        ✓ Yes
                     </button>
                     <button
                         className={`${styles.styleOption} ${!glassesEnabled ? styles.selected : ""}`}
                         onClick={() => setGlassesEnabled(false)}
                         style={{ padding: '8px 16px', minWidth: '60px' }}
                     >
-                        ✕ Off
+                        ✕ No
                     </button>
                 </div>
             </div>
@@ -95,14 +95,14 @@ const Accessories = () => {
                         onClick={() => setEnabled(true)}
                         style={{ padding: '8px 16px', minWidth: '60px' }}
                     >
-                        ✓ On
+                        ✓ Yes
                     </button>
                     <button
                         className={`${styles.styleOption} ${!enabled ? styles.selected : ""}`}
                         onClick={() => setEnabled(false)}
                         style={{ padding: '8px 16px', minWidth: '60px' }}
                     >
-                        ✕ Off
+                        ✕ No
                     </button>
                 </div>
             </div>
