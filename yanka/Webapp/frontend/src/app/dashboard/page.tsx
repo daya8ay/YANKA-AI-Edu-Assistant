@@ -6,7 +6,7 @@ import { useAuth } from "@/hooks/useAuth";
 import { useLanguage } from "@/context/LanguageContext";
 import DashboardNavBar from "@/components/DashboardNavBar";
 import Image from "next/image";
-import Footer from "@/components/Footer";
+import Footer from "@/components/Footer"; // ✅ Import Footer component
 import styles from "./page.module.css";
 
 export default function Dashboard() {
@@ -124,6 +124,10 @@ export default function Dashboard() {
             <h3>{t.lectureSummaries}</h3>
             <p>{t.lectureSummariesValue}</p>
           </div>
+          <Link href="/video_analytics" className={styles.card}>
+            <h3>Video Analytics</h3>
+            <p>Track your learning engagement and video interactions.</p>
+          </Link>
         </section>
 
         {/* Recommendations Section */}
