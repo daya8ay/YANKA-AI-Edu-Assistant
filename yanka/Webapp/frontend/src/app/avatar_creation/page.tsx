@@ -59,7 +59,13 @@ const AvatarCreation = () => {
           <div className={styles.cardRow}>
             <div className={styles.previewCard}>
               <h3>Preview</h3>
-              <p style={{ color: '#666', margin: 0 }}>Coming soon</p>
+              <div className={styles.previewImageWrap}>
+                <img
+                  src="/avatar/Avatar1.jpeg"
+                  alt="Avatar preview"
+                  className={styles.previewImage}
+                />
+              </div>
             </div>
 
             <div className={styles.customizationCard}>
@@ -84,7 +90,7 @@ const AvatarCreation = () => {
       </div>
 
       <AvatarChat />
-      {/* ✅ Footer at the bottom */}
+      {}
       <Footer />
     </>
   );
