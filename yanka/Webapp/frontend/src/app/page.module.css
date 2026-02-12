@@ -76,24 +76,6 @@
   animation: fadeInUp 1s ease-in-out;
 }
 
-/* Mute Button */
-.muteButton {
-  position: absolute;
-  bottom: 12px;
-  right: 12px;
-  background: rgba(255, 255, 255, 0.75);
-  border: none;
-  font-size: 20px;
-  padding: 8px 10px;
-  border-radius: 50%;
-  cursor: pointer;
-  transition: background 0.25s ease;
-}
-
-.muteButton:hover {
-  background: rgba(255, 255, 255, 0.95);
-}
-
 /* Smooth entry animation */
 @keyframes fadeInUp {
     from {
@@ -109,7 +91,7 @@
 /* ---------- Features ---------- */
 .features {
   text-align: center;
-  padding: 80px 60px;
+  padding: 30px 60px;
   background-color: #F5F8FD;
 }
 
@@ -161,10 +143,28 @@
   line-height: 1.5;
 }
 
+.exploreBtn {
+  margin-top: 50px;
+  padding: 14px 36px;
+  background: #0041ad;
+  color: #ffffff;
+  border: none;
+  border-radius: 10px;
+  font-size: 1rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+.exploreBtn:hover {
+  background: #f6f63f;
+  color: #031444;
+  transform: translateY(-3px);
+}
 /* ---------- Academic Suite ---------- */
 .academicSuite {
     position: relative;
-    padding: 90px 50px;
+    padding: 50px 50px;
     text-align: center;
     color: #fff;
     overflow: hidden;
@@ -256,6 +256,30 @@
 .suiteCard:hover h3,
 .suiteCard:hover p {
     color: #05235a;
+}
+
+/* CTA Section */
+.suiteCTA {
+  margin-top: 50px;
+  position: relative;
+  z-index: 2;
+}
+
+.suiteButton {
+  background: #ffffff;
+  color: #0041ad;
+  border: none;
+  padding: 14px 28px;
+  font-size: 1rem;
+  font-weight: 600;
+  border-radius: 40px;
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+.suiteButton:hover {
+  background: #cfe3ff;
+  transform: translateY(-3px);
 }
 
 /* ---------- Pricing Section ---------- */

@@ -69,7 +69,6 @@ const NavBar: React.FC = () => {
               height={42} 
               className={styles.logoImg}
             />
-            <span className={styles.logoSubtitle}>Yanka AI</span>
           </div>
         </Link>
 
