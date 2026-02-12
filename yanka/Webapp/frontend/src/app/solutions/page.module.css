@@ -1,0 +1,144 @@
+/* HERO */
+.hero {
+  background: linear-gradient(180deg, #F5F8FD 0%, #EAF1FF 100%);
+  padding: 70px 20px 50px;
+  text-align: center;
+}
+
+.heroInner {
+  max-width: 800px;
+  margin: 0 auto;
+}
+
+.hero h1 {
+  font-size: 3rem;
+  font-weight: 700;
+  color: #0041ad;
+  margin-bottom: 18px;
+  letter-spacing: -0.5px;
+}
+
+.heroSubtitle {
+  font-size: 1.15rem;
+  color: #1f3f7a;
+  line-height: 1.6;
+}
+
+.heroDivider {
+  width: 60px;
+  height: 4px;
+  background: #0041ad;
+  margin: 24px auto 0;
+  border-radius: 2px;
+}
+
+/* ===== SOLUTION SECTIONS ===== */
+
+.solutionSection,
+.solutionSectionReverse {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 90px 12%;
+  gap: 80px;
+}
+
+/* Reverse layout */
+.solutionSectionReverse {
+  flex-direction: row-reverse;
+}
+
+/* Image Containers */
+.imageLeft,
+.imageRight {
+  flex: 1;
+  display: flex;
+  justify-content: center;
+}
+
+.imageLeft img,
+.imageRight img {
+  width: 100%;
+  max-width: 480px;
+  border-radius: 18px;
+  object-fit: cover;
+  box-shadow: 0 8px 25px rgba(0, 65, 173, 0.08);
+}
+
+/* Content Containers */
+.contentLeft,
+.contentRight {
+  flex: 1;
+  max-width: 600px;
+}
+
+/* Headings */
+.contentLeft h2,
+.contentRight h2 {
+  font-size: 2.2rem;
+  color: #0041ad;
+  margin-bottom: 22px;
+}
+
+/* Paragraphs */
+.contentLeft p,
+.contentRight p {
+  line-height: 1.75;
+  margin-bottom: 18px;
+  color: #1f3f7a;
+  font-size: 1rem;
+}
+
+/* VIDEO STRIP */
+.videoStripSection {
+  padding: 80px 10%;
+  text-align: center;
+}
+
+.videoStrip {
+  position: relative;
+  overflow: hidden;
+  border-radius: 20px;
+  margin-top: 40px;
+}
+
+.videoStrip video {
+  width: 100%;
+  height: 350px;
+  object-fit: cover;
+  display: block;
+}
+
+.videoOverlay {
+  position: absolute;
+  inset: 0;
+  background: rgba(0, 65, 173, 0.75);
+  color: white;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  opacity: 0;
+  transition: opacity 0.4s ease;
+  padding: 30px;
+  text-align: center;
+}
+
+.videoStrip:hover .videoOverlay {
+  opacity: 1;
+}
+
+@media (max-width: 900px) {
+  .solutionSection,
+  .solutionSectionReverse {
+    flex-direction: column;
+    text-align: center;
+    padding: 70px 8%;
+    gap: 40px;
+  }
+
+  .contentLeft,
+  .contentRight {
+    max-width: 100%;
+  }
+}

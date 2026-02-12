@@ -1,49 +1,24 @@
-/* ---------- Navbar ---------- */
 .navbar {
     display: flex;
     justify-content: space-between;
     align-items: center;
-    padding: 10px 60px;
+    padding: 5px 40px;   /* remove vertical padding completely */
     background-color: #ffffff;
     position: sticky;
     top: 0;
     z-index: 1000;
     box-shadow: 0 2px 12px rgba(30, 67, 134, 0.08);
-    transition: transform 0.3s ease;
 }
 
 .navbar.scrollDown {
     transform: translateY(-100%);
 }
 
-.logoContainer { 
-  display: flex; 
-  align-items: center; 
-  text-decoration: none; 
-}
-
-/* WRAPS IMAGE + TEXT */
-.logoWrapper {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  line-height: 1;
-}
-
 .logoImg {
   width: auto;
-  height: 60px;
+  height: 72px;          /* increased from 60px */
+  max-height: 72px;
   object-fit: contain;
-  max-height: 60px;
-}
-
-/* TEXT UNDER LOGO */
-.logoSubtitle {
-  font-size: 12px;
-  color: #125acd;
-  margin-top: 2;   /* removed spacing */
-  line-height: 1;  /* prevents extra text height spacing */
-  font-weight: 800;
 }
 
 /* Navbar links */

@@ -1,30 +1,17 @@
 "use client";
 
-import React, { useEffect } from "react";  // <-- add useEffect
+import React from "react";
 import Link from "next/link";
 import Image from "next/image";
 import NavBar from "@/components/NavBar";
-import Footer from "@/components/Footer"; // ✅ Import your Footer component
+import Footer from "@/components/Footer";
 import styles from "./page.module.css";
 
 export default function Home() {
-  
-  useEffect(() => {
-    const video = document.querySelector(`.${styles.heroVideo}`);
-    const btn = document.getElementById("muteBtn");
-
-    if (video && btn) {
-      btn.onclick = () => {
-        video.muted = !video.muted;
-        btn.textContent = video.muted ? "🔇" : "🔊";
-      };
-    }
-  }, []);
-
   return (
     <>
       <NavBar />
-      
+
       {/* Hero Section */}
       <section className={styles.hero} id="top">
         <div className={styles.heroContent}>
@@ -44,20 +31,16 @@ export default function Home() {
             </Link>
           </div>
         </div>
-          <div className={styles.heroVideoContainer}>
-            <video
-              className={styles.heroVideo}
-              src="/video/intro.mp4"
-              autoPlay
-              loop
-              muted
-              playsInline
-            />
 
-            {/* Mute/Unmute Button */}
-            <button className={styles.muteButton} id="muteBtn">
-              🔇
-            </button>
+        <div className={styles.heroVideoContainer}>
+          <video
+            className={styles.heroVideo}
+            src="/video/intro.mp4"
+            autoPlay
+            loop
+            muted
+            playsInline
+          />
         </div>
       </section>
 
@@ -135,6 +118,11 @@ export default function Home() {
     </div>
 
     </div>
+    <Link href="/features">
+  <button className={styles.exploreBtn}>
+    Explore More →
+  </button>
+</Link>
 </section>
 
 {/* Academic Suite Section */}
@@ -177,8 +165,16 @@ export default function Home() {
       <h3>🔒 Integrity & Ethics</h3>
       <p>Plagiarism Shield • Citation Fixer • Secure Data • Compliance</p>
     </div>
-
   </div>
+  
+  <div className={styles.suiteCTA}>
+  <button
+    className={styles.suiteButton}
+    onClick={() => window.location.href = "/solutions"}
+  >
+    Explore Who Yanka Serves
+  </button>
+</div>
 </section>
 
       {/* Pricing & Plans Section */}
