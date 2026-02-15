@@ -33,7 +33,7 @@ export default function FeaturesPage() {
           />
         </div>
         <div className={styles.textRight}>
-          <h2>🎥 AI Video Generation</h2>
+          <h2>AI Video Generation</h2>
           <p>
             Instantly transform academic content into professional,
             high-quality educational videos. Convert notes, lectures,
@@ -56,7 +56,7 @@ export default function FeaturesPage() {
           />
         </div>
         <div className={styles.textRight}>
-          <h2>🧑‍🎓 Real-Time AI Avatar Creation</h2>
+          <h2>Real-Time AI Avatar Creation</h2>
           <p>
             Design multilingual AI avatars for teaching, research defense,
             training sessions, and professional communication. Customize
@@ -78,7 +78,7 @@ export default function FeaturesPage() {
           />
         </div>
         <div className={styles.textRight}>
-          <h2>📘 AI-Designed Training Programs & Workshops</h2>
+          <h2>AI-Designed Training Programs & Workshops</h2>
           <p>
             Build structured academic training programs, workshops, and
             institutional learning tracks powered by AI. Automatically
@@ -104,7 +104,7 @@ export default function FeaturesPage() {
                 className={styles.cardImage}
               />
               <div className={styles.overlay}>
-                <h3>🌐 Wide Range of Courses</h3>
+                <h3>Wide Range of Courses</h3>
                 <p>
                   Explore and create AI-powered courses across disciplines.
                   Instantly translated into 100+ languages.
@@ -123,7 +123,7 @@ export default function FeaturesPage() {
                 className={styles.cardImage}
               />
               <div className={styles.overlay}>
-                <h3>📊 AI Data Analysis & Visualization</h3>
+                <h3>AI Data Analysis & Visualization</h3>
                 <p>
                   Perform quantitative and qualitative analysis with
                   integrated AI tools and generate professional charts,
@@ -143,7 +143,7 @@ export default function FeaturesPage() {
                 className={styles.cardImage}
               />
               <div className={styles.overlay}>
-                <h3>🎓 Thesis & Dissertation Builder</h3>
+                <h3>Thesis & Dissertation Builder</h3>
                 <p>
                   Structured academic frameworks for research design,
                   literature review, citation management, and academic

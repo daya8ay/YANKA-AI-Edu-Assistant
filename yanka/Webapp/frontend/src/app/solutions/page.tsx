@@ -23,12 +23,12 @@ export default function SolutionsPage() {
 
 
       {/* STUDENTS */}
-      <section className={styles.solutionSection}>
+      <section id="students" className={styles.solutionSection}>
         <div className={styles.imageLeft}>
           <img src="/pics/students.jpeg" alt="Students using AI tools" />
         </div>
         <div className={styles.contentRight}>
-          <h2>🎓 Students</h2>
+          <h2>Students</h2>
           <p>
             Yanka empowers students with intelligent study tools designed for
             modern academic success. From an AI-powered tutor that explains
@@ -44,9 +44,9 @@ export default function SolutionsPage() {
       </section>
 
       {/* RESEARCHERS */}
-      <section className={styles.solutionSectionReverse}>
+      <section id="researchers" className={styles.solutionSectionReverse}>
         <div className={styles.contentLeft}>
-          <h2>🔬 Researchers</h2>
+          <h2>Researchers</h2>
           <p>
             Yanka accelerates academic research with advanced thesis-building
             tools, literature review automation, and AI-driven writing
@@ -65,12 +65,12 @@ export default function SolutionsPage() {
       </section>
 
       {/* TEACHERS & INSTITUTIONS */}
-      <section className={styles.solutionSection}>
+      <section id="teachers" className={styles.solutionSection}>
         <div className={styles.imageLeft}>
           <img src="/pics/teachers.jpeg" alt="Teachers using analytics" />
         </div>
         <div className={styles.contentRight}>
-          <h2>🏫 Teachers & Institutions</h2>
+          <h2>Teachers & Institutions</h2>
           <p>
             Yanka enables educators to design interactive courses, generate
             lesson plans instantly, and personalize classroom content using AI.
@@ -85,9 +85,9 @@ export default function SolutionsPage() {
       </section>
 
       {/* COURSE CREATORS */}
-      <section className={styles.solutionSectionReverse}>
+      <section id="creators" className={styles.solutionSectionReverse}>
         <div className={styles.contentLeft}>
-          <h2>🌐 Course Creators</h2>
+          <h2>Course Creators</h2>
           <p>
             Yanka allows creators to build and monetize AI-powered courses
             globally. With avatar-based video generation and automated
@@ -104,12 +104,12 @@ export default function SolutionsPage() {
       </section>
 
       {/* UNIVERSITIES */}
-      <section className={styles.solutionSection}>
+      <section id="universities" className={styles.solutionSection}>
         <div className={styles.imageLeft}>
           <img src="/pics/universities.jpeg" alt="University integration" />
         </div>
         <div className={styles.contentRight}>
-          <h2>🏛 Universities</h2>
+          <h2>Universities</h2>
           <p>
             Universities can integrate Yanka’s full research and learning suite
             into their ecosystem. From enterprise-level AI deployment to
