@@ -26,7 +26,9 @@ const Footer: React.FC = () => {
 
           {/* Platform */}
             <div className={styles.column}>
-              <h4>Platform</h4>
+              <Link href="/features" className={styles.columnTitleLink}>
+                <h4>Platform</h4>
+              </Link>
               <ul>
                 <li>
                   <Link href="/features#video">AI Video Generation</Link>
@@ -49,23 +51,35 @@ const Footer: React.FC = () => {
               </ul>
             </div>
 
-          {/* Solutions */}
-          <div className={styles.column}>
-            <h4>Solutions</h4>
-            <ul>
-              <li><Link href="#">Students & Learners</Link></li>
-              <li><Link href="#">Researchers & Scholars</Link></li>
-              <li><Link href="#">Educators & Faculty</Link></li>
-              <li><Link href="#">Institutions & Universities</Link></li>
-              <li><Link href="#">Course Creators</Link></li>
-            </ul>
-          </div>
+          {/* Who We Serve */}
+            <div className={styles.column}>
+              <Link href="/solutions" className={styles.columnTitleLink}>
+                <h4>Who We Serve</h4>
+              </Link>
+              <ul>
+                <li>
+                  <Link href="/solutions#students">Students</Link>
+                </li>
+                <li>
+                  <Link href="/solutions#researchers">Researchers</Link>
+                </li>
+                <li>
+                  <Link href="/solutions#teachers">Teachers & Institutions</Link>
+                </li>
+                <li>
+                  <Link href="/solutions#creators">Course Creators</Link>
+                </li>
+                <li>
+                  <Link href="/solutions#universities">Universities</Link>
+                </li>
+              </ul>
+            </div>
 
           {/* Resources */}
           <div className={styles.column}>
             <h4>Resources</h4>
             <ul>
-              <li><Link href="#">Pricing & Plans</Link></li>
+              <li><Link href="/#pricing">Pricing & Plans</Link></li>
               <li><Link href="#">Documentation</Link></li>
               <li><Link href="#">Community & Blog</Link></li>
               <li><Link href="#">Academic Integrity</Link></li>
@@ -77,7 +91,7 @@ const Footer: React.FC = () => {
           <div className={styles.column}>
             <h4>Company</h4>
             <ul>
-              <li><Link href="#">About YANKA</Link></li>
+              <li><Link href="/#about">About Yanka</Link></li>
               <li><Link href="#">Vision & Ethics</Link></li>
               <li><Link href="#">Partnerships</Link></li>
               <li><Link href="#">Affiliates</Link></li>
