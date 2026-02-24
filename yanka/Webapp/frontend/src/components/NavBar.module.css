@@ -182,3 +182,66 @@
         grid-template-columns: repeat(2, 1fr);
     }
 }
+
+/* ---------- Dropdown ---------- */
+.dropdown {
+  position: relative;
+  cursor: pointer;
+}
+
+.dropdownToggle {
+  color: #0041ad;
+  font-weight: 500;
+  transition: color 0.3s;
+}
+
+.dropdownToggle:hover {
+  color: #e9df13;
+}
+
+/* Dropdown menu hidden by default */
+.dropdownMenu {
+  position: absolute;
+  top: 30px;
+  left: 0;
+  background: rgba(255, 255, 255, 0.988);
+  padding: 1px 0px;
+  margin: 0;
+  border-radius: 10px;
+  box-shadow: 0 8px 24px rgba(30, 67, 134, 0.15);
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+  min-width: 240px;
+
+  opacity: 0;
+  visibility: hidden;
+  transform: translateY(10px);
+  transition: all 0.25s ease;
+  z-index: 1000;
+}
+
+/* Show on hover */
+.dropdown:hover .dropdownMenu {
+  opacity: 1;
+  visibility: visible;
+  transform: translateY(0);
+}
+
+/* Dropdown links */
+.dropdownMenu li {
+    padding: 8px 20px;
+}
+
+.dropdownMenu li a {
+    color: #0041ad;
+    font-weight: 500;
+    display: block;
+    transition: all 0.2s;
+}
+
+.dropdownMenu li a:hover {
+    background: #F5F8FD;
+    border-radius: 6px;
+    color: #2E5AA8;
+}

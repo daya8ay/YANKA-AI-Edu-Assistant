@@ -74,9 +74,72 @@ const NavBar: React.FC = () => {
 
         <nav>
           <ul>
-            <li><Link href="/#about">About</Link></li>
-            <li><Link href="/#features">Features</Link></li>
-            <li><Link href="/#institutions">Institutions</Link></li>
+            <li className={styles.dropdown}>
+              {/* Main click → About page */}
+              <Link href="/about" className={styles.dropdownTitle}>
+                About
+              </Link>
+
+              {/* Dropdown */}
+              <ul className={styles.dropdownMenu}>
+                <li>
+                  <Link href="/about#promise">Our Promise</Link>
+                </li>
+                <li>
+                  <Link href="/about#mission">Our Mission</Link>
+                </li>
+                <li>
+                  <Link href="/about#vision">Our Vision</Link>
+                </li>
+              </ul>
+            </li>
+            <li className={styles.dropdown}>
+              {/* Main Features Link → Homepage section */}
+              <Link href="/#features" className={styles.dropdownTitle}>
+                Features
+              </Link>
+
+              {/* Dropdown Menu */}
+              <ul className={styles.dropdownMenu}>
+                <li>
+                  <Link href="/features#video">AI Video Generation</Link>
+                </li>
+                <li>
+                  <Link href="/features#avatar">Real-Time AI Creation</Link>
+                </li>
+                <li>
+                  <Link href="/features#training">AI-Designed Training Program Workshops</Link>
+                </li>
+                <li>
+                  <Link href="/features#courses">Advanced Academic Capabilities</Link>
+                </li>
+              </ul>
+            </li>
+            <li className={styles.dropdown}>
+              {/* Main click → homepage institutions section */}
+              <Link href="/#institutions" className={styles.dropdownTitle}>
+                Institutions
+              </Link>
+
+              {/* Dropdown */}
+              <ul className={styles.dropdownMenu}>
+                <li>
+                  <Link href="/solutions#students">Students</Link>
+                </li>
+                <li>
+                  <Link href="/solutions#researchers">Researchers</Link>
+                </li>
+                <li>
+                  <Link href="/solutions#teachers">Teachers & Institutions</Link>
+                </li>
+                <li>
+                  <Link href="/solutions#creators">Course Creators</Link>
+                </li>
+                <li>
+                  <Link href="/solutions#universities">Universities</Link>
+                </li>
+              </ul>
+            </li>
             <li><Link href="/#pricing">Pricing & Plans</Link></li>
             <li><Link href="/#marketplace">Marketplace</Link></li>
             <li><Link href="/support">Support</Link></li>

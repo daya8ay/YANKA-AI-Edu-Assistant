@@ -68,14 +68,9 @@ export default function Home() {
       is to empower students and researchers everywhere with intelligent, ethical, 
       and inclusive AI solutions.
     </p>
-    <a 
-      href="https://docs.google.com/document/d/1c4hNj9rRmWOMxIMIKmEEnjyS6mzK2mot1TvQaPebMtc/edit?tab=t.0" 
-      className={styles.btnPrimary}
-      target="_blank"
-      rel="noopener noreferrer"
-    >
+    <Link href="/about" className={styles.btnPrimary}>
       Read More
-    </a>
+    </Link>
   </div>
 
 </section>
@@ -83,46 +78,72 @@ export default function Home() {
 {/* Features Section */}
 <section id="features" className={styles.features}>
   <h2>What We Offer</h2>
-  <p className={styles.subtitle}>
-    Powerful AI tools for learning, teaching, research, and content creation all in one platform.
-  </p>
 
   <div className={styles.featureGrid}>
 
-    <div className={styles.featureCard}>
-      <h3>AI Learning & Tutoring</h3>
-      <p>
-        Smart planners, curriculum-aligned tutors, instant homework help, and real-time multilingual interaction to enhance study and revision.
-      </p>
+    {/* 1 */}
+    <div className={styles.flipCard}>
+      <div className={styles.flipCardInner}>
+        <div className={styles.flipCardFront}>
+          <h3>AI Video Generation</h3>
+        </div>
+        <div className={styles.flipCardBack}>
+          <p>
+            Turn notes, lectures, and research into structured educational videos instantly.
+          </p>
+        </div>
+      </div>
     </div>
 
-    <div className={styles.featureCard}>
-      <h3>AI Content & Course Creation</h3>
-      <p>
-        Instantly turn text into videos with AI avatars, convert documents into multilingual explainers, and build courses to teach or monetize globally.
-      </p>
+    {/* 2 */}
+    <div className={styles.flipCard}>
+      <div className={styles.flipCardInner}>
+        <div className={styles.flipCardFront}>
+          <h3>Real-Time AI Avatar Creation</h3>
+        </div>
+        <div className={styles.flipCardBack}>
+          <p>
+            Create multilingual AI avatars with customizable voice and delivery.
+          </p>
+        </div>
+      </div>
     </div>
 
-    <div className={styles.featureCard}>
-      <h3>Academic Research Suite</h3>
-      <p>
-        Thesis Builder, literature review automation, academic writing support, and integrity protection for advanced research.
-      </p>
+    {/* 3 */}
+    <div className={styles.flipCard}>
+      <div className={styles.flipCardInner}>
+        <div className={styles.flipCardFront}>
+          <h3>AI-Designed Training Programs & Workshops</h3>
+        </div>
+        <div className={styles.flipCardBack}>
+          <p>
+            Generate complete training programs, lesson plans, and assessments with AI.
+          </p>
+        </div>
+      </div>
     </div>
 
-    <div className={styles.featureCard}>
-      <h3>Teacher & Institution Tools</h3>
-      <p>
-        AI-generated lessons, smart analytics, global translation, and seamless LMS integration for efficient education management.
-      </p>
+    {/* 4 */}
+    <div className={styles.flipCard}>
+      <div className={styles.flipCardInner}>
+        <div className={styles.flipCardFront}>
+          <h3>Advanced Academic Capabilities</h3>
+        </div>
+        <div className={styles.flipCardBack}>
+          <p>
+            Research tools, thesis support, data analysis, and academic integrity protection.
+          </p>
+        </div>
+      </div>
     </div>
 
-    </div>
-    <Link href="/features">
-  <button className={styles.exploreBtn}>
-    Explore More →
-  </button>
-</Link>
+  </div>
+
+  <Link href="/features">
+    <button className={styles.exploreBtn}>
+      Explore More →
+    </button>
+  </Link>
 </section>
 
 {/* Academic Suite Section */}
