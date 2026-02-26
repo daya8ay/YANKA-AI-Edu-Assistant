@@ -4,7 +4,7 @@
     align-items: center;
     justify-content: space-between;
     padding: 80px 100px;
-    background: linear-gradient(115deg, #ffffff 0%, #4c7fe0 100%);
+    background: #0041ad
 }
 
 .heroContent {
@@ -14,17 +14,17 @@
 .heroContent h1 {
     font-family: 'Poppins', sans-serif;
     font-size: 2.8rem;
-    color: #0047ac;
+    color: #ffffff;
 }
 
 .heroContent h1 span {
-    color: #4c7fe0;
+    color: #ffffff;
 }
 
 .heroContent p {
     margin-top: 20px;
     line-height: 1.6;
-    color: #003a8a;
+    color: #ffffff;
 }
 
 .heroButtons {
@@ -43,35 +43,37 @@
 }
 
 .btnPrimary {
-    background: #0047ac;
-    color: white;
+    background: #ffffff;
+    color: rgb(38, 56, 159);
 }
 
 .btnPrimary:hover {
-   background: #003a8a;
+   background: #f6f63f;
 }
 
 .btnSecondary {
-    border: 1px solid #0047ac;
-    color: #0047ac;
+    border: 1px solid #ffffff;
+    color: #ffffff;
 }
 
 .btnSecondary:hover {
-    background: #0047ac;
-    color: white;
+    background: #f6f63f;
+    color: rgb(15, 42, 141);
 }
 
-.heroImage {
-    max-width: 500px;
-    margin-left: 40px;
+/* ---------- Hero Video ---------- */
+
+.heroVideoContainer {
+  position: relative;
+  max-width: 500px;
+  margin-left: 40px;
 }
 
-.heroAvatar {
-    width: 100%;
-    height: auto;
-    border-radius: 12px;
-    box-shadow: 0 8px 20px rgba(0, 71, 172, 0.1);
-    animation: fadeInUp 1s ease-in-out;
+.heroVideo {
+  width: 100%;
+  border-radius: 12px;
+  box-shadow: 0 8px 20px rgba(0, 71, 172, 0.1);
+  animation: fadeInUp 1s ease-in-out;
 }
 
 /* Smooth entry animation */
@@ -88,135 +90,235 @@
 
 /* ---------- Features ---------- */
 .features {
-    text-align: center;
-    padding: 80px 60px;
-    background-color: #F5F8FD;
+  text-align: center;
+  padding: 40px 20px;
+  background-color: #F5F8FD;
 }
 
 .features h2 {
-    font-family: 'Poppins', sans-serif;
-    font-size: 2rem;
-    color: #0047ac;
+  font-size: 2.4rem;
+  color: #0041ad;
+  font-weight: 700;
+  margin-bottom: 10px;
 }
 
 .subtitle {
-    color: #003a8a;
-    margin: 10px 0 40px 0;
+  color: #022352;
+  margin: 15px auto 60px;
+  max-width: 600px;
+  font-size: 1.1rem;
 }
 
+/* Grid */
 .featureGrid {
-    display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
-    gap: 24px;
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+  gap: 40px;
+  max-width: 1100px;
+  margin: 0 auto;
 }
 
-.featureCard {
-    background: white;
-    padding: 30px;
-    border-radius: 10px;
-    box-shadow: 0 4px 12px rgba(0, 71, 172, 0.08);
-    transition: transform 0.3s, box-shadow 0.3s;
+/* Flip Card */
+.flipCard {
+  perspective: 1000px;
+  height: 220px;
 }
 
-.featureCard:hover {
-    transform: translateY(-6px);
-    box-shadow: 0 8px 16px rgba(0, 71, 172, 0.12);
+.flipCardInner {
+  position: relative;
+  width: 100%;
+  height: 100%;
+  transition: transform 0.6s ease;
+  transform-style: preserve-3d;
+}
+
+.flipCard:hover .flipCardInner {
+  transform: rotateY(180deg);
+}
+
+.flipCardFront,
+.flipCardBack {
+  position: absolute;
+  width: 100%;
+  height: 100%;
+  border-radius: 16px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 25px;
+  backface-visibility: hidden;
+  box-shadow: 0 8px 25px rgba(0, 71, 172, 0.08);
+}
+
+/* Front */
+.flipCardFront {
+  background: white;
+}
+
+.flipCardFront h3 {
+  font-size: 1 rem;
+  color: #00337a;
+  font-weight: 600;
+}
+
+/* Back */
+.flipCardBack {
+  background: #0041ad;
+  color: white;
+  transform: rotateY(180deg);
+}
+
+.flipCardBack p {
+  font-size: 0.95rem;
+  line-height: 1.5;
+}
+
+/* Button */
+.exploreBtn {
+  margin-top: 70px;
+  padding: 14px 36px;
+  background: #0041ad;
+  color: #ffffff;
+  border: none;
+  border-radius: 10px;
+  font-size: 1rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+.exploreBtn:hover {
+  background: #f6f63f;
+  color: #031444;
+  transform: translateY(-3px);
 }
 
 /* ---------- Academic Suite ---------- */
 .academicSuite {
     position: relative;
-    padding: 100px 60px;
+    padding: 50px 50px;
     text-align: center;
     color: #fff;
     overflow: hidden;
 }
 
-/* Background with gradient (placeholder for institutions.gif) */
+/* Background */
 .academicSuite::before {
     content: "";
     position: absolute;
     inset: 0;
-    background: linear-gradient(#0547a4 0%, #0047ac 50%, #88a5db 100%);
+    background: #0041ad;
     z-index: 0;
 }
 
-/* Translucent overlay */
-.suiteOverlay {
-    position: absolute;
-    inset: 0;
-    background: rgba(0, 0, 0, 0.4);
-    z-index: 1;
-}
-
-/* Header text styling */
+/* Header */
 .suiteHeader {
     position: relative;
     z-index: 2;
-    max-width: 800px;
-    margin: 0 auto 60px;
+    max-width: 750px;
+    margin: 0 auto 50px;
 }
 
 .suiteHeader h2 {
-    font-size: 2.5rem;
-    margin-bottom: 15px;
-    color: #fff;
+    font-size: 2.8rem;
+    margin-bottom: 10px;
     font-weight: 700;
 }
 
 .suiteHeader p {
-    font-size: 1.2rem;
-    color: #f0f0f0;
-    line-height: 1.6;
+    font-size: 1.15rem;
+    opacity: 0.9;
 }
 
-/* Content grid */
-.suiteGrid {
+/* -------- Horizontal Scroll for Academic Suite -------- */
+.suiteScroll {
     display: flex;
-    justify-content: center;
-    flex-wrap: wrap;
-    gap: 40px;
-    margin-top: 40px;
-    position: relative;
-    z-index: 2;
+    gap: 25px;
+    overflow-x: auto;
+    white-space: nowrap;
+    padding-bottom: 20px;
+    scroll-snap-type: x mandatory;
+    scrollbar-width: none; /* Firefox */
 }
 
+.suiteScroll::-webkit-scrollbar {
+    display: none; /* Chrome/Safari */
+}
+
+/* Each card sits in a row */
 .suiteCard {
-    background-color: rgba(255, 255, 255, 0.15);
-    padding: 30px;
-    border-radius: 12px;
-    width: 320px;
-    text-align: left;
+    flex: 0 0 280px;         /* controls card width */
+    scroll-snap-align: start;
+    white-space: normal;     /* allow text to wrap */
+}
+
+/* Cards */
+.suiteCard {
+    background: rgba(255, 255, 255, 0.18);
+    padding: 25px;
+    border-radius: 14px;
+    width: 300px;
+    text-align: center;
     color: #fff;
-    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
-    backdrop-filter: blur(8px);
-    transition: all 0.4s ease;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.18);
+    backdrop-filter: blur(10px);
+    transition: all 0.35s ease;
     cursor: pointer;
 }
 
-/* Hover effect */
-.suiteCard:hover {
-    transform: scale(1.07);
-    background-color: rgba(255, 255, 255, 0.9);
-    color: #0a2540;
-    box-shadow: 0 6px 20px rgba(0, 0, 0, 0.25);
+.suiteCard h3 {
+    font-size: 1.25rem;
+    margin-bottom: 12px;
+    font-weight: 600;
 }
 
-.suiteCard h3,
 .suiteCard p {
-    transition: color 0.3s ease;
+    font-size: 0.95rem;
+    line-height: 1.4;
+}
+
+/* Hover */
+.suiteCard:hover {
+    transform: translateY(-6px);
+    background-color: rgba(255, 255, 255, 0.92);
+    color: #05235a;
+    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.25);
 }
 
 .suiteCard:hover h3,
 .suiteCard:hover p {
-    color: #002c6b;
+    color: #05235a;
+}
+
+/* CTA Section */
+.suiteCTA {
+  margin-top: 50px;
+  position: relative;
+  z-index: 2;
+}
+
+.suiteButton {
+  background: #ffffff;
+  color: #0041ad;
+  border: none;
+  padding: 14px 28px;
+  font-size: 1rem;
+  font-weight: 600;
+  border-radius: 40px;
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+.suiteButton:hover {
+  background: #cfe3ff;
+  transform: translateY(-3px);
 }
 
 /* ---------- Pricing Section ---------- */
 .pricing {
     text-align: center;
     padding: 100px 60px;
-    background: linear-gradient(115deg, #ffffff 0%, #a3b8df 100%);
+    background: #ffffff
 }
 
 .pricing h2 {
@@ -357,23 +459,198 @@
     background: #123a72;
 }
 
-/* ---------- About ---------- */
+/* ---------- About Section With Hover Blur ---------- */
+
 .about {
-    text-align: center;
-    padding: 100px 60px;
-    background: linear-gradient(to bottom, #F5F8FD, #ffffff);
+  position: relative;
+  text-align: center;
+  padding: 120px 60px;
+  color: white;
+  overflow: hidden;
 }
 
-.about p {
-    color: #3B4F8E;
-    max-width: 800px;
-    margin: 0 auto 30px;
+/* Background Video — CLEAR BY DEFAULT */
+.aboutVideo {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  filter: none; /* no blur, no darkening initially */
+  transition: filter 0.5s ease;
+  z-index: 1;
+}
+
+/* Overlay (hidden by default) */
+.aboutOverlay {
+  position: absolute;
+  inset: 0;
+  background: rgba(0, 0, 0, 0); /* Invisible initially */
+  transition: background 0.5s ease;
+  z-index: 2;
+}
+
+/* Content – HIDDEN initially */
+.aboutContent {
+  position: relative;
+  z-index: 3;
+  max-width: 800px;
+  margin: 0 auto;
+  opacity: 0; /* hide initially */
+  transform: translateY(10px);
+  transition: opacity 0.5s ease, transform 0.5s ease;
+}
+
+.aboutContent p {
+  color: #E4E7F5;
+  margin-bottom: 30px;
+}
+
+/* ---------- HOVER EFFECTS ---------- */
+
+.about:hover .aboutVideo {
+  filter: blur(4px) brightness(70%);
+}
+
+.about:hover .aboutOverlay {
+  background: rgba(0, 0, 0, 0.3);
+}
+
+.about:hover .aboutContent {
+  opacity: 1;             /* Reveal text */
+  transform: translateY(0); 
+}
+
+/* ---------- Marketplace Preview ---------- */
+.marketplacePreview {
+  padding: 90px 60px;
+  background: #c4d8f7;
+  text-align: center;
+}
+
+.marketplaceTitle {
+  font-size: 2.6rem;
+  color: #0041ad;
+  font-family: "Poppins", sans-serif;
+}
+
+.marketplaceDescription {
+  font-size: 1rem;
+  color: #0b1c57;
+  max-width: 600px;
+  margin: 10px auto;
+  line-height: 1.6;
+  font-family: "Inter", sans-serif;
+}
+
+/* Search bar */
+.searchWrapper {
+  margin: 28px auto 0 auto;
+  background: #f7f9ff;
+  border: 1px solid #e1e8f5;
+  padding: 14px 18px;
+  border-radius: 14px;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  cursor: pointer;
+  transition: 0.25s ease;
+  max-width: 450px;
+}
+
+.searchInput {
+  border: none;
+  background: transparent;
+  width: 100%;
+}
+
+/* ---------- HORIZONTAL SCROLL ---------- */
+.horizontalScroll {
+  margin-top: 40px;
+  display: flex;
+  gap: 26px;                     /* more spacing */
+  overflow-x: auto;
+  padding-bottom: 12px;
+  scroll-behavior: smooth;
+}
+
+.horizontalScroll::-webkit-scrollbar {
+  height: 8px;
+}
+
+.horizontalScroll::-webkit-scrollbar-thumb {
+  background: #97aee0;
+  border-radius: 10px;
+}
+
+/* Larger Cards */
+.courseCard {
+  min-width: 260px;              /* increased from 220 */
+  max-width: 260px;
+  background: #ffffff;
+  border-radius: 14px;
+  overflow: hidden;
+  cursor: pointer;
+  border: 1px solid #e8eefc;
+  box-shadow: 0 3px 10px rgba(0, 41, 112, 0.06);
+  transition: all 0.3s ease;
+}
+
+.courseCard:hover {
+  transform: translateY(-6px);
+  box-shadow: 0 12px 28px rgba(0, 41, 112, 0.15);
+}
+
+/* Slightly bigger image */
+.courseImage {
+  width: 100%;
+  height: 155px;                 /* increased from 130 */
+  object-fit: cover;
+}
+
+/* More breathing room */
+.courseInfo {
+  padding: 18px;                 /* increased from 14 */
+}
+
+/* Bigger readable title */
+.courseInfo h3 {
+  font-size: 1.1rem;             /* increased */
+  font-weight: 600;
+  margin-bottom: 6px;
+  color: #1a2c55;
+}
+
+/* Teacher text */
+.teacher {
+  font-size: 0.9rem;             /* slightly bigger */
+  color: #7a86a8;
+}
+
+/* Price text */
+.price {
+  margin-top: 10px;
+  font-size: 1.05rem;            /* bigger */
+  font-weight: 700;
+  color: #003e99;
+}
+
+/* Button */
+.viewAllBtn {
+  margin-top: 50px;
+  padding: 13px 32px;
+  background: #003e99;
+  color: white;
+  border: none;
+  border-radius: 10px;
+  cursor: pointer;
 }
 
 /* ---------- Blogs / Insights Section ---------- */
 .blogs {
-  padding: 100px 60px;
-  background: #f9fbff;
+  padding: 40px 60px;
+  background: #ffffff;
   text-align: center;
 }
 
@@ -463,32 +740,167 @@
   -webkit-overflow-scrolling: touch;
 }
 
-/* ---------- Responsive ---------- */
+/* Register Button */
+.registerBtn {
+  margin-top: 20px;
+  padding: 12px 28px;
+  background: #0047ac;
+  color: white;
+  border: none;
+  font-size: 1rem;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: 0.3s;
+}
+
+.registerBtn:hover {
+  background: #f6f63f;
+  color: rgb(3, 20, 68);
+}
+
+/* ---------- Sponsors Section ---------- */
+.sponsorSection {
+  padding: 40px 60px;
+  background: #ffffff;
+  text-align: center;
+}
+
+.sponsorSection h2 {
+  font-size: 1.8rem;
+  color: #0047ac;
+  margin-bottom: 25px;
+  font-family: "Poppins", sans-serif;
+}
+
+/* Slider container */
+.sponsorSlider {
+  width: 100%;
+  overflow: hidden;
+  padding: 10px 0;
+  position: relative;
+}
+
+/* Track containing scrolling logos */
+.sponsorTrack {
+  display: flex;
+  width: calc(200%); /* allows repeating loop */
+  animation: scrollSponsors 18s linear infinite;
+}
+
+/* Each logo */
+.sponsorLogo {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  min-width: 180px;
+  margin: 0 40px;
+  opacity: 0.85;
+  transition: 0.3s;
+}
+
+.sponsorLogo img {
+  height: 60px;
+  width: auto;
+  object-fit: contain;
+}
+
+.sponsorLogo:hover {
+  opacity: 1;
+  transform: scale(1.05);
+}
+
+/* Infinite scroll animation */
+@keyframes scrollSponsors {
+  0% {
+    transform: translateX(0);
+  }
+  100% {
+    transform: translateX(-50%);
+  }
+}
+
+/* ---------- Contact Section ---------- */
+.contactSection {
+  padding: 40px 60px;
+  background: #f5f8fdaa;
+  text-align: center;
+}
+
+.contactSection h2 {
+  font-size: 2.2rem;
+  color: #0047ac;
+  font-family: "Poppins", sans-serif;
+  margin-bottom: 10px;
+}
+
+.contactCenter {
+  margin-top: 40px;
+  display: flex;
+  justify-content: center;  /* Center the form */
+  align-items: center;
+  width: 100%;
+}
+
+/* Form Only */
+.contactForm {
+  max-width: 450px;
+  width: 100%;
+  background: white;
+  padding: 35px;
+  border-radius: 16px;
+  box-shadow: 0 6px 20px rgba(0, 71, 172, 0.12);
+  border-left: 6px solid #0047ac;
+  text-align: left;
+}
+
+.formGroup {
+  margin-bottom: 20px;
+}
+
+.formGroup label {
+  display: block;
+  font-size: 0.95rem;
+  font-weight: 600;
+  margin-bottom: 6px;
+  color: #003d85;
+}
+
+.formGroup input,
+.formGroup textarea {
+  width: 100%;
+  padding: 12px 14px;
+  border: 1px solid #cad8f3;
+  border-radius: 10px;
+  background: #f9fbff;
+  font-size: 0.95rem;
+  color: #022352;
+  transition: border 0.2s ease;
+}
+
+.formGroup input:focus,
+.formGroup textarea:focus {
+  border-color: #0047ac;
+  outline: none;
+  background: white;
+}
+
+.contactForm button {
+  margin-top: 10px;
+  width: 100%;
+  background: #0047ac !important;
+  color: white !important;
+  padding: 12px;
+  font-size: 1rem;
+  border-radius: 10px;
+}
+
+.contactForm button:hover {
+  background: #003b8f !important;
+}
+
+/* Mobile */
 @media (max-width: 768px) {
-    .hero {
-        flex-direction: column;
-        padding: 60px 20px;
-    }
-
-    .heroContent h1 {
-        font-size: 2rem;
-    }
-
-    .heroImage {
-        margin-left: 0;
-        margin-top: 40px;
-    }
-
-    .pricing {
-        padding: 60px 20px;
-    }
-
-    .pricingGrid {
-        flex-direction: column;
-        align-items: center;
-    }
-
-    .planCard {
-        width: 90%;
-    }
+  .contactForm {
+    width: 90%;
+  }
 }

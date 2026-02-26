@@ -1,7 +1,7 @@
 .footer {
-  background: linear-gradient(180deg, #002b6d 0%, #0156b7 100%);
+  background: #0041ad;
   color: #f4f8ff;
-  padding: 60px 80px 30px;
+  padding: 40px 80px 30px;
   font-family: 'Inter', sans-serif;
 }
 
@@ -14,54 +14,66 @@
 
 .logoSection {
   display: flex;
+  justify-content: center; 
   align-items: center;
-  gap: 12px;
 }
 
 /* Link Columns */
 .linkColumns {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
-  gap: 40px;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 80px;                 /* slightly reduced for balance */
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 0 20px;
 }
 
+/* Column Headings */
 .column h4 {
-  font-size: 1.1rem;
+  font-size: 1rem;
   font-weight: 700;
-  color: #cfe3ff;
-  margin-bottom: 16px;
+  color: #ffffff;            /* brighter for contrast */
+  margin-bottom: 18px;
+  white-space: nowrap;       /* keep heading on ONE line */
 }
 
+/* Lists */
 .column ul {
   list-style: none;
   padding: 0;
+  margin: 0;
 }
 
 .column ul li {
-  margin-bottom: 8px;
+  margin-bottom: 12px;       /* vertical separation */
 }
 
+/* Links */
 .column ul li a {
-  text-decoration: none;
-  color: #e1eeff;
+  display: block;            /* one link per line */
+  color: #ffffff;            /* white text */
+  text-decoration: none;     /* 🚫 no underline */
   font-size: 0.95rem;
+  line-height: 1.4;
+  cursor: pointer;
   transition: color 0.3s ease;
 }
 
 .column ul li a:hover {
-  color: #8ec3ff;
+  color: #9fc5ff;
+  text-decoration: none;     /* still no underline on hover */
 }
 
 /* Bottom Section */
 .footerBottom {
-  border-top: 1px solid rgba(255, 255, 255, 0.15);
+  border-top: 1px solid rgba(255, 255, 255, 0.18);
   margin-top: 60px;
   padding-top: 20px;
   display: flex;
   justify-content: space-between;
   flex-wrap: wrap;
   align-items: center;
-  font-size: 0.9rem;
+  font-size: 0.85rem;
   color: #cfe0ff;
 }
 
@@ -88,7 +100,7 @@
 
   .linkColumns {
     grid-template-columns: 1fr 1fr;
-    gap: 30px;
+    gap: 40px;
   }
 
   .footerBottom {
@@ -103,12 +115,22 @@
     grid-template-columns: 1fr;
   }
 
-  .logoSection {
-    justify-content: center;
-  }
-
   .footerBottom {
     align-items: center;
     text-align: center;
   }
+}
+
+.columnTitleLink {
+  text-decoration: none;
+  display: inline-block;
+}
+
+.columnTitleLink h4 {
+  color: #ffffff;
+  transition: color 0.3s ease;
+}
+
+.columnTitleLink:hover h4 {
+  color: #9fc5ff;
 }

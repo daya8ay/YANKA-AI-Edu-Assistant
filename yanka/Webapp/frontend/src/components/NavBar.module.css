@@ -1,43 +1,24 @@
-/* ---------- Navbar ---------- */
 .navbar {
     display: flex;
     justify-content: space-between;
     align-items: center;
-    padding: 18px 60px;
+    padding: 5px 40px;   /* remove vertical padding completely */
     background-color: #ffffff;
     position: sticky;
     top: 0;
     z-index: 1000;
     box-shadow: 0 2px 12px rgba(30, 67, 134, 0.08);
-    transition: transform 0.3s ease;
 }
 
 .navbar.scrollDown {
     transform: translateY(-100%);
 }
 
-.logoContainer {
-    display: flex;
-    align-items: center;
-    gap: 10px;
-    text-decoration: none;
-}
-
 .logoImg {
-    width: 80px;
-    height: 60px;
-    object-fit: contain;
-}
-
-.logoText {
-    font-family: 'Poppins', sans-serif;
-    font-weight: 700;
-    font-size: 1.8rem;
-    color: #1E4386;
-}
-
-.logoText .dot {
-    color: #2E5AA8;
+  width: auto;
+  height: 72px;          /* increased from 60px */
+  max-height: 72px;
+  object-fit: contain;
 }
 
 /* Navbar links */
@@ -50,30 +31,30 @@
 
 .navbar a {
     text-decoration: none;
-    color: #1E4386;
+    color: #0041ad;
     font-weight: 500;
     transition: color 0.3s;
 }
 
 .navbar a:hover {
-    color: #4678CC;
+    color: #e9df13;
 }
 
 .btnLogin {
     border: 1px solid #1E4386;
-    color: #1E4386;
+    color: #0041ad;
     padding: 8px 16px;
     border-radius: 6px;
     transition: all 0.3s;
 }
 
 .btnLogin:hover {
-    background: #1E4386;
+    background: #0041ad;
     color: white !important;
 }
 
 .btnSignup {
-    background-color: #1E4386;
+    background-color: #0041ad;
     color: white !important;
     padding: 8px 16px;
     border-radius: 6px;
@@ -81,7 +62,7 @@
 }
 
 .btnSignup:hover {
-    background-color: #2E5AA8;
+    background-color: #0c2d62;
 }
 
 /* Globe Icon */
@@ -131,7 +112,6 @@
     margin-bottom: 24px;
 }
 
-/* Close Button */
 .closeBtn {
     position: absolute;
     top: 20px;
@@ -146,7 +126,6 @@
     color: #2E5AA8;
 }
 
-/* Language Grid */
 .languageGrid {
     display: grid;
     grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
@@ -167,7 +146,6 @@
     color: #2E5AA8;
 }
 
-/* Animation */
 @keyframes fadeInUp {
     from { opacity: 0; transform: translateY(20px); }
     to { opacity: 1; transform: translateY(0); }
@@ -192,8 +170,8 @@
         height: 36px;
     }
 
-    .logoText {
-        font-size: 1.5rem;
+    .logoSubtitle {
+        font-size: 11px;
     }
 
     .modalContent {
@@ -203,4 +181,67 @@
     .languageGrid {
         grid-template-columns: repeat(2, 1fr);
     }
+}
+
+/* ---------- Dropdown ---------- */
+.dropdown {
+  position: relative;
+  cursor: pointer;
+}
+
+.dropdownToggle {
+  color: #0041ad;
+  font-weight: 500;
+  transition: color 0.3s;
+}
+
+.dropdownToggle:hover {
+  color: #e9df13;
+}
+
+/* Dropdown menu hidden by default */
+.dropdownMenu {
+  position: absolute;
+  top: 30px;
+  left: 0;
+  background: rgba(255, 255, 255, 0.988);
+  padding: 1px 0px;
+  margin: 0;
+  border-radius: 10px;
+  box-shadow: 0 8px 24px rgba(30, 67, 134, 0.15);
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+  min-width: 240px;
+
+  opacity: 0;
+  visibility: hidden;
+  transform: translateY(10px);
+  transition: all 0.25s ease;
+  z-index: 1000;
+}
+
+/* Show on hover */
+.dropdown:hover .dropdownMenu {
+  opacity: 1;
+  visibility: visible;
+  transform: translateY(0);
+}
+
+/* Dropdown links */
+.dropdownMenu li {
+    padding: 8px 20px;
+}
+
+.dropdownMenu li a {
+    color: #0041ad;
+    font-weight: 500;
+    display: block;
+    transition: all 0.2s;
+}
+
+.dropdownMenu li a:hover {
+    background: #F5F8FD;
+    border-radius: 6px;
+    color: #2E5AA8;
 }

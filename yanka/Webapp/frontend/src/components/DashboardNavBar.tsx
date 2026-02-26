@@ -25,13 +25,16 @@ const DashboardNavBar: React.FC = () => {
   return (
     <header className={`${styles.navbar} ${isScrolled ? styles.scrollDown : ""}`}>
       <Link href="/dashboard" className={styles.logoContainer}>
-        <Image
-          src="/pics/Y_Logo.jpeg"
-          alt="YANKA Logo"
-          width={42}
-          height={42}
-          className={styles.logoImg}
-        />
+        <div className={styles.logoWrapper}>
+          <Image
+            src="/pics/Y_Logo.jpeg"
+            alt="YANKA Logo"
+            width={80}
+            height={80}
+            className={styles.logoImg}
+          />
+          <span className={styles.logoSubtitle}>Yanka AI</span>
+        </div>
       </Link>
 
       <nav>

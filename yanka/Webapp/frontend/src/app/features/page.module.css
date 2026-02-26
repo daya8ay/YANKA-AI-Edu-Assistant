@@ -1,0 +1,127 @@
+.hero {
+  background: #0041ad;
+  color: white;
+  padding: 110px 60px;
+  text-align: center;
+}
+
+.hero h1 {
+  font-size: 2.6rem;
+  font-weight: 700;
+}
+
+.hero p {
+  margin-top: 12px;
+  font-size: 1.1rem;
+  opacity: 0.95;
+}
+
+/* SPLIT SECTIONS */
+.splitSection {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 15px 80px;
+  gap: 60px;
+}
+
+.reverse {
+  flex-direction: row-reverse;
+}
+
+.mediaLeft {
+  flex: 1;
+}
+
+.video {
+  width: 100%;
+  border-radius: 16px;
+  box-shadow: 0 6px 20px rgba(0, 65, 173, 0.15);
+}
+
+.textRight {
+  flex: 1;
+}
+
+.textRight h2 {
+  font-size: 1.8rem;
+  color: #0041ad;
+  margin-bottom: 20px;
+}
+
+.textRight p {
+  font-size: 1.05rem;
+  color: #022352;
+  line-height: 1.7;
+}
+
+/* CARD SECTION */
+.cardSection {
+  background: #f5f8fd;
+  padding: 100px 60px;
+  text-align: center;
+}
+
+.cardSection h2 {
+  color: #0041ad;
+  margin-bottom: 50px;
+}
+
+.cardGrid {
+  display: flex;
+  justify-content: center;
+  gap: 40px;
+  flex-wrap: wrap;
+}
+
+/* HOVER CARD */
+.hoverCard {
+  width: 320px;
+  height: 360px;
+}
+
+.cardImageWrapper {
+  position: relative;
+  width: 100%;
+  height: 100%;
+  border-radius: 16px;
+  overflow: hidden;
+  box-shadow: 0 6px 20px rgba(0, 65, 173, 0.1);
+}
+
+.cardImage {
+  object-fit: cover;
+}
+
+.overlay {
+  position: absolute;
+  inset: 0;
+  background: rgba(0, 65, 173, 0.85);
+  color: white;
+  padding: 30px;
+  opacity: 0;
+  transition: opacity 0.4s ease;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+}
+
+.cardImageWrapper:hover .overlay {
+  opacity: 1;
+}
+
+.overlay h3 {
+  margin-bottom: 15px;
+  font-size: 1.2rem;
+}
+
+/* RESPONSIVE */
+@media (max-width: 900px) {
+  .splitSection {
+    flex-direction: column;
+  }
+
+  .reverse {
+    flex-direction: column;
+  }
+}
