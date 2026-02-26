@@ -15,12 +15,35 @@ const SupportContent: React.FC = () => {
     { text: 'Hi! How can I help you?', sender: 'bot' },
   ]);
 
-  const handleSend = () => {
+  const handleSend = async () => {
     if (!input.trim()) return;
-    setMessages([...messages, { text: input, sender: 'user' }]);
-    setInput('');
-  };
 
+    const userMessage = { text: input, sender: "user" as const };
+    setMessages((prev) => [...prev, userMessage]);
+    setInput("");
+
+    try {
+      const res = await fetch("/api/chat", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ message: input }),
+      });
+
+      const data = await res.json();
+
+      setMessages((prev) => [
+        ...prev,
+        { text: data.response, sender: "bot" },
+      ]);
+    } catch (error) {
+      setMessages((prev) => [
+        ...prev,
+        { text: "Sorry, something went wrong.", sender: "bot" },
+      ]);
+    }
+  };
   return (
     <>
       <main className={styles.main}>
