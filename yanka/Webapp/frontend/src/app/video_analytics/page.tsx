@@ -3,6 +3,7 @@
 import React, { useRef, useState, useEffect } from "react";
 import DashboardNavBar from "../../components/DashboardNavBar";
 import Footer from "@/components/Footer";
+import { api } from "@/lib/api";
 import styles from "./video_analytics.module.css";
 
 interface AnalyticsEvent {
@@ -31,6 +32,10 @@ const VideoAnalytics = () => {
   const [completionTime, setCompletionTime] = useState<number | null>(null);
   const [replayCount, setReplayCount] = useState(0);
   const [lastDetectedTime, setLastDetectedTime] = useState(0);
+  const [prediction, setPrediction] = useState<number | string | null>(null);
+  const [predictionLoading, setPredictionLoading] = useState(false);
+  const [predictionError, setPredictionError] = useState<string | null>(null);
+  const [lastSentMetrics, setLastSentMetrics] = useState<Record<string, number | string> | null>(null);
 
   // Track analytics event
   const trackEvent = (type: string, value?: any) => {
@@ -223,41 +228,27 @@ const VideoAnalytics = () => {
     };
   };
 
-  // Send analytics to backend (placeholder - implement your API call here)
+  // Send video metrics to backend and get ML prediction
   const sendAnalyticsToBackend = async () => {
-    const summary = getAnalyticsSummary();
-    const analyticsData = {
-      events: analytics,
-      summary,
-      metrics: {
-        playCount,
-        pauseCount,
-        seekCount,
-        speedChangeCount,
-        replayCount,
-        totalWatchTime: Math.floor(totalWatchTime),
-        currentTime: Math.floor(currentTime),
-        duration: Math.floor(duration),
-        playbackRate,
-        volume,
-      },
+    setPredictionError(null);
+    setPrediction(null);
+    setPredictionLoading(true);
+    const metrics = {
+      video_topic: "Yanka platform overview",
+      video_duration: Number((duration / 60).toFixed(2)) || 0,
+      time_watched: Number((totalWatchTime / 60).toFixed(2)) || 0,
+      skip_count: seekCount,
+      pause_count: pauseCount,
     };
-
-    console.log("Sending analytics to backend:", analyticsData);
-    
-    // TODO: Replace with your actual backend API endpoint
-    // try {
-    //   const response = await fetch("http://localhost:8000/api/video-analytics", {
-    //     method: "POST",
-    //     headers: { "Content-Type": "application/json" },
-    //     body: JSON.stringify(analyticsData),
-    //   });
-    //   if (response.ok) {
-    //     console.log("Analytics sent successfully");
-    //   }
-    // } catch (error) {
-    //   console.error("Error sending analytics:", error);
-    // }
+    setLastSentMetrics(metrics);
+    try {
+      const result = await api.getVideoPrediction(metrics);
+      setPrediction(result.prediction);
+    } catch (err) {
+      setPredictionError(err instanceof Error ? err.message : "Failed to get prediction");
+    } finally {
+      setPredictionLoading(false);
+    }
   };
 
   const summary = getAnalyticsSummary();
@@ -284,7 +275,7 @@ const VideoAnalytics = () => {
                 onCanPlay={handleCanPlay}
                 controls={false}
               >
-                <source src="/video/intro.mp4" type="video/mp4" />
+                <source src="/video/test.mp4" type="video/mp4" />
                 Your browser does not support the video tag.
               </video>
 
@@ -405,9 +396,33 @@ const VideoAnalytics = () => {
               <button
                 onClick={sendAnalyticsToBackend}
                 className={styles.sendButton}
+                disabled={predictionLoading}
               >
-                Send Analytics to Backend
+                {predictionLoading ? "Getting prediction…" : "Send Analytics & Get Prediction"}
               </button>
+
+              {(prediction !== null || predictionError || lastSentMetrics) && (
+                <div className={styles.predictionCard}>
+                  {lastSentMetrics && (
+                    <div className={styles.metricsList}>
+                      <h4>Metrics sent</h4>
+                      <ul>
+                        <li>video_topic: {String(lastSentMetrics.video_topic)}</li>
+                        <li>video_duration: {String(lastSentMetrics.video_duration)}m</li>
+                        <li>time_watched: {String(lastSentMetrics.time_watched)}m</li>
+                        <li>skip_count: {String(lastSentMetrics.skip_count)}</li>
+                        <li>pause_count: {String(lastSentMetrics.pause_count)}</li>
+                      </ul>
+                    </div>
+                  )}
+                  <h3>User Engagement Prediction</h3>
+                  {predictionError ? (
+                    <p className={styles.predictionError}>{predictionError}</p>
+                  ) : prediction !== null ? (
+                    <p className={styles.predictionValue}>{Number(prediction).toFixed(2)}</p>
+                  ) : null}
+                </div>
+              )}
 
               <div className={styles.eventsLog}>
                 <h3>Event Log (Last 10)</h3>
