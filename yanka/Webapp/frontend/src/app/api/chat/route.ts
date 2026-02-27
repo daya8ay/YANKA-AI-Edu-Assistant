@@ -8,7 +8,7 @@ export async function POST(req: Request) {
   try {
     const { message } = await req.json();
     
-      let content_message: string = `
+      const content_message: string = `
       You are YANKA's support assistant.Only answer questions related to YANKA's features,
       pricing, and account issues. If asked anything unrelated, politely decline and redirect the user.
       Be concise, polite, and brief in your answers.

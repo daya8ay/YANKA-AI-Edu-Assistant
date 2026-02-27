@@ -452,7 +452,7 @@ export default function Home() {
 <section id="contact" className={styles.contactSection}>
   <h2>Contact Us</h2>
   <p className={styles.subtitle}>
-    Have questions? We're here to help you learn, grow, and succeed.
+    Have questions? We&apos;re here to help you learn, grow, and succeed.
   </p>
 
   <div className={styles.contactCenter}>
