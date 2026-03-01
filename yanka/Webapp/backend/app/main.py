@@ -3,6 +3,7 @@ from fastapi.middleware.cors import CORSMiddleware
 from dotenv import load_dotenv
 from pydantic import BaseModel
 from openai import OpenAI
+from pathlib import Path
 import os
 
 load_dotenv()
@@ -36,6 +37,7 @@ class ChatRequest(BaseModel):
 
 @app.post("/chat")
 def chat(request: ChatRequest):
+    load_dotenv(dotenv_path=Path(__file__).resolve().parents[2] / ".env")
     client = OpenAI(api_key=os.getenv("OPENAI_API_KEY"))
 
     message_content = """You are YANKA's support assistant.Only answer questions related to YANKA's features,
