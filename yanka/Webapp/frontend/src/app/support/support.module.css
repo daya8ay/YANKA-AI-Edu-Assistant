@@ -43,8 +43,6 @@
     box-sizing: border-box;
   }
   
-  
-  
   .main {
     display: flex;
     flex-direction: column;
@@ -148,8 +146,8 @@
   position: fixed;
   bottom: 90px;
   right: 20px;
-  width: 280px;
-  height: 380px;
+  width: 400px;
+  height: 550px;
   background: white;
   border: 1px solid #ddd;
   border-radius: 12px;

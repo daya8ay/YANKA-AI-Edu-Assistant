@@ -43,3 +43,5 @@ next-env.d.ts
 # macOS file
 .DS_Store
 
+# API Folder
+.env.local
