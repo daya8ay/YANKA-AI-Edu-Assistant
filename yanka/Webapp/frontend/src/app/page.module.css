@@ -345,14 +345,31 @@
     box-shadow: 0 4px 12px rgba(30, 67, 134, 0.05);
     transition: transform 0.3s, box-shadow 0.3s;
     position: relative;
+
+    display: flex;
+    flex-direction: column;
+}
+
+.planCard a {
+    margin-top: auto;
 }
 
 .planCard ul {
-    list-style: none;
-    padding-left: 0;
+    list-style: disc;
+    padding-left: 20px;
     color: #003a8a;
     text-align: left;
     margin-top: 15px;
+    flex-grow: 1;
+}
+
+.planCard ul li {
+    margin: 8px 0;
+    line-height: 1.5;
+}
+
+.planCard ul li::marker {
+    color: #0047ac;
 }
 
 .planCard:hover {
@@ -394,10 +411,6 @@
     font-weight: 700;
     color: #0047ac;
     margin: 10px 0 20px;
-}
-
-.planCard ul li {
-    margin: 8px 0;
 }
 
 .btnPrimary.small,
