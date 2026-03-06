@@ -83,13 +83,13 @@ const NavBar: React.FC = () => {
               {/* Dropdown */}
               <ul className={styles.dropdownMenu}>
                 <li>
-                  <Link href="/about#promise">Our Promise</Link>
+                  <Link href="/about#promise">Promise</Link>
                 </li>
                 <li>
-                  <Link href="/about#mission">Our Mission</Link>
+                  <Link href="/about#mission">Mission</Link>
                 </li>
                 <li>
-                  <Link href="/about#vision">Our Vision</Link>
+                  <Link href="/about#vision">Vision</Link>
                 </li>
               </ul>
             </li>
@@ -140,7 +140,7 @@ const NavBar: React.FC = () => {
                 </li>
               </ul>
             </li>
-            <li><Link href="/#pricing">Pricing & Plans</Link></li>
+            <li><Link href="/#pricing">Pricing</Link></li>
             <li><Link href="/#marketplace">Marketplace</Link></li>
             <li><Link href="/support">Support</Link></li>
             <li><Link href="/login" className={styles.btnLogin}>Login</Link></li>

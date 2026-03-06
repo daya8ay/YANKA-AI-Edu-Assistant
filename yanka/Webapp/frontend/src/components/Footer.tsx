@@ -27,7 +27,7 @@ const Footer: React.FC = () => {
           {/* Platform */}
             <div className={styles.column}>
               <Link href="/features" className={styles.columnTitleLink}>
-                <h4>Platform</h4>
+                <h4>Features</h4>
               </Link>
               <ul>
                 <li>
@@ -79,11 +79,15 @@ const Footer: React.FC = () => {
           <div className={styles.column}>
             <h4>Resources</h4>
             <ul>
-              <li><Link href="/#pricing">Pricing & Plans</Link></li>
-              <li><Link href="#">Documentation</Link></li>
+              <li>
+                <Link href="/#pricing">Pricing</Link>
+              </li>
+              <li><Link href="#">Integration</Link></li>
               <li><Link href="#">Community & Blog</Link></li>
               <li><Link href="#">Academic Integrity</Link></li>
-              <li><Link href="#">Support Center</Link></li>
+              <li>
+                <Link href="/support">Support Center</Link>
+              </li>
             </ul>
           </div>
 
@@ -91,7 +95,7 @@ const Footer: React.FC = () => {
           <div className={styles.column}>
             <h4>Company</h4>
             <ul>
-              <li><Link href="/#about">About Yanka</Link></li>
+              <li><Link href="/#about">About</Link></li>
               <li><Link href="#">Vision & Ethics</Link></li>
               <li><Link href="#">Partnerships</Link></li>
               <li><Link href="#">Affiliates</Link></li>

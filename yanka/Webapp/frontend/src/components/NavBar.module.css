@@ -184,64 +184,78 @@
 }
 
 /* ---------- Dropdown ---------- */
+
 .dropdown {
   position: relative;
   cursor: pointer;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;   /* ensures left alignment */
 }
 
-.dropdownToggle {
+/* Main navbar title */
+.dropdownTitle {
   color: #0041ad;
   font-weight: 500;
   transition: color 0.3s;
 }
 
-.dropdownToggle:hover {
+.dropdownTitle:hover {
   color: #e9df13;
 }
 
 /* Dropdown menu hidden by default */
 .dropdownMenu {
   position: absolute;
-  top: 30px;
-  left: 0;
-  background: rgba(255, 255, 255, 0.988);
-  padding: 1px 0px;
+  top: 38px;
+  left: 0;                  /* keeps dropdown aligned to left of title */
+  background: rgba(255, 255, 255, 0.99);
+  padding: 8px 0;
   margin: 0;
   border-radius: 10px;
   box-shadow: 0 8px 24px rgba(30, 67, 134, 0.15);
+
   display: flex;
   flex-direction: column;
-  gap: 5px;
+  align-items: flex-start;  /* LEFT ALIGN ITEMS */
+
   min-width: 240px;
 
   opacity: 0;
   visibility: hidden;
   transform: translateY(10px);
   transition: all 0.25s ease;
+
   z-index: 1000;
 }
 
-/* Show on hover */
+/* Show dropdown on hover */
 .dropdown:hover .dropdownMenu {
   opacity: 1;
   visibility: visible;
   transform: translateY(0);
 }
 
-/* Dropdown links */
+/* List items */
 .dropdownMenu li {
-    padding: 8px 20px;
+  width: 100%;
+  padding: 8px 20px;
+  list-style: none;
 }
 
+/* Dropdown links */
 .dropdownMenu li a {
-    color: #0041ad;
-    font-weight: 500;
-    display: block;
-    transition: all 0.2s;
+  color: #0041ad;
+  font-weight: 500;
+  display: block;
+  width: 100%;
+  text-align: left;     /* ensure text is left aligned */
+  transition: all 0.2s ease;
 }
 
+/* Hover effect */
 .dropdownMenu li a:hover {
-    background: #F5F8FD;
-    border-radius: 6px;
-    color: #2E5AA8;
+  background: #F5F8FD;
+  border-radius: 6px;
+  color: #2E5AA8;
 }
