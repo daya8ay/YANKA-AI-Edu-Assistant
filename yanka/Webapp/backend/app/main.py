@@ -1,15 +1,46 @@
-export const runtime = "nodejs";
-import OpenAI from "openai";
+from fastapi import FastAPI, HTTPException
+from fastapi.middleware.cors import CORSMiddleware
+from dotenv import load_dotenv
+from pydantic import BaseModel
+from openai import OpenAI
+from pathlib import Path
+import os
 
-export async function POST(req: Request) {
-    const openai = new OpenAI({
-        apiKey: process.env.OPENAI_API_KEY!,
-        });
-  try {
-    const { message } = await req.json();
-    
-      const content_message: string = `
-      You are YANKA's support assistant.Only answer questions related to YANKA's features,
+load_dotenv()
+
+app = FastAPI(
+    title="YANKA API",
+    description="Backend API for YANKA",
+    version="0.1.0",
+)
+
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=["http://localhost:3000"],
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"],
+)
+
+
+@app.get("/health")
+def health():
+    return {"status": "ok"}
+
+
+@app.get("/")
+def root():
+    return {"message": "YANKA API", "docs": "/docs"}
+
+class ChatRequest(BaseModel):
+    message: str
+
+@app.post("/chat")
+def chat(request: ChatRequest):
+    load_dotenv(dotenv_path=Path(__file__).resolve().parents[2] / ".env")
+    client = OpenAI(api_key=os.getenv("OPENAI_API_KEY"))
+
+    message_content = """You are YANKA's support assistant.Only answer questions related to YANKA's features,
       pricing, and account issues. If asked anything unrelated, politely decline and redirect the user.
       Be concise, polite, and brief in your answers.
 
@@ -38,24 +69,20 @@ export async function POST(req: Request) {
 
        ## Support number
        If users want to talk to a human tell them to call at "123-456-7890"
-       `;
-
-
-    const completion = await openai.chat.completions.create({
-      model: "gpt-4o-mini",
-      messages: [
-        {
-          role: "system",
-          content: content_message,
-        },
-        { role: "user", content: message },
-      ],
-    });
-
-    return Response.json({
-      response: completion.choices[0].message.content,
-    });
-  } catch (error) {
-    return Response.json({ error: "Something went wrong" }, { status: 500 });
-  }
-}
+       """
+    
+    completion = client.chat.completions.create(
+        model="gpt-4o-mini",
+        messages=[
+            {
+                "role": "system",
+                "content": message_content
+            },
+            {
+                "role": "user",
+                "content": request.message
+            }
+        ]
+    )
+    
+    return {"response": completion.choices[0].message.content}
