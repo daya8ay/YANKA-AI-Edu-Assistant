@@ -80,19 +80,22 @@
   color: white;
 }
 
-.suggestions{
+.suggestions {
   font-size: 35px;
   padding-top: 100px;
+  padding-bottom: 0;
   padding-left: 50px;
   color: white;
+  margin-bottom: 12px;
 }
 
 .imageRow {
   display: flex;
   justify-content: flex-start;
-  align-items: flex-start;      
-  gap: 20px;                    
+  align-items: flex-start;
+  gap: 20px;
   padding-left: 50px;
+  margin-top: 0;
 }
 
 .imageItem {
@@ -169,21 +172,27 @@
 }
 
 .userMessage {
-  align-self: flex-start;
-  background-color: #f0f0f0;
+  align-self: flex-end;
+  background-color: #0070f3;
   color: #333;
   padding: 8px 12px;
   border-radius: 12px;
   max-width: 80%;
+  display: flex;      
+  gap: 8px;           
+  align-items: flex-start; 
 }
 
 .botMessage {
-  align-self: flex-end;
-  background-color: #0070f3;
+  align-self: flex-start;
+  background-color: #bcbcbc;
   color: white;
   padding: 8px 12px;
   border-radius: 12px;
   max-width: 80%;
+  display: flex;      
+  gap: 8px;           
+  align-items: flex-start; 
 }
 
 .inputArea {
@@ -221,4 +230,253 @@
     opacity: 1;
     transform: translateY(0);
   }
+}
+
+.faqSection {
+  width: 100%;
+  padding: 60px 50px 40px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.faqTitle {
+  font-size: 35px;
+  color: white;
+  margin-bottom: 20px;
+  text-align: center;
+}
+
+.faqCarousel {
+  display: flex;
+  align-items: center;
+  gap: 24px;
+  width: 100%;
+  max-width: 1500px;
+  justify-content: center;
+}
+
+.faqTrack {
+  display: flex;
+  flex-direction: row;
+  overflow: hidden;
+  gap: 50px;          
+  padding: 70px 30px;
+  width: 100%;
+  justify-content: center;
+}
+.arrowBtn {
+  background: rgba(255, 255, 255, 0.15);
+  border: 2px solid rgba(255, 255, 255, 0.4);
+  color: white;
+  font-size: 24px;
+  width: 48px;
+  height: 48px;
+  border-radius: 50%;
+  cursor: pointer;
+  flex-shrink: 0;
+  transition: background 0.3s;
+}
+
+.arrowBtn:hover {
+  background: #0070f3;
+  text-decoration: underline;
+}
+
+.arrowBtnWrapper {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 6px;
+}
+
+.viewMore {
+  color: white;
+  font-size: 12px;
+  opacity: 0.7;
+}
+
+.faqBox {
+  position: relative;
+  min-width: 320px;
+  max-width: 320px;  
+  width: 320px;
+  height: 380px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  flex-shrink: 0;
+  transition: 0.5s;
+  isolation: isolate; /* fixes the bleed-through on adjacent cards */
+}
+
+.faqBox::before {
+  content: ' ';
+  position: absolute;
+  top: 0;
+  left: 50px;
+  width: 50%;
+  height: 100%;
+  background: #fff;
+  border-radius: 8px;
+  transform: skewX(15deg);
+  transition: 0.5s;
+  z-index: 0;
+}
+
+.faqBox::after {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 50px;
+  width: 50%;
+  height: 100%;
+  background: #fff;
+  border-radius: 8px;
+  transform: skewX(15deg);
+  transition: 0.5s;
+  filter: blur(20px); /* reduced from 30px */
+  z-index: 0;
+}
+
+.faqBox:hover::before,
+.faqBox:hover::after {
+  transform: skewX(0deg);
+  left: 20px;
+  width: calc(100% - 90px);
+}
+
+.faqBox:nth-child(1)::before,
+.faqBox:nth-child(1)::after {
+  background: linear-gradient(315deg, #0070f3, #00c6ff);
+}
+
+.faqBox:nth-child(2)::before,
+.faqBox:nth-child(2)::after {
+  background: linear-gradient(315deg, #005bb5, #0070f3);
+}
+
+.faqBox:nth-child(3)::before,
+.faqBox:nth-child(3)::after {
+  background: linear-gradient(315deg, #00c6ff, #0070f3);
+}
+
+.faqBox:nth-child(4)::before,
+.faqBox:nth-child(4)::after {
+  background: linear-gradient(315deg, #0070f3, #005bb5);
+}
+
+.faqBox span {
+  display: block;
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  z-index: 5;
+  pointer-events: none;
+}
+
+.faqBox span::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 0;
+  height: 0;
+  border-radius: 8px;
+  background: rgba(255, 255, 255, 0.1);
+  backdrop-filter: blur(10px);
+  opacity: 0;
+  transition: 0.1s;
+  animation: faqAnimate 2s ease-in-out infinite;
+  box-shadow: 0 5px 15px rgba(0, 0, 0, 0.08);
+}
+
+.faqBox:hover span::before {
+  top: -50px;
+  left: 50px;
+  width: 100px;
+  height: 100px;
+  opacity: 1;
+}
+
+.faqBox span::after {
+  content: '';
+  position: absolute;
+  bottom: 0;
+  right: 0;
+  width: 100%;
+  height: 100%;
+  border-radius: 8px;
+  background: rgba(255, 255, 255, 0.1);
+  backdrop-filter: blur(10px);
+  opacity: 0;
+  transition: 0.5s;
+  animation: faqAnimate 2s ease-in-out infinite;
+  box-shadow: 0 5px 15px rgba(0, 0, 0, 0.08);
+  animation-delay: -1s;
+}
+
+.faqBox:hover span::after {
+  bottom: -50px;
+  right: 50px;
+  width: 100px;
+  height: 100px;
+  opacity: 1;
+}
+
+@keyframes faqAnimate {
+  0%, 100% { transform: translateY(10px); }
+  50%       { transform: translateX(-10px); }
+}
+
+.faqContent {
+  position: relative;
+  left: 0;
+  padding: 20px 30px;
+  background: rgba(255, 255, 255, 0.05);
+  backdrop-filter: blur(10px);
+  box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+  border-radius: 8px;
+  z-index: 1;
+  transition: 0.5s;
+  color: #fff;
+}
+
+.faqBox:hover .faqContent {
+  left: -25px;
+  padding: 40px 30px;
+}
+
+.faqContent h2 {
+  font-size: 1.4em;
+  color: #fff;
+  margin-bottom: 10px;
+}
+
+.faqContent p {
+  font-size: 0.95em;
+  margin-bottom: 10px;
+  line-height: 1.4em;
+}
+
+.avatar {
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  object-fit: cover;
+  flex-shrink: 0;
+}
+
+.messageContent {
+  display: flex;
+  flex-direction: column;
+}
+
+.senderName {
+  font-size: 11px;
+  font-weight: 600;
+  margin-bottom: 2px;
+  opacity: 0.75;
 }

@@ -24,6 +24,8 @@ services:
     environment:
       DATABASE_URL: postgresql://yanka_user:yanka_password@db:5432/yanka_dev
       OPENAI_API_KEY: ${OPENAI_API_KEY}
+    volumes:
+      - ./yanka/Webapp/backend:/app
     depends_on:
       - db
 
@@ -37,5 +39,9 @@ services:
       - "3000:3000"
     environment:
       OPENAI_API_KEY: ${OPENAI_API_KEY}
+    volumes:
+      - ./yanka/Webapp/frontend:/app
+      - /app/node_modules
+      - /app/.next
     depends_on:
       - backend
