@@ -267,6 +267,7 @@
 }
 .arrowBtn {
   background: rgba(255, 255, 255, 0.15);
+  text-decoration: none;
   border: 2px solid rgba(255, 255, 255, 0.4);
   color: white;
   font-size: 24px;
@@ -280,7 +281,7 @@
 
 .arrowBtn:hover {
   background: #0070f3;
-  text-decoration: underline;
+  text-decoration: none;
 }
 
 .arrowBtnWrapper {
@@ -307,7 +308,7 @@
   align-items: center;
   flex-shrink: 0;
   transition: 0.5s;
-  isolation: isolate; /* fixes the bleed-through on adjacent cards */
+  isolation: isolate;
 }
 
 .faqBox::before {
@@ -335,16 +336,16 @@
   border-radius: 8px;
   transform: skewX(15deg);
   transition: 0.5s;
-  filter: blur(20px); /* reduced from 30px */
-  z-index: 0;
+  filter: blur(20px);
+   z-index: 0;
 }
 
-.faqBox:hover::before,
+/* .faqBox:hover::before,
 .faqBox:hover::after {
   transform: skewX(0deg);
   left: 20px;
   width: calc(100% - 90px);
-}
+} */
 
 .faqBox:nth-child(1)::before,
 .faqBox:nth-child(1)::after {
@@ -393,7 +394,7 @@
   box-shadow: 0 5px 15px rgba(0, 0, 0, 0.08);
 }
 
-.faqBox:hover span::before {
+/* .faqBox:hover span::before {
   top: -50px;
   left: 50px;
   width: 100px;
@@ -401,7 +402,7 @@
   opacity: 1;
 }
 
-.faqBox span::after {
+ .faqBox span::after {
   content: '';
   position: absolute;
   bottom: 0;
@@ -416,7 +417,7 @@
   animation: faqAnimate 2s ease-in-out infinite;
   box-shadow: 0 5px 15px rgba(0, 0, 0, 0.08);
   animation-delay: -1s;
-}
+} 
 
 .faqBox:hover span::after {
   bottom: -50px;
@@ -424,7 +425,7 @@
   width: 100px;
   height: 100px;
   opacity: 1;
-}
+} */
 
 @keyframes faqAnimate {
   0%, 100% { transform: translateY(10px); }

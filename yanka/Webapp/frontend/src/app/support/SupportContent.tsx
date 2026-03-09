@@ -128,13 +128,10 @@ const SupportContent: React.FC = () => {
             </div>
           </div>
 
-        <div className={styles.arrowBtnWrapper}>
-          <button className={styles.arrowBtn} onClick={() => {
-            const el = document.getElementById('faqTrack');
-            if (el) el.scrollBy({ left: 320, behavior: 'smooth' });
-          }}>&#8594;</button>
-          <span className={styles.viewMore}>View More</span>
-        </div>
+          <div className={styles.arrowBtnWrapper}>
+            <Link href="/faq" className={styles.arrowBtn}>&#8594;</Link>
+            <span className={styles.viewMore}>View More</span>
+          </div>
         </div>
       </div>
 
