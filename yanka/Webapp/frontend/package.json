@@ -9,6 +9,9 @@
     "lint": "eslint"
   },
   "dependencies": {
+    "@aws-amplify/ui-react": "^6.15.1",
+    "aws-amplify": "^6.16.2",
+    "jose": "^6.2.1",
     "next": "15.5.6",
     "openai": "^6.25.0",
     "react": "19.1.0",

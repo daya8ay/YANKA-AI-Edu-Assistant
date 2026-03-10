@@ -1,0 +1,13 @@
+.amplify-textareafield {
+  max-height: 100%;
+  flex-direction: column;
+  --amplify-components-fieldcontrol-color: var(
+    --amplify-components-textareafield-color
+  );
+  --amplify-components-fieldcontrol-border-color: var(
+    --amplify-components-textareafield-border-color
+  );
+  --amplify-components-fieldcontrol-focus-border-color: var(
+    --amplify-components-textareafield-focus-border-color
+  );
+}

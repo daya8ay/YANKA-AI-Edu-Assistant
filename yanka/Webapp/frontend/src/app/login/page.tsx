@@ -3,39 +3,68 @@
 import React, { useState } from "react";
 import Link from "next/link";
 import Image from "next/image";
-import { useRouter } from "next/navigation"; // ✅ Import router
+import { useRouter } from "next/navigation";
+import { signIn } from "aws-amplify/auth";
 import styles from "./login.module.css";
 
 export default function Login() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
-  const router = useRouter(); // ✅ Initialize router
+  const [error, setError] = useState<string | null>(null);
+  const [loading, setLoading] = useState(false);
+  const router = useRouter();
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    // For now, skip authentication
-    console.log("Login:", { email, password });
-    router.push("/dashboard"); // ✅ Redirect to dashboard
+    setError(null);
+    setLoading(true);
+
+    try {
+      const { isSignedIn, nextStep } = await signIn({
+        username: email,
+        password,
+      });
+
+      if (isSignedIn) {
+        router.push("/dashboard");
+      } else if (nextStep.signInStep === "CONFIRM_SIGN_UP") {
+        // User registered but hasn't verified their email yet
+        router.push(`/signup?verify=true&email=${encodeURIComponent(email)}`);
+      } else {
+        setError(`Unexpected step: ${nextStep.signInStep}`);
+      }
+    } catch (err: unknown) {
+      if (err instanceof Error) {
+        setError(err.message);
+      } else {
+        setError("Login failed. Please try again.");
+      }
+    } finally {
+      setLoading(false);
+    }
   };
 
   return (
     <div className={styles.loginContainer}>
       <div className={styles.loginBox}>
         {/* LOGO */}
-        <Image 
-          src="/pics/Y_Logo.jpeg" 
-          alt="YANKA Logo" 
-          width={100} 
-          height={100} 
+        <Image
+          src="/pics/Y_Logo.jpeg"
+          alt="YANKA Logo"
+          width={100}
+          height={100}
           className={styles.logo}
         />
 
-        <h1>
-          Welcome Back
-        </h1>
-        <p className={styles.subtitle}>
-          Log in to your AI-powered portfolio
-        </p>
+        <h1>Welcome Back</h1>
+        <p className={styles.subtitle}>Log in to your AI-powered portfolio</p>
+
+        {/* Error banner */}
+        {error && (
+          <p style={{ color: "red", marginBottom: "12px", fontSize: "14px" }}>
+            {error}
+          </p>
+        )}
 
         <form className={styles.loginForm} onSubmit={handleSubmit}>
           <div className={styles.formGroup}>
@@ -46,6 +75,7 @@ export default function Login() {
               placeholder="Enter your email"
               value={email}
               onChange={(e) => setEmail(e.target.value)}
+              required
             />
           </div>
 
@@ -58,12 +88,13 @@ export default function Login() {
                 placeholder="Enter your password"
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
+                required
               />
             </div>
           </div>
 
-          <button type="submit" className={styles.loginBtn}>
-            Login
+          <button type="submit" className={styles.loginBtn} disabled={loading}>
+            {loading ? "Logging in…" : "Login"}
           </button>
         </form>
 
