@@ -12,7 +12,7 @@ const SupportContent: React.FC = () => {
   const [isOpen, setIsOpen] = useState(false);
   const [input, setInput] = useState('');
   const [messages, setMessages] = useState<Message[]>([
-    { text: 'Hi! How can I help you?', sender: 'bot' },
+    { text: 'Hello! My name is YANKA. How can I help you today?', sender: 'bot' },
   ]);
 
   const handleSend = async () => {
@@ -23,7 +23,7 @@ const SupportContent: React.FC = () => {
     setInput("");
 
     try {
-      const res = await fetch("/api/chat", {
+      const res = await fetch("http://localhost:8000/chat", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -76,6 +76,65 @@ const SupportContent: React.FC = () => {
         </div>
       </div>
 
+      {/* FAQ Section */}
+      <div className={styles.faqSection}>
+        <h3 className={styles.faqTitle}>Frequently Asked Questions</h3>
+        <div className={styles.faqCarousel}>
+          {/* <button className={styles.arrowBtn} onClick={() => {
+            const el = document.getElementById('faqTrack');
+            if (el) el.scrollBy({ left: -320, behavior: 'smooth' });
+          }}>&#8592;</button> */}
+
+          <div className={styles.faqTrack} id="faqTrack">
+            <div className={styles.faqBox}>
+              <span></span>
+              <div className={styles.faqContent}>
+                <h2>What is YANKA?</h2>
+                <p>YANKA is an AI-powered, multilingual learning, training, and creator
+                  ecosystem designed to help people learn, teach, create content, and
+                  monetize knowledge. It combines AI tutoring, academic research tools,
+                  AI avatars, voice and video generation, course creation, and a global
+                  marketplace in one platform.
+                </p>
+              </div>
+            </div>
+
+            <div className={styles.faqBox}>
+              <span></span>
+              <div className={styles.faqContent}>
+                <h2>Do I need to create an account to use YANKA?</h2>
+                <p>
+                  You can explore the Marketplace and public content without an account.
+                  To learn, create content, publish courses, or earn money, you must sign up or sign in
+                </p>
+              </div>
+            </div>
+
+            <div className={styles.faqBox}>
+              <span></span>
+              <div className={styles.faqContent}>
+                <h2>How do I get started?</h2>
+                <p>
+                  YANKA is built for:<br />
+                  - Students (secondary school to university)<br />
+                  - Researchers & academics <br />
+                  - Teachers & educational institutions <br />
+                  - Professionals & companies <br />
+                  - Content creators & trainers <br />
+                  - NGOs & governments<br />
+                  - Lifelong learners worldwide<br />
+                </p>
+              </div>
+            </div>
+          </div>
+
+          <div className={styles.arrowBtnWrapper}>
+            <Link href="/faq" className={styles.arrowBtn}>&#8594;</Link>
+            <span className={styles.viewMore}>View More</span>
+          </div>
+        </div>
+      </div>
+
       {/* Floating Chat Button */}
       <button
         className={styles.chatButton}
@@ -97,7 +156,17 @@ const SupportContent: React.FC = () => {
                     : styles.userMessage
                 }
               >
-                {msg.text}
+                <img
+                  src={msg.sender === 'bot' ? 'pics/chat_bot.png' : 'pics/guest_user.png'}
+                  alt={msg.sender === 'bot' ? 'YANKA' : 'Guest'}
+                  className={styles.avatar}
+                />
+                <div className={styles.messageContent}>
+                  <span className={styles.senderName}>
+                    {msg.sender === 'bot' ? 'YANKA' : 'Guest'}
+                  </span>
+                  <p>{msg.text}</p>
+                </div>
               </div>
             ))}
           </div>
