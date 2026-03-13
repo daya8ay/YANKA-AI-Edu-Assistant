@@ -1,0 +1,442 @@
+.container {
+  min-height: 100vh;
+  background: #f9fafb;
+  padding: 20px 20px 60px;
+  transition: background 0.3s ease;
+}
+
+.container.dark {
+  background: #0f0f13;
+}
+
+.content {
+  max-width: 1100px;
+  margin: 0 auto;
+  padding: 32px 0 0;
+}
+
+.title {
+  font-family: 'Poppins', sans-serif;
+  font-size: 1.5rem;
+  font-weight: 600;
+  color: #1E3A8A;
+  margin-bottom: 20px;
+  letter-spacing: 0.01em;
+  transition: color 0.3s ease;
+}
+
+.dark .title {
+  color: #e5e7eb;
+}
+
+/* ── Player shell ── */
+.playerShell {
+  position: relative;
+  background: #000;
+  border-radius: 12px;
+  overflow: hidden;
+  box-shadow: 0 8px 40px rgba(0, 0, 0, 0.6);
+}
+
+.video {
+  width: 100%;
+  display: block;
+  aspect-ratio: 16 / 9;
+  background: #000;
+  cursor: pointer;
+}
+
+/* ── Controls bar ── */
+.controlsBar {
+  background: linear-gradient(transparent, rgba(0,0,0,0.85));
+  padding: 10px 16px 14px;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+/* ── Progress row ── */
+.progressRow {
+  width: 100%;
+}
+
+.progressTrack {
+  position: relative;
+  width: 100%;
+  height: 4px;
+  background: rgba(255,255,255,0.2);
+  border-radius: 2px;
+  cursor: pointer;
+}
+
+.progressTrack::before {
+  content: '';
+  position: absolute;
+  left: 0;
+  top: 0;
+  height: 100%;
+  width: var(--progress, 0%);
+  background: #3b82f6;
+  border-radius: 2px;
+  pointer-events: none;
+  transition: width 0.1s linear;
+}
+
+.seekBar {
+  position: absolute;
+  inset: -6px 0;
+  width: 100%;
+  height: 16px;
+  opacity: 0;
+  cursor: pointer;
+  margin: 0;
+}
+
+.progressTrack:hover {
+  height: 6px;
+}
+
+.progressTrack:hover::before {
+  height: 6px;
+}
+
+/* ── Bottom row ── */
+.bottomRow {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+}
+
+.leftGroup {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+}
+
+.rightGroup {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+
+/* ── Play / Pause button ── */
+.playButton {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 34px;
+  height: 34px;
+  background: transparent;
+  border: none;
+  color: #fff;
+  cursor: pointer;
+  border-radius: 50%;
+  transition: background 0.2s;
+  flex-shrink: 0;
+  padding: 0;
+}
+
+.playButton:hover {
+  background: rgba(255,255,255,0.15);
+}
+
+/* ── Volume ── */
+.volumeGroup {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.volumeIcon {
+  color: #d1d5db;
+  flex-shrink: 0;
+}
+
+.volumeSlider {
+  -webkit-appearance: none;
+  appearance: none;
+  width: 80px;
+  height: 4px;
+  background: rgba(255,255,255,0.3);
+  border-radius: 2px;
+  outline: none;
+  cursor: pointer;
+}
+
+.volumeSlider::-webkit-slider-thumb {
+  -webkit-appearance: none;
+  appearance: none;
+  width: 12px;
+  height: 12px;
+  border-radius: 50%;
+  background: #fff;
+  cursor: pointer;
+}
+
+.volumeSlider::-moz-range-thumb {
+  width: 12px;
+  height: 12px;
+  border-radius: 50%;
+  background: #fff;
+  cursor: pointer;
+  border: none;
+}
+
+/* ── Time display ── */
+.timeDisplay {
+  font-size: 0.82rem;
+  color: #d1d5db;
+  font-variant-numeric: tabular-nums;
+  white-space: nowrap;
+}
+
+/* ── Speed buttons ── */
+.speedButton {
+  padding: 3px 9px;
+  background: transparent;
+  border: 1px solid rgba(255,255,255,0.25);
+  border-radius: 4px;
+  color: #d1d5db;
+  font-size: 0.78rem;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.15s;
+}
+
+.speedButton:hover {
+  background: rgba(255,255,255,0.1);
+  border-color: rgba(255,255,255,0.5);
+  color: #fff;
+}
+
+.speedButton.active {
+  background: #3b82f6;
+  border-color: #3b82f6;
+  color: #fff;
+}
+
+/* ── Theme toggle ── */
+.themeRow {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-top: 16px;
+}
+
+.themeLabel,
+.themeValue {
+  font-size: 0.85rem;
+  font-weight: 500;
+  color: #6b7280;
+  transition: color 0.3s;
+  user-select: none;
+}
+
+.dark .themeLabel,
+.dark .themeValue {
+  color: #9ca3af;
+}
+
+.themeToggle {
+  position: relative;
+  width: 44px;
+  height: 24px;
+  background: #d1d5db;
+  border: none;
+  border-radius: 12px;
+  cursor: pointer;
+  padding: 0;
+  transition: background 0.25s;
+  flex-shrink: 0;
+}
+
+.themeToggle.themeActive {
+  background: #1E3A8A;
+}
+
+.themeToggleThumb {
+  position: absolute;
+  top: 3px;
+  left: 3px;
+  width: 18px;
+  height: 18px;
+  background: #fff;
+  border-radius: 50%;
+  transition: transform 0.25s;
+  box-shadow: 0 1px 4px rgba(0,0,0,0.2);
+  display: block;
+}
+
+.themeToggle.themeActive .themeToggleThumb {
+  transform: translateX(20px);
+}
+
+/* ── Demo trigger ── */
+.demoRow {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  margin-top: 20px;
+}
+
+.demoTrigger {
+  padding: 8px 16px;
+  background: transparent;
+  border: 1.5px dashed #9ca3af;
+  border-radius: 8px;
+  color: #6b7280;
+  font-size: 0.82rem;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.demoTrigger:hover {
+  border-color: #1E3A8A;
+  color: #1E3A8A;
+}
+
+.dark .demoTrigger {
+  border-color: #4b5563;
+  color: #9ca3af;
+}
+
+.dark .demoTrigger:hover {
+  border-color: #93c5fd;
+  color: #93c5fd;
+}
+
+.demoResponse {
+  font-size: 0.82rem;
+  color: #6b7280;
+}
+
+.dark .demoResponse {
+  color: #9ca3af;
+}
+
+/* ── Confusion modal ── */
+.modalOverlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.55);
+  backdrop-filter: blur(4px);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1000;
+  padding: 20px;
+  animation: fadeIn 0.2s ease;
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; }
+  to   { opacity: 1; }
+}
+
+.modal {
+  background: #fff;
+  border-radius: 16px;
+  padding: 36px 32px 28px;
+  max-width: 460px;
+  width: 100%;
+  box-shadow: 0 24px 60px rgba(0, 0, 0, 0.2);
+  animation: slideUp 0.25s ease;
+  text-align: center;
+}
+
+@keyframes slideUp {
+  from { opacity: 0; transform: translateY(16px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+.modalIcon {
+  width: 56px;
+  height: 56px;
+  border-radius: 50%;
+  background: #eff6ff;
+  color: #1E3A8A;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin: 0 auto 20px;
+}
+
+.modalTitle {
+  font-family: 'Poppins', sans-serif;
+  font-size: 1.25rem;
+  font-weight: 700;
+  color: #111827;
+  margin: 0 0 14px;
+  line-height: 1.3;
+}
+
+.modalBody {
+  font-size: 0.93rem;
+  color: #4b5563;
+  line-height: 1.65;
+  margin: 0 0 28px;
+}
+
+.modalActions {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.modalBtn {
+  width: 100%;
+  padding: 12px 20px;
+  border-radius: 10px;
+  font-size: 0.95rem;
+  font-weight: 600;
+  cursor: pointer;
+  border: none;
+  transition: all 0.2s;
+}
+
+.modalBtnPrimary {
+  background: #1E3A8A;
+  color: #fff;
+}
+
+.modalBtnPrimary:hover {
+  background: #1e40af;
+  transform: translateY(-1px);
+  box-shadow: 0 4px 12px rgba(30, 58, 138, 0.3);
+}
+
+.modalBtnSecondary {
+  background: #eff6ff;
+  color: #1E3A8A;
+}
+
+.modalBtnSecondary:hover {
+  background: #dbeafe;
+}
+
+.modalBtnGhost {
+  background: transparent;
+  color: #9ca3af;
+  font-weight: 400;
+  font-size: 0.88rem;
+}
+
+.modalBtnGhost:hover {
+  color: #6b7280;
+}
+
+/* ── Responsive ── */
+@media (max-width: 640px) {
+  .rightGroup {
+    display: none;
+  }
+
+  .volumeSlider {
+    width: 60px;
+  }
+
+  .title {
+    font-size: 1.2rem;
+  }
+}

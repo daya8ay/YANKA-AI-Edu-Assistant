@@ -26,6 +26,7 @@ from .schemas import (
 from .database import get_db
 from sqlalchemy.orm import Session, joinedload
 import json
+from model.model import predict as model_predict
 
 load_dotenv()
 
@@ -63,6 +64,21 @@ def health():
 def root():
     return {"message": "YANKA API", "docs": "/docs"}
 
+class VideoMetrics(BaseModel):
+    video_duration: float
+    time_watched: float
+    skip_count: int
+    pause_count: int
+
+
+@app.post("/api/video-analytics/predict")
+def video_analytics_predict(metrics: VideoMetrics):
+    """Run ML model on video metrics and return prediction."""
+    try:
+        prediction = model_predict(metrics.model_dump())
+        return {"ok": True, "prediction": prediction}
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))
 
 class ChatRequest(BaseModel):
     message: str

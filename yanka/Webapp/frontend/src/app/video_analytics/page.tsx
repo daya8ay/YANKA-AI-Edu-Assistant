@@ -10,7 +10,7 @@ interface AnalyticsEvent {
   type: string;
   timestamp: number;
   videoTime: number;
-  value?: any;
+  value?: string | number | boolean | Record<string, unknown> | null;
 }
 
 const VideoAnalytics = () => {
@@ -32,13 +32,14 @@ const VideoAnalytics = () => {
   const [completionTime, setCompletionTime] = useState<number | null>(null);
   const [replayCount, setReplayCount] = useState(0);
   const [lastDetectedTime, setLastDetectedTime] = useState(0);
+  const watchStartVideoTimeRef = useRef<number | null>(null);
   const [prediction, setPrediction] = useState<number | string | null>(null);
   const [predictionLoading, setPredictionLoading] = useState(false);
   const [predictionError, setPredictionError] = useState<string | null>(null);
   const [lastSentMetrics, setLastSentMetrics] = useState<Record<string, number | string> | null>(null);
 
   // Track analytics event
-  const trackEvent = (type: string, value?: any) => {
+  const trackEvent = (type: string, value?: string | number | boolean | Record<string, unknown> | null) => {
     if (!videoRef.current) return;
 
     const event: AnalyticsEvent = {
@@ -58,6 +59,7 @@ const VideoAnalytics = () => {
 
     setIsPlaying(true);
     setPlayCount((prev) => prev + 1);
+    watchStartVideoTimeRef.current = videoRef.current.currentTime;
 
     if (pauseStartTime) {
       const pauseDuration = Date.now() - pauseStartTime;
@@ -78,6 +80,14 @@ const VideoAnalytics = () => {
   const handlePause = () => {
     if (!videoRef.current) return;
 
+    if (watchStartVideoTimeRef.current !== null) {
+      const watched = videoRef.current.currentTime - watchStartVideoTimeRef.current;
+      if (watched > 0) {
+        setTotalWatchTime((prev) => prev + watched);
+      }
+      watchStartVideoTimeRef.current = null;
+    }
+
     setIsPlaying(false);
     setPauseCount((prev) => prev + 1);
     setPauseStartTime(Date.now());
@@ -85,14 +95,13 @@ const VideoAnalytics = () => {
     videoRef.current.pause();
   };
 
-  // Handle time update
+  // Handle time update — polls currentTime for UI display and replay detection only
   useEffect(() => {
     if (isPlaying && videoRef.current) {
       const interval = setInterval(() => {
         if (videoRef.current) {
           const newTime = videoRef.current.currentTime;
           // Detect replay if video was completed and time jumps back to near start
-          // Only detect once per replay by checking if we haven't already detected this jump
           if (isCompleted && newTime < 2 && lastDetectedTime > duration * 0.9 && duration > 0) {
             setReplayCount((prev) => {
               const newCount = prev + 1;
@@ -105,7 +114,6 @@ const VideoAnalytics = () => {
             setLastDetectedTime(newTime);
           }
           setCurrentTime(newTime);
-          setTotalWatchTime((prev) => prev + 0.1);
         }
       }, 100);
       return () => clearInterval(interval);
@@ -138,6 +146,15 @@ const VideoAnalytics = () => {
       setIsCompleted(false); // Reset completion status
     }
 
+    // Flush the current watch segment before jumping, so rewatched sections count
+    if (isPlaying && watchStartVideoTimeRef.current !== null) {
+      const watched = videoRef.current.currentTime - watchStartVideoTimeRef.current;
+      if (watched > 0) {
+        setTotalWatchTime((prev) => prev + watched);
+      }
+      watchStartVideoTimeRef.current = newTime;
+    }
+
     setCurrentTime(newTime);
     videoRef.current.currentTime = newTime;
     setSeekCount((prev) => prev + 1);
@@ -166,6 +183,14 @@ const VideoAnalytics = () => {
 
   // Handle video end
   const handleEnded = () => {
+    if (videoRef.current && watchStartVideoTimeRef.current !== null) {
+      const watched = videoRef.current.currentTime - watchStartVideoTimeRef.current;
+      if (watched > 0) {
+        setTotalWatchTime((prev) => prev + watched);
+      }
+      watchStartVideoTimeRef.current = null;
+    }
+
     setIsPlaying(false);
     setIsCompleted(true);
     if (sessionStartTime) {
@@ -194,6 +219,7 @@ const VideoAnalytics = () => {
       if (videoRef.current.currentTime > 2) {
         videoRef.current.currentTime = 0;
       }
+      watchStartVideoTimeRef.current = videoRef.current.currentTime;
     }
   };
 
@@ -415,11 +441,12 @@ const VideoAnalytics = () => {
                       </ul>
                     </div>
                   )}
-                  <h3>User Engagement Prediction</h3>
+                  <h3>User Confusion Prediction</h3>
                   {predictionError ? (
                     <p className={styles.predictionError}>{predictionError}</p>
                   ) : prediction !== null ? (
-                    <p className={styles.predictionValue}>{Number(prediction).toFixed(2)}</p>
+                    // <p className={styles.predictionValue}>{Number(prediction).toFixed(2)}</p>
+                    <p className={styles.predictionValue}>{String(prediction)}</p>
                   ) : null}
                 </div>
               )}
