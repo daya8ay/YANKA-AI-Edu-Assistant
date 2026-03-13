@@ -2,10 +2,11 @@
 
 import React, { useEffect } from "react";
 import { useRouter } from "next/navigation";
+import Link from "next/link";
 import { useAuth } from "@/hooks/useAuth";
 import DashboardNavBar from "@/components/DashboardNavBar";
 import Image from "next/image";
-import Footer from "@/components/Footer"; // ✅ Import Footer component
+import Footer from "@/components/Footer";
 import styles from "./page.module.css";
 
 export default function Dashboard() {

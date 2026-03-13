@@ -4,7 +4,7 @@ import React, { useState } from "react";
 import Link from "next/link";
 import Image from "next/image";
 import { useRouter } from "next/navigation";
-import { signIn } from "aws-amplify/auth";
+import { signIn, signOut } from "aws-amplify/auth";
 import styles from "./login.module.css";
 
 export default function Login() {
@@ -20,6 +20,8 @@ export default function Login() {
     setLoading(true);
 
     try {
+      await signOut().catch(() => {});
+
       const { isSignedIn, nextStep } = await signIn({
         username: email,
         password,

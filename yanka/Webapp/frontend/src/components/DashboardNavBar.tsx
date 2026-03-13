@@ -3,11 +3,19 @@
 import React, { useState, useEffect } from "react";
 import Link from "next/link";
 import Image from "next/image";
+import { useRouter } from "next/navigation";
+import { signOut } from "aws-amplify/auth";
 import styles from "./DashboardNavBar.module.css";
 
 const DashboardNavBar: React.FC = () => {
   const [isScrolled, setIsScrolled] = useState(false);
   const [lastScroll, setLastScroll] = useState(0);
+  const router = useRouter();
+
+  const handleLogout = async () => {
+    await signOut();
+    router.push("/login");
+  };
 
   useEffect(() => {
     const handleScroll = () => {
@@ -42,8 +50,9 @@ const DashboardNavBar: React.FC = () => {
           <li><Link href="/courses">Courses</Link></li>
           <li><Link href="/avatar_creation">Avatar Creation</Link></li>
           <li><Link href="/video">Video</Link></li>
+          <li><Link href="/video_simulator">Video Simulator</Link></li>
           <li><Link href="/video_analytics">Video Analytics</Link></li>
-          <li><Link href="/login" className={styles.logoutBtn}>Logout</Link></li>
+          <li><button onClick={handleLogout} className={styles.logoutBtn}>Logout</button></li>
           <li>
             <Image
               src="/pics/user_avatar.jpeg"
