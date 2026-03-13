@@ -2,6 +2,7 @@
 import React, { useState } from 'react';
 import styles from './support.module.css';
 import Link from 'next/link';
+import { fetchAuthSession } from 'aws-amplify/auth';
 
 interface Message {
   text: string;
@@ -15,35 +16,32 @@ const SupportContent: React.FC = () => {
     { text: 'Hello! My name is YANKA. How can I help you today?', sender: 'bot' },
   ]);
 
-  const handleSend = async () => {
-    if (!input.trim()) return;
+const handleSend = async () => {
+  if (!input.trim()) return;
 
-    const userMessage = { text: input, sender: "user" as const };
-    setMessages((prev) => [...prev, userMessage]);
-    setInput("");
+  const userMessage = { text: input, sender: "user" as const };
+  setMessages((prev) => [...prev, userMessage]);
+  setInput("");
 
-    try {
-      const res = await fetch("http://localhost:8000/chat", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({ message: input }),
-      });
+  try {
+    const session = await fetchAuthSession();
+    const token = session.tokens?.idToken?.toString();
 
-      const data = await res.json();
+    const res = await fetch("http://localhost:8000/chat", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        "Authorization": `Bearer ${token}`,
+      },
+      body: JSON.stringify({ message: input }),
+    });
 
-      setMessages((prev) => [
-        ...prev,
-        { text: data.response, sender: "bot" },
-      ]);
-    } catch (error) {
-      setMessages((prev) => [
-        ...prev,
-        { text: "Sorry, something went wrong.", sender: "bot" },
-      ]);
-    }
-  };
+    const data = await res.json();
+    setMessages((prev) => [...prev, { text: data.response, sender: "bot" }]);
+  } catch (error) {
+    setMessages((prev) => [...prev, { text: "Sorry, something went wrong.", sender: "bot" }]);
+  }
+};
   return (
     <>
       <main className={styles.main}>
