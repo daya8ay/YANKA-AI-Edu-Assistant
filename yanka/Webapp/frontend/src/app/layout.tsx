@@ -1,8 +1,9 @@
 import type { Metadata } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
+import './aws-auth-config';
 import "./globals.css";
+import AuthWrapper from '@/components/AuthWrapper';
 
-// Server-side font imports
 const geistSans = Geist({
   variable: "--font-geist-sans",
   subsets: ["latin"],
@@ -25,9 +26,11 @@ export default function RootLayout({
 }) {
   return (
     <html lang="en">
-      {/* Keep this a server component — no 'use client' */}
       <body className={`${geistSans.variable} ${geistMono.variable}`}>
-        {children}
+        {/* Wrap children so Auth state is available globally */}
+        <AuthWrapper>
+          {children}
+        </AuthWrapper>
       </body>
     </html>
   );
