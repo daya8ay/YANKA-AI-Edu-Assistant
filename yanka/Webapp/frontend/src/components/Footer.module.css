@@ -12,17 +12,55 @@
   gap: 50px;
 }
 
+/* Logo Section */
 .logoSection {
   display: flex;
-  justify-content: center; 
+  flex-direction: column;
   align-items: center;
+  text-align: center;
+  gap: 15px;
+}
+
+/* Tagline */
+.tagline {
+  max-width: 500px;
+  font-size: 0.95rem;
+  line-height: 1.5;
+  color: #dbe7ff;
+}
+
+/* Social Links */
+.socialLinks {
+  display: flex;
+  gap: 16px;
+  justify-content: center;
+  margin-top: 5px;
+}
+
+.socialLinks a {
+  display: inline-flex;
+  transition: transform 0.25s ease, opacity 0.25s ease;
+}
+
+.socialLinks a:hover {
+  transform: translateY(-3px) scale(1.05);
+  opacity: 0.85;
+}
+
+.socialLinks img {
+  border-radius: 6px; /* optional if icons are square */
 }
 
 /* Link Columns */
+.column {
+  min-width: 180px;
+}
+
 .linkColumns {
   display: grid;
   grid-template-columns: repeat(4, 1fr);
-  gap: 80px;                 /* slightly reduced for balance */
+  gap: 60px;              /* keeps it spacious */
+  width: 100%;            /* 👈 THIS is the key fix */
   max-width: 1200px;
   margin: 0 auto;
   padding: 0 20px;
@@ -32,9 +70,9 @@
 .column h4 {
   font-size: 1rem;
   font-weight: 700;
-  color: #ffffff;            /* brighter for contrast */
+  color: #ffffff;
   margin-bottom: 18px;
-  white-space: nowrap;       /* keep heading on ONE line */
+  white-space: nowrap;
 }
 
 /* Lists */
@@ -45,23 +83,21 @@
 }
 
 .column ul li {
-  margin-bottom: 12px;       /* vertical separation */
+  margin-bottom: 12px;
 }
 
 /* Links */
 .column ul li a {
-  display: block;            /* one link per line */
-  color: #ffffff;            /* white text */
-  text-decoration: none;     /* 🚫 no underline */
+  display: block;
+  color: #ffffff;
+  text-decoration: none;
   font-size: 0.95rem;
   line-height: 1.4;
-  cursor: pointer;
   transition: color 0.3s ease;
 }
 
 .column ul li a:hover {
   color: #9fc5ff;
-  text-decoration: none;     /* still no underline on hover */
 }
 
 /* Bottom Section */
@@ -121,6 +157,7 @@
   }
 }
 
+/* Column Title Link */
 .columnTitleLink {
   text-decoration: none;
   display: inline-block;
