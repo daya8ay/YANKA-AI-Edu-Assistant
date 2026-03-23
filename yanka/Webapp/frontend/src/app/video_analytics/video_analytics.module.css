@@ -379,3 +379,114 @@
       justify-content: center;
     }
   }
+
+/* ── Confusion modal ── */
+.modalOverlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.55);
+  backdrop-filter: blur(4px);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1000;
+  padding: 20px;
+  animation: fadeIn 0.2s ease;
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; }
+  to   { opacity: 1; }
+}
+
+.modal {
+  background: #fff;
+  border-radius: 16px;
+  padding: 36px 32px 28px;
+  max-width: 460px;
+  width: 100%;
+  box-shadow: 0 24px 60px rgba(0, 0, 0, 0.2);
+  animation: slideUp 0.25s ease;
+  text-align: center;
+}
+
+@keyframes slideUp {
+  from { opacity: 0; transform: translateY(16px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+.modalIcon {
+  width: 56px;
+  height: 56px;
+  border-radius: 50%;
+  background: #eff6ff;
+  color: #1E3A8A;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin: 0 auto 20px;
+}
+
+.modalTitle {
+  font-family: 'Poppins', sans-serif;
+  font-size: 1.25rem;
+  font-weight: 700;
+  color: #111827;
+  margin: 0 0 14px;
+  line-height: 1.3;
+}
+
+.modalBody {
+  font-size: 0.93rem;
+  color: #4b5563;
+  line-height: 1.65;
+  margin: 0 0 28px;
+}
+
+.modalActions {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.modalBtn {
+  width: 100%;
+  padding: 12px 20px;
+  border-radius: 10px;
+  font-size: 0.95rem;
+  font-weight: 600;
+  cursor: pointer;
+  border: none;
+  transition: all 0.2s;
+}
+
+.modalBtnPrimary {
+  background: #1E3A8A;
+  color: #fff;
+}
+
+.modalBtnPrimary:hover {
+  background: #1e40af;
+  transform: translateY(-1px);
+  box-shadow: 0 4px 12px rgba(30, 58, 138, 0.3);
+}
+
+.modalBtnSecondary {
+  background: #eff6ff;
+  color: #1E3A8A;
+}
+
+.modalBtnSecondary:hover {
+  background: #dbeafe;
+}
+
+.modalBtnGhost {
+  background: transparent;
+  color: #9ca3af;
+  font-weight: 400;
+  font-size: 0.88rem;
+}
+
+.modalBtnGhost:hover {
+  color: #6b7280;
+}

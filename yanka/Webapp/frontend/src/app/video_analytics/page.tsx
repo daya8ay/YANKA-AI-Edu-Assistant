@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useRef, useState, useEffect } from "react";
+import React, { useRef, useState, useEffect, useCallback } from "react";
 import DashboardNavBar from "../../components/DashboardNavBar";
 import Footer from "@/components/Footer";
 import { api } from "@/lib/api";
@@ -37,6 +37,17 @@ const VideoAnalytics = () => {
   const [predictionLoading, setPredictionLoading] = useState(false);
   const [predictionError, setPredictionError] = useState<string | null>(null);
   const [lastSentMetrics, setLastSentMetrics] = useState<Record<string, number | string> | null>(null);
+
+  // Confusion popup
+  const [showConfusionModal, setShowConfusionModal] = useState(false);
+
+  // Trigger guards — prevent each milestone from firing more than once per session
+  const midCheckSent  = useRef(false);
+  const lateCheckSent = useRef(false);
+  const endCheckSent  = useRef(false);
+
+  // "none" → not yet shown | "snoozed" → student said "Maybe later" once | "dismissed" → stop asking
+  const helpDecision = useRef<"none" | "snoozed" | "dismissed">("none");
 
   // Track analytics event
   const trackEvent = (type: string, value?: string | number | boolean | Record<string, unknown> | null) => {
@@ -120,6 +131,80 @@ const VideoAnalytics = () => {
     }
   }, [isPlaying, isCompleted, lastDetectedTime, duration]);
 
+  // Send video metrics to backend and get ML prediction.
+  // trigger: "manual" = button click; "mid" = 50%; "late" = 75%; "end" = video finished.
+  // metricOverrides lets handleEnded pass the final computed watch time before state re-renders.
+  const sendAnalyticsToBackend = useCallback(async (
+    trigger: "manual" | "mid" | "late" | "end" = "manual",
+    metricOverrides?: { time_watched?: number },
+  ) => {
+    if (trigger === "manual") setPrediction(null);
+    setPredictionError(null);
+    setPredictionLoading(true);
+    const metrics = {
+      video_topic: "Yanka platform overview",
+      video_duration: Number((duration / 60).toFixed(2)) || 0,
+      time_watched: metricOverrides?.time_watched ?? (Number((totalWatchTime / 60).toFixed(2)) || 0),
+      skip_count: seekCount,
+      pause_count: pauseCount,
+    };
+    setLastSentMetrics(metrics);
+    try {
+      const result = await api.getVideoPrediction(metrics);
+      // Normalize to guard against whitespace or casing differences from the model
+      const p = (result.prediction as string).trim().toLowerCase();
+      setPrediction(p);
+
+      if (helpDecision.current !== "dismissed") {
+        const isHigh   = p === "high";
+        const isMedEnd = p === "medium" && trigger === "end";
+        if (isHigh || isMedEnd) {
+          // Pause directly on the element so pauseCount isn't incremented.
+          // Flush the in-progress watch segment first so that time isn't lost.
+          if (videoRef.current && !videoRef.current.paused) {
+            if (watchStartVideoTimeRef.current !== null) {
+              const watched = videoRef.current.currentTime - watchStartVideoTimeRef.current;
+              if (watched > 0) setTotalWatchTime((prev) => prev + watched);
+              watchStartVideoTimeRef.current = null;
+            }
+            videoRef.current.pause();
+            setIsPlaying(false);
+          }
+          setShowConfusionModal(true);
+        }
+      }
+    } catch (err) {
+      setPredictionError(err instanceof Error ? err.message : "Failed to get prediction");
+    } finally {
+      setPredictionLoading(false);
+    }
+  }, [duration, totalWatchTime, seekCount, pauseCount]);
+
+  // Milestone checks: fire prediction at 50% and 75% of video progress.
+  // Compute real-time watch time here to include the in-progress playing segment,
+  // which hasn't been flushed to totalWatchTime state yet.
+  useEffect(() => {
+    if (duration <= 0) return;
+    const pct = currentTime / duration;
+
+    const getCurrentWatchTimeMins = () => {
+      const inProgressSecs =
+        watchStartVideoTimeRef.current !== null && videoRef.current
+          ? Math.max(0, videoRef.current.currentTime - watchStartVideoTimeRef.current)
+          : 0;
+      return Number(((totalWatchTime + inProgressSecs) / 60).toFixed(2)) || 0;
+    };
+
+    if (pct >= 0.5 && !midCheckSent.current) {
+      midCheckSent.current = true;
+      sendAnalyticsToBackend("mid", { time_watched: getCurrentWatchTimeMins() });
+    }
+    if (pct >= 0.75 && !lateCheckSent.current) {
+      lateCheckSent.current = true;
+      sendAnalyticsToBackend("late", { time_watched: getCurrentWatchTimeMins() });
+    }
+  }, [currentTime, duration, totalWatchTime, sendAnalyticsToBackend]);
+
   // Handle video loaded
   const handleLoadedMetadata = () => {
     if (videoRef.current) {
@@ -143,7 +228,11 @@ const VideoAnalytics = () => {
         trackEvent("replay", { replayNumber: newCount, method: "seek" });
         return newCount;
       });
-      setIsCompleted(false); // Reset completion status
+      setIsCompleted(false);
+      midCheckSent.current  = false;
+      lateCheckSent.current = false;
+      endCheckSent.current  = false;
+      helpDecision.current  = "none";
     }
 
     // Flush the current watch segment before jumping, so rewatched sections count
@@ -183,10 +272,16 @@ const VideoAnalytics = () => {
 
   // Handle video end
   const handleEnded = () => {
+    if (endCheckSent.current) return;
+    endCheckSent.current = true;
+
+    // Compute the final watch time before the state update lands
+    let finalWatchTime = totalWatchTime;
     if (videoRef.current && watchStartVideoTimeRef.current !== null) {
       const watched = videoRef.current.currentTime - watchStartVideoTimeRef.current;
       if (watched > 0) {
-        setTotalWatchTime((prev) => prev + watched);
+        finalWatchTime += watched;
+        setTotalWatchTime(finalWatchTime);
       }
       watchStartVideoTimeRef.current = null;
     }
@@ -199,6 +294,11 @@ const VideoAnalytics = () => {
       trackEvent("video_completed", { totalSessionTime });
     }
     console.log("Video ended - isCompleted set to true");
+
+    // Auto-send at end with accurate final watch time
+    sendAnalyticsToBackend("end", {
+      time_watched: Number((finalWatchTime / 60).toFixed(2)) || 0,
+    });
   };
 
   // Handle video play event (catches all play events including automatic restarts)
@@ -220,6 +320,12 @@ const VideoAnalytics = () => {
         videoRef.current.currentTime = 0;
       }
       watchStartVideoTimeRef.current = videoRef.current.currentTime;
+
+      // Reset all trigger guards and help state so the new session runs fresh
+      midCheckSent.current  = false;
+      lateCheckSent.current = false;
+      endCheckSent.current  = false;
+      helpDecision.current  = "none";
     }
   };
 
@@ -254,26 +360,22 @@ const VideoAnalytics = () => {
     };
   };
 
-  // Send video metrics to backend and get ML prediction
-  const sendAnalyticsToBackend = async () => {
-    setPredictionError(null);
-    setPrediction(null);
-    setPredictionLoading(true);
-    const metrics = {
-      video_topic: "Yanka platform overview",
-      video_duration: Number((duration / 60).toFixed(2)) || 0,
-      time_watched: Number((totalWatchTime / 60).toFixed(2)) || 0,
-      skip_count: seekCount,
-      pause_count: pauseCount,
-    };
-    setLastSentMetrics(metrics);
-    try {
-      const result = await api.getVideoPrediction(metrics);
-      setPrediction(result.prediction);
-    } catch (err) {
-      setPredictionError(err instanceof Error ? err.message : "Failed to get prediction");
-    } finally {
-      setPredictionLoading(false);
+  const handleModalResponse = (response: string) => {
+    if (response === "Maybe later") {
+      // First snooze → allow one more popup at the next qualifying trigger.
+      // Second snooze → stop asking for the rest of the session.
+      helpDecision.current = helpDecision.current === "snoozed" ? "dismissed" : "snoozed";
+    } else {
+      // "Yes, help me" or "No thanks" — both permanently close for this session
+      helpDecision.current = "dismissed";
+    }
+    setShowConfusionModal(false);
+
+    // Resume playback for dismissals — but not when the student wants help
+    if (response !== "Yes, help me" && videoRef.current && !isCompleted) {
+      videoRef.current.play();
+      setIsPlaying(true);
+      watchStartVideoTimeRef.current = videoRef.current.currentTime;
     }
   };
 
@@ -420,7 +522,7 @@ const VideoAnalytics = () => {
               </div>
 
               <button
-                onClick={sendAnalyticsToBackend}
+                onClick={() => sendAnalyticsToBackend("manual")}
                 className={styles.sendButton}
                 disabled={predictionLoading}
               >
@@ -445,7 +547,6 @@ const VideoAnalytics = () => {
                   {predictionError ? (
                     <p className={styles.predictionError}>{predictionError}</p>
                   ) : prediction !== null ? (
-                    // <p className={styles.predictionValue}>{Number(prediction).toFixed(2)}</p>
                     <p className={styles.predictionValue}>{String(prediction)}</p>
                   ) : null}
                 </div>
@@ -474,6 +575,47 @@ const VideoAnalytics = () => {
         </div>
       </div>
       <Footer />
+
+      {showConfusionModal && (
+        <div className={styles.modalOverlay} role="dialog" aria-modal="true" aria-labelledby="confusionTitle">
+          <div className={styles.modal}>
+            <div className={styles.modalIcon}>
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" width="28" height="28">
+                <circle cx="12" cy="12" r="10" />
+                <path d="M12 8v4M12 16h.01" strokeLinecap="round" />
+              </svg>
+            </div>
+            <h2 className={styles.modalTitle} id="confusionTitle">
+              Looks like you might need a hand
+            </h2>
+            <p className={styles.modalBody}>
+              Our system noticed some patterns that suggest you may be finding this section tricky,
+              which is completely okay! Would you like us to provide a deeper explanation or
+              additional resources for this topic?
+            </p>
+            <div className={styles.modalActions}>
+              <button
+                className={`${styles.modalBtn} ${styles.modalBtnPrimary}`}
+                onClick={() => handleModalResponse("Yes, help me")}
+              >
+                Yes, help me
+              </button>
+              <button
+                className={`${styles.modalBtn} ${styles.modalBtnSecondary}`}
+                onClick={() => handleModalResponse("Maybe later")}
+              >
+                Maybe later
+              </button>
+              <button
+                className={`${styles.modalBtn} ${styles.modalBtnGhost}`}
+                onClick={() => handleModalResponse("No thanks")}
+              >
+                No thanks
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </>
   );
 };

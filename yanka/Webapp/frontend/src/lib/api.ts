@@ -51,4 +51,28 @@ export const api = {
       "/api/video-analytics/predict",
       { method: "POST", body: { video_topic: "general", ...metrics } }
     ),
+
+  /** Create and start a LiveAvatar session — returns LiveKit credentials */
+  getAvatarSession: () =>
+    request<{
+      session_id: string;
+      session_token: string;
+      livekit_url: string;
+      livekit_token: string;
+    }>("/api/avatar/session", { method: "POST" }),
+
+  /** Stop a LiveAvatar session */
+  stopAvatarSession: (sessionId: string) =>
+    request<{ ok: boolean }>(`/api/avatar/session/${sessionId}`, { method: "DELETE" }),
+
+  /** Get AI-generated help content for a video section */
+  getVideoHelp: (params: { timestamp: number }) =>
+    request<{
+      summary: string;
+      keyPoints: { point: string; explanation: string }[];
+      suggestedQuestions: { question: string; answer: string }[];
+    }>(
+      "/api/video-help",
+      { method: "POST", body: params }
+    ),
 };

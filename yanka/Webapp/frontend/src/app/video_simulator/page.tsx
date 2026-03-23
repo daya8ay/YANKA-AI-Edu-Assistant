@@ -1,9 +1,33 @@
 "use client";
 
-import React, { useRef, useState } from "react";
+import React, { useRef, useState, useEffect, useCallback } from "react";
 import DashboardNavBar from "../../components/DashboardNavBar";
 import Footer from "@/components/Footer";
+import { api } from "@/lib/api";
 import styles from "./video_simulator.module.css";
+import {
+  Room,
+  RoomEvent,
+  Track,
+  type RemoteTrack,
+  DataPacket_Kind,
+} from "livekit-client";
+
+interface KeyPoint {
+  point: string;
+  explanation: string;
+}
+
+interface SuggestedQuestion {
+  question: string;
+  answer: string;
+}
+
+interface HelpContent {
+  summary: string;
+  keyPoints: KeyPoint[];
+  suggestedQuestions: SuggestedQuestion[];
+}
 
 const VideoSimulator = () => {
   const videoRef = useRef<HTMLVideoElement>(null);
@@ -13,35 +37,190 @@ const VideoSimulator = () => {
   const [duration, setDuration] = useState(0);
   const [volume, setVolume] = useState(1);
 
+  // ── Analytics state ──
+  const [pauseCount, setPauseCount] = useState(0);
+  const [seekCount, setSeekCount] = useState(0);
+  const [totalWatchTime, setTotalWatchTime] = useState(0);
+  const watchStartVideoTimeRef = useRef<number | null>(null);
+
+  // ── ML prediction ──
+  const [predictionLoading, setPredictionLoading] = useState(false);
+
+  // ── Milestone guards ──
+  const earlyCheckSent = useRef(false);
+  const midCheckSent   = useRef(false);
+  const lateCheckSent  = useRef(false);
+  const endCheckSent   = useRef(false);
+
+  // ── Help state ──
+  const helpDecision = useRef<"none" | "snoozed" | "dismissed">("none");
+  const [showHelpPanel, setShowHelpPanel] = useState(false);
+  const [helpContent, setHelpContent] = useState<HelpContent | null>(null);
+  const [helpLoading, setHelpLoading] = useState(false);
+  const [helpTimestamp, setHelpTimestamp] = useState(0);
+  const [revealedAnswers, setRevealedAnswers] = useState<Set<number>>(new Set());
+  const [revealedPoints, setRevealedPoints] = useState<Set<number>>(new Set());
+
+  // ── Avatar state ──
+  const [avatarMode, setAvatarMode] = useState(false);
+  const [avatarLoading, setAvatarLoading] = useState(false);
+  const [avatarError, setAvatarError] = useState<string | null>(null);
+  const avatarVideoRef = useRef<HTMLVideoElement>(null);
+  const livekitRoomRef = useRef<Room | null>(null);
+  const avatarSessionIdRef = useRef<string | null>(null);
+  const avatarAudioElemsRef = useRef<HTMLAudioElement[]>([]);
+
+  // ── UI state ──
+  const [darkMode, setDarkMode] = useState(false);
+  const [showConfusionModal, setShowConfusionModal] = useState(false);
+  const [isCompleted, setIsCompleted] = useState(false);
+
+  // ── Resizable panel (horizontal + vertical) ──
+  const [videoPct, setVideoPct] = useState(50);
+  const [panelHeight, setPanelHeight] = useState(560);
+  const playerRowRef = useRef<HTMLDivElement>(null);
+  const helpPanelRef = useRef<HTMLDivElement>(null);
+
+  const onResizeStart = useCallback((e: React.MouseEvent) => {
+    e.preventDefault();
+    const onMove = (ev: MouseEvent) => {
+      if (!playerRowRef.current) return;
+      const { left, width } = playerRowRef.current.getBoundingClientRect();
+      const pct = ((ev.clientX - left) / width) * 100;
+      setVideoPct(Math.min(70, Math.max(30, pct)));
+    };
+    const onUp = () => {
+      window.removeEventListener("mousemove", onMove);
+      window.removeEventListener("mouseup", onUp);
+    };
+    window.addEventListener("mousemove", onMove);
+    window.addEventListener("mouseup", onUp);
+  }, []);
+
+  const onVerticalResizeStart = useCallback((e: React.MouseEvent) => {
+    e.preventDefault();
+    const startY = e.clientY;
+    const startHeight = helpPanelRef.current?.getBoundingClientRect().height ?? panelHeight;
+    const onMove = (ev: MouseEvent) => {
+      const next = startHeight + (ev.clientY - startY);
+      setPanelHeight(Math.min(900, Math.max(280, next)));
+    };
+    const onUp = () => {
+      window.removeEventListener("mousemove", onMove);
+      window.removeEventListener("mouseup", onUp);
+    };
+    window.addEventListener("mousemove", onMove);
+    window.addEventListener("mouseup", onUp);
+  }, [panelHeight]);
+
+  const progressPercent = duration > 0 ? (currentTime / duration) * 100 : 0;
+
+  // ── Send analytics to ML backend ──
+  const sendAnalyticsToBackend = useCallback(async (
+    trigger: "manual" | "mid" | "late" | "end" = "manual",
+    metricOverrides?: { time_watched?: number },
+  ) => {
+    setPredictionLoading(true);
+    try {
+      const metrics = {
+        video_duration: Number((duration / 60).toFixed(2)) || 0,
+        time_watched: metricOverrides?.time_watched ?? (Number((totalWatchTime / 60).toFixed(2)) || 0),
+        skip_count: seekCount,
+        pause_count: pauseCount,
+      };
+      const result = await api.getVideoPrediction(metrics);
+      const p = (result.prediction as string).trim().toLowerCase();
+
+      if (helpDecision.current !== "dismissed") {
+        const isHigh   = p === "high";
+        const isMedEnd = p === "medium" && trigger === "end";
+        if (isHigh || isMedEnd) {
+          if (videoRef.current && !videoRef.current.paused) {
+            if (watchStartVideoTimeRef.current !== null) {
+              const watched = videoRef.current.currentTime - watchStartVideoTimeRef.current;
+              if (watched > 0) setTotalWatchTime((prev) => prev + watched);
+              watchStartVideoTimeRef.current = null;
+            }
+            videoRef.current.pause();
+            setIsPlaying(false);
+          }
+          setShowConfusionModal(true);
+        }
+      }
+    } catch (err) {
+      console.error("Prediction error:", err);
+    } finally {
+      setPredictionLoading(false);
+    }
+  }, [duration, totalWatchTime, seekCount, pauseCount]);
+
+  // ── Milestone checks at 25% / 50% / 75% ──
+  useEffect(() => {
+    if (duration <= 0) return;
+    const pct = currentTime / duration;
+
+    const getCurrentWatchTimeMins = () => {
+      const inProgressSecs =
+        watchStartVideoTimeRef.current !== null && videoRef.current
+          ? Math.max(0, videoRef.current.currentTime - watchStartVideoTimeRef.current)
+          : 0;
+      return Number(((totalWatchTime + inProgressSecs) / 60).toFixed(2)) || 0;
+    };
+
+    if (pct >= 0.25 && !earlyCheckSent.current) {
+      earlyCheckSent.current = true;
+      sendAnalyticsToBackend("mid", { time_watched: getCurrentWatchTimeMins() });
+    }
+    if (pct >= 0.5 && !midCheckSent.current) {
+      midCheckSent.current = true;
+      sendAnalyticsToBackend("mid", { time_watched: getCurrentWatchTimeMins() });
+    }
+    if (pct >= 0.75 && !lateCheckSent.current) {
+      lateCheckSent.current = true;
+      sendAnalyticsToBackend("late", { time_watched: getCurrentWatchTimeMins() });
+    }
+  }, [currentTime, duration, totalWatchTime, sendAnalyticsToBackend]);
+
   const handlePlay = () => {
     if (!videoRef.current) return;
     setIsPlaying(true);
+    watchStartVideoTimeRef.current = videoRef.current.currentTime;
     videoRef.current.play();
   };
 
   const handlePause = () => {
     if (!videoRef.current) return;
+    if (watchStartVideoTimeRef.current !== null) {
+      const watched = videoRef.current.currentTime - watchStartVideoTimeRef.current;
+      if (watched > 0) setTotalWatchTime((prev) => prev + watched);
+      watchStartVideoTimeRef.current = null;
+    }
     setIsPlaying(false);
+    setPauseCount((prev) => prev + 1);
     videoRef.current.pause();
   };
 
   const handleLoadedMetadata = () => {
-    if (videoRef.current) {
-      setDuration(videoRef.current.duration);
-    }
+    if (videoRef.current) setDuration(videoRef.current.duration);
   };
 
   const handleTimeUpdate = () => {
-    if (videoRef.current) {
-      setCurrentTime(videoRef.current.currentTime);
-    }
+    if (videoRef.current) setCurrentTime(videoRef.current.currentTime);
   };
 
   const handleSeek = (e: React.ChangeEvent<HTMLInputElement>) => {
     if (!videoRef.current) return;
     const newTime = parseFloat(e.target.value);
+
+    if (isPlaying && watchStartVideoTimeRef.current !== null) {
+      const watched = videoRef.current.currentTime - watchStartVideoTimeRef.current;
+      if (watched > 0) setTotalWatchTime((prev) => prev + watched);
+      watchStartVideoTimeRef.current = newTime;
+    }
+
     setCurrentTime(newTime);
     videoRef.current.currentTime = newTime;
+    setSeekCount((prev) => prev + 1);
   };
 
   const handleSpeedChange = (speed: number) => {
@@ -58,7 +237,24 @@ const VideoSimulator = () => {
   };
 
   const handleEnded = () => {
+    if (endCheckSent.current) return;
+    endCheckSent.current = true;
+
+    let finalWatchTime = totalWatchTime;
+    if (videoRef.current && watchStartVideoTimeRef.current !== null) {
+      const watched = videoRef.current.currentTime - watchStartVideoTimeRef.current;
+      if (watched > 0) {
+        finalWatchTime += watched;
+        setTotalWatchTime(finalWatchTime);
+      }
+      watchStartVideoTimeRef.current = null;
+    }
+
     setIsPlaying(false);
+    setIsCompleted(true);
+    sendAnalyticsToBackend("end", {
+      time_watched: Number((finalWatchTime / 60).toFixed(2)) || 0,
+    });
   };
 
   const formatTime = (seconds: number) => {
@@ -67,130 +263,425 @@ const VideoSimulator = () => {
     return `${mins}:${secs.toString().padStart(2, "0")}`;
   };
 
-  const [darkMode, setDarkMode] = useState(false);
-  const [showConfusionModal, setShowConfusionModal] = useState(false);
-  const [modalResponse, setModalResponse] = useState<string | null>(null);
-  const progressPercent = duration > 0 ? (currentTime / duration) * 100 : 0;
+  // ── Avatar: stop current session ──
+  const stopAvatarSession = useCallback(async () => {
+    if (livekitRoomRef.current) {
+      livekitRoomRef.current.disconnect();
+      livekitRoomRef.current = null;
+    }
+    avatarAudioElemsRef.current.forEach((el) => { el.pause(); el.remove(); });
+    avatarAudioElemsRef.current = [];
+    if (avatarSessionIdRef.current) {
+      try { await api.stopAvatarSession(avatarSessionIdRef.current); } catch { /* best effort */ }
+      avatarSessionIdRef.current = null;
+    }
+    setAvatarMode(false);
+    setAvatarLoading(false);
+    setAvatarError(null);
+  }, []);
+
+  // ── Avatar: start session and speak the help content ──
+  const startAvatarSession = useCallback(async (content: typeof helpContent) => {
+    if (!content) return;
+    setAvatarError(null);
+    setAvatarLoading(true);
+
+    try {
+      const { session_id, livekit_url, livekit_token } = await api.getAvatarSession();
+      avatarSessionIdRef.current = session_id;
+
+      const room = new Room();
+      livekitRoomRef.current = room;
+
+      // Attach video to the <video> element; give audio its own <audio> element
+      // to avoid srcObject conflicts and bypass browser autoplay restrictions.
+      room.on(RoomEvent.TrackSubscribed, (track: RemoteTrack) => {
+        if (track.kind === Track.Kind.Audio) {
+          const audioEl = track.attach() as HTMLAudioElement;
+          audioEl.autoplay = true;
+          document.body.appendChild(audioEl);
+          avatarAudioElemsRef.current.push(audioEl);
+        }
+        if (track.kind === Track.Kind.Video && avatarVideoRef.current) {
+          track.attach(avatarVideoRef.current);
+          setAvatarLoading(false);
+          setAvatarMode(true);
+
+          // Build a teacher-style spoken script from the help content
+          const ordinals = ["First", "Second", "Third", "Fourth", "Fifth"];
+          const keyPointsScript = content.keyPoints.length > 0
+            ? `Now, there are ${content.keyPoints.length} key concept${content.keyPoints.length > 1 ? "s" : ""} I want you to take away from this section. ` +
+              content.keyPoints
+                .map((kp, i) => `${ordinals[i] ?? `Point ${i + 1}`} — ${kp.point}. ${kp.explanation}`)
+                .join(" ")
+            : "";
+          const questionsScript = content.suggestedQuestions.length > 0
+            ? "Before you move on, here are a couple of things worth thinking about. " +
+              content.suggestedQuestions.map((sq) => sq.question).join(" And also — ")
+            : "";
+          const script = [
+            "Alright, let me walk you through what's happening in this section.",
+            content.summary,
+            keyPointsScript,
+            questionsScript,
+            "Take your time, and feel free to continue watching the video whenever you're ready.",
+          ].filter(Boolean).join(" ");
+
+          const payload = new TextEncoder().encode(
+            JSON.stringify({ event_type: "avatar.speak_text", session_id, text: script })
+          );
+          room.localParticipant
+            .publishData(payload, { topic: "agent-control", reliable: true })
+            .catch(console.error);
+        }
+      });
+
+      await room.connect(livekit_url, livekit_token);
+      // Unlock the browser's audio autoplay restriction using the current user gesture
+      await room.startAudio();
+    } catch (err) {
+      console.error("Avatar session error:", err);
+      const msg = err instanceof Error ? err.message : "";
+      setAvatarError(
+        msg.includes("429") || msg.toLowerCase().includes("closing")
+          ? "A previous avatar session is still closing. Please wait a few seconds and try again."
+          : "Could not start avatar session. Please try again."
+      );
+      setAvatarLoading(false);
+      stopAvatarSession();
+    }
+  }, [stopAvatarSession]);
+
+  // Stop avatar when help panel closes
+  useEffect(() => {
+    if (!showHelpPanel) stopAvatarSession();
+  }, [showHelpPanel, stopAvatarSession]);
+
+  // ── Open help panel with AI content ──
+  const openHelpPanel = async (timestamp: number) => {
+    setHelpTimestamp(timestamp);
+    setShowHelpPanel(true);
+    setHelpContent(null);
+    setHelpLoading(true);
+    setRevealedAnswers(new Set());
+    setRevealedPoints(new Set());
+    try {
+      const result = await api.getVideoHelp({ timestamp });
+      setHelpContent(result);
+    } catch (err) {
+      console.error("Help fetch error:", err);
+      setHelpContent({
+        summary: "Unable to load help content at this time. Please try again.",
+        keyPoints: [],
+        suggestedQuestions: [],
+      });
+    } finally {
+      setHelpLoading(false);
+    }
+  };
 
   const handleModalResponse = (response: string) => {
-    setModalResponse(response);
+    if (response === "Maybe later") {
+      helpDecision.current = helpDecision.current === "snoozed" ? "dismissed" : "snoozed";
+    } else {
+      helpDecision.current = "dismissed";
+    }
     setShowConfusionModal(false);
+
+    if (response === "Yes, help me") {
+      const ts = videoRef.current?.currentTime ?? 0;
+      openHelpPanel(ts);
+    }
   };
 
   return (
     <>
       <DashboardNavBar />
       <div className={`${styles.container} ${darkMode ? styles.dark : ""}`}>
-        <div className={styles.content}>
+        <div className={`${styles.content} ${showHelpPanel ? styles.contentWide : ""}`}>
           <h1 className={styles.title}>Video Simulator</h1>
 
-          <div className={styles.playerShell}>
-            {/* Video */}
-            <video
-              ref={videoRef}
-              className={styles.video}
-              onLoadedMetadata={handleLoadedMetadata}
-              onTimeUpdate={handleTimeUpdate}
-              onEnded={handleEnded}
-              onClick={isPlaying ? handlePause : handlePlay}
-              controls={false}
+          <div
+            ref={playerRowRef}
+            className={`${styles.playerRow} ${showHelpPanel ? styles.playerRowSplit : ""}`}
+          >
+            {/* ── Video player ── */}
+            <div
+              className={styles.playerShell}
+              style={showHelpPanel ? { flex: `0 0 calc(${videoPct}% - 8px)` } : undefined}
             >
-              <source src="/video/test.mp4" type="video/mp4" />
-              Your browser does not support the video tag.
-            </video>
+              <video
+                ref={videoRef}
+                className={styles.video}
+                onLoadedMetadata={handleLoadedMetadata}
+                onTimeUpdate={handleTimeUpdate}
+                onEnded={handleEnded}
+                onClick={isPlaying ? handlePause : handlePlay}
+                controls={false}
+              >
+                <source src="/video/test.mp4" type="video/mp4" />
+                Your browser does not support the video tag.
+              </video>
 
-            {/* Controls bar */}
-            <div className={styles.controlsBar}>
-              {/* Progress row */}
-              <div className={styles.progressRow}>
-                <div
-                  className={styles.progressTrack}
-                  style={{ "--progress": `${progressPercent}%` } as React.CSSProperties}
-                >
-                  <input
-                    type="range"
-                    min="0"
-                    max={duration || 0}
-                    step="0.01"
-                    value={currentTime}
-                    onChange={handleSeek}
-                    className={styles.seekBar}
-                  />
-                </div>
-              </div>
-
-              {/* Bottom row */}
-              <div className={styles.bottomRow}>
-                {/* Left group */}
-                <div className={styles.leftGroup}>
-                  <button
-                    onClick={isPlaying ? handlePause : handlePlay}
-                    className={styles.playButton}
-                    aria-label={isPlaying ? "Pause" : "Play"}
+              <div className={styles.controlsBar}>
+                <div className={styles.progressRow}>
+                  <div
+                    className={styles.progressTrack}
+                    style={{ "--progress": `${progressPercent}%` } as React.CSSProperties}
                   >
-                    {isPlaying ? (
-                      <svg viewBox="0 0 24 24" fill="currentColor" width="20" height="20">
-                        <rect x="6" y="4" width="4" height="16" rx="1" />
-                        <rect x="14" y="4" width="4" height="16" rx="1" />
-                      </svg>
-                    ) : (
-                      <svg viewBox="0 0 24 24" fill="currentColor" width="20" height="20">
-                        <path d="M8 5v14l11-7z" />
-                      </svg>
-                    )}
-                  </button>
-
-                  {/* Volume */}
-                  <div className={styles.volumeGroup}>
-                    <svg viewBox="0 0 24 24" fill="currentColor" width="18" height="18" className={styles.volumeIcon}>
-                      <path d="M3 9v6h4l5 5V4L7 9H3zm13.5 3A4.5 4.5 0 0 0 14 7.97v8.05c1.48-.73 2.5-2.25 2.5-4.02z"/>
-                    </svg>
                     <input
                       type="range"
                       min="0"
-                      max="1"
-                      step="0.05"
-                      value={volume}
-                      onChange={handleVolumeChange}
-                      className={styles.volumeSlider}
+                      max={duration || 0}
+                      step="0.01"
+                      value={currentTime}
+                      onChange={handleSeek}
+                      className={styles.seekBar}
                     />
                   </div>
-
-                  <span className={styles.timeDisplay}>
-                    {formatTime(currentTime)} / {formatTime(duration)}
-                  </span>
                 </div>
 
-                {/* Right group — speed */}
-                <div className={styles.rightGroup}>
-                  {[0.5, 0.75, 1, 1.25, 1.5, 2].map((speed) => (
+                <div className={styles.bottomRow}>
+                  <div className={styles.leftGroup}>
                     <button
-                      key={speed}
-                      onClick={() => handleSpeedChange(speed)}
-                      className={`${styles.speedButton} ${playbackRate === speed ? styles.active : ""}`}
+                      onClick={isPlaying ? handlePause : handlePlay}
+                      className={styles.playButton}
+                      aria-label={isPlaying ? "Pause" : "Play"}
                     >
-                      {speed}x
+                      {isPlaying ? (
+                        <svg viewBox="0 0 24 24" fill="currentColor" width="20" height="20">
+                          <rect x="6" y="4" width="4" height="16" rx="1" />
+                          <rect x="14" y="4" width="4" height="16" rx="1" />
+                        </svg>
+                      ) : (
+                        <svg viewBox="0 0 24 24" fill="currentColor" width="20" height="20">
+                          <path d="M8 5v14l11-7z" />
+                        </svg>
+                      )}
                     </button>
-                  ))}
+
+                    <div className={styles.volumeGroup}>
+                      <svg viewBox="0 0 24 24" fill="currentColor" width="18" height="18" className={styles.volumeIcon}>
+                        <path d="M3 9v6h4l5 5V4L7 9H3zm13.5 3A4.5 4.5 0 0 0 14 7.97v8.05c1.48-.73 2.5-2.25 2.5-4.02z"/>
+                      </svg>
+                      <input
+                        type="range"
+                        min="0"
+                        max="1"
+                        step="0.05"
+                        value={volume}
+                        onChange={handleVolumeChange}
+                        className={styles.volumeSlider}
+                      />
+                    </div>
+
+                    <span className={styles.timeDisplay}>
+                      {formatTime(currentTime)} / {formatTime(duration)}
+                    </span>
+
+                    {predictionLoading && (
+                      <span className={styles.analysing}>Analysing…</span>
+                    )}
+                  </div>
+
+                  <div className={styles.rightGroup}>
+                    {[0.5, 0.75, 1, 1.25, 1.5, 2].map((speed) => (
+                      <button
+                        key={speed}
+                        onClick={() => handleSpeedChange(speed)}
+                        className={`${styles.speedButton} ${playbackRate === speed ? styles.active : ""}`}
+                      >
+                        {speed}x
+                      </button>
+                    ))}
+                  </div>
                 </div>
               </div>
             </div>
-          </div>
 
-          {/* Demo trigger */}
-          <div className={styles.demoRow}>
-            <button
-              className={styles.demoTrigger}
-              onClick={() => { setModalResponse(null); setShowConfusionModal(true); }}
-            >
-              Preview confusion alert
-            </button>
-            {modalResponse && (
-              <span className={styles.demoResponse}>
-                You selected: <strong>{modalResponse}</strong>
-              </span>
+            {/* ── Drag-to-resize handle ── */}
+            {showHelpPanel && (
+              <div className={styles.resizeHandle} onMouseDown={onResizeStart} title="Drag to resize" />
+            )}
+
+            {/* ── Help panel ── */}
+            {showHelpPanel && (
+              <div
+                ref={helpPanelRef}
+                className={styles.helpPanel}
+                style={{ flex: `0 0 calc(${100 - videoPct}% - 8px)`, height: `${panelHeight}px` }}
+              >
+                <div className={styles.helpPanelHeader}>
+                  <div>
+                    <h2 className={styles.helpPanelTitle}>Help</h2>
+                    <span className={styles.helpPanelTimestamp}>
+                      at {formatTime(helpTimestamp)}
+                    </span>
+                  </div>
+                  <div className={styles.helpPanelHeaderRight}>
+                    {/* Avatar / Read toggle — only show once help content is ready */}
+                    {helpContent && !helpLoading && (
+                      <div className={styles.avatarToggle}>
+                        <button
+                          className={`${styles.avatarToggleBtn} ${!avatarMode && !avatarLoading ? styles.avatarToggleBtnActive : ""}`}
+                          onClick={() => { if (avatarMode || avatarLoading) stopAvatarSession(); }}
+                          disabled={!avatarMode && !avatarLoading}
+                        >
+                          Read
+                        </button>
+                        <button
+                          className={`${styles.avatarToggleBtn} ${(avatarMode || avatarLoading) ? styles.avatarToggleBtnActive : ""}`}
+                          onClick={() => { if (!avatarMode && !avatarLoading) startAvatarSession(helpContent); }}
+                          disabled={avatarMode || avatarLoading}
+                        >
+                          {avatarLoading ? "Connecting…" : "Avatar"}
+                        </button>
+                      </div>
+                    )}
+                    <button
+                      className={styles.helpPanelClose}
+                      onClick={() => setShowHelpPanel(false)}
+                      aria-label="Close help panel"
+                    >
+                      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" width="20" height="20">
+                        <path d="M18 6L6 18M6 6l12 12" strokeLinecap="round" />
+                      </svg>
+                    </button>
+                  </div>
+                </div>
+
+                <div className={styles.helpPanelBody}>
+                  {/* Avatar video — hidden when not active */}
+                  <video
+                    ref={avatarVideoRef}
+                    className={`${styles.avatarVideo} ${avatarMode ? styles.avatarVideoVisible : ""}`}
+                    autoPlay
+                    playsInline
+                    muted={false}
+                  />
+                  {avatarError && (
+                    <p className={styles.avatarError}>{avatarError}</p>
+                  )}
+
+                  {/* Written content — only shown in Read mode */}
+                  {!avatarMode && !avatarLoading && (
+                    helpLoading ? (
+                      <div className={styles.helpLoading}>
+                        <div className={styles.helpSpinner} />
+                        <p>Generating help for this section…</p>
+                      </div>
+                    ) : helpContent ? (
+                      <>
+                        <section className={styles.helpSection}>
+                          <h3 className={styles.helpSectionTitle}>Summary</h3>
+                          <p className={styles.helpSummaryText}>{helpContent.summary}</p>
+                        </section>
+
+                        {helpContent.keyPoints.length > 0 && (
+                          <section className={styles.helpSection}>
+                            <h3 className={styles.helpSectionTitle}>Key Points</h3>
+                            <ul className={styles.helpKeyPoints}>
+                              {helpContent.keyPoints.map((kp, i) => {
+                                const isOpen = revealedPoints.has(i);
+                                return (
+                                  <li key={i}>
+                                    <button
+                                      className={styles.helpPointToggle}
+                                      onClick={() => setRevealedPoints((prev) => {
+                                        const next = new Set(prev);
+                                        isOpen ? next.delete(i) : next.add(i);
+                                        return next;
+                                      })}
+                                      aria-expanded={isOpen}
+                                    >
+                                      <svg
+                                        className={`${styles.helpPointChevron} ${isOpen ? styles.helpPointChevronOpen : ""}`}
+                                        viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" width="14" height="14"
+                                      >
+                                        <path d="M9 18l6-6-6-6" strokeLinecap="round" strokeLinejoin="round" />
+                                      </svg>
+                                      <span className={styles.helpPointLabel}>{kp.point}</span>
+                                    </button>
+                                    {isOpen && kp.explanation && (
+                                      <p className={styles.helpPointExplanation}>{kp.explanation}</p>
+                                    )}
+                                  </li>
+                                );
+                              })}
+                            </ul>
+                          </section>
+                        )}
+
+                        {helpContent.suggestedQuestions.length > 0 && (
+                          <section className={styles.helpSection}>
+                            <h3 className={styles.helpSectionTitle}>Questions to Consider</h3>
+                            <ul className={styles.helpQuestions}>
+                              {helpContent.suggestedQuestions.map((sq, i) => {
+                                const isRevealed = revealedAnswers.has(i);
+                                return (
+                                  <li key={i}>
+                                    <div className={styles.helpQuestionRow}>
+                                      <span className={styles.helpQuestionLabel}>{sq.question}</span>
+                                      <button
+                                        className={`${styles.helpRevealBtn} ${isRevealed ? styles.helpRevealBtnOpen : ""}`}
+                                        onClick={() => setRevealedAnswers((prev) => {
+                                          const next = new Set(prev);
+                                          isRevealed ? next.delete(i) : next.add(i);
+                                          return next;
+                                        })}
+                                        aria-expanded={isRevealed}
+                                      >
+                                        {isRevealed ? "Hide answer" : "Show answer"}
+                                      </button>
+                                    </div>
+                                    {isRevealed && sq.answer && (
+                                      <p className={styles.helpQuestionAnswer}>{sq.answer}</p>
+                                    )}
+                                  </li>
+                                );
+                              })}
+                            </ul>
+                          </section>
+                        )}
+                      </>
+                    ) : null
+                  )}
+
+                  {/* Avatar mode hint */}
+                  {(avatarMode || avatarLoading) && !avatarError && (
+                    <p className={styles.avatarHint}>
+                      Switch to <strong>Read</strong> to review the summary and key points at your own pace.
+                    </p>
+                  )}
+                </div>
+
+                {/* ── Vertical drag-to-resize handle ── */}
+                <div className={styles.verticalResizeHandle} onMouseDown={onVerticalResizeStart} title="Drag to resize height" />
+              </div>
             )}
           </div>
+
+          {/* ── Help button (manual trigger) ── */}
+          {!showHelpPanel && (
+            <div className={styles.demoRow}>
+              <button
+                className={styles.demoTrigger}
+                onClick={() => {
+                  const ts = videoRef.current?.currentTime ?? 0;
+                  if (isPlaying) handlePause();
+                  openHelpPanel(ts);
+                }}
+              >
+                Get help
+              </button>
+              {/* <button
+                className={styles.demoTrigger}
+                onClick={() => { setShowConfusionModal(true); }}
+              >
+                Preview confusion alert
+              </button> */}
+            </div>
+          )}
 
           <div className={styles.themeRow}>
             <span className={styles.themeLabel}>Background</span>
@@ -207,7 +698,7 @@ const VideoSimulator = () => {
       </div>
       <Footer />
 
-      {/* Confusion detection modal */}
+      {/* ── Confusion detection modal ── */}
       {showConfusionModal && (
         <div className={styles.modalOverlay} role="dialog" aria-modal="true" aria-labelledby="confusionTitle">
           <div className={styles.modal}>
@@ -221,9 +712,9 @@ const VideoSimulator = () => {
               Looks like you might need a hand
             </h2>
             <p className={styles.modalBody}>
-              Our system noticed some patterns that suggest you may be finding this section tricky, 
-              which is completely okay! Would you like us to provide
-              a deeper explanation or additional resources for this topic?
+              Our system noticed some patterns that suggest you may be finding this section tricky,
+              which is completely okay! Would you like us to provide a deeper explanation or
+              additional resources for this topic?
             </p>
             <div className={styles.modalActions}>
               <button
