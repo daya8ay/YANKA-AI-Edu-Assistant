@@ -122,10 +122,10 @@ python main.py
 Or with uvicorn directly:
 
 ```bash
-uvicorn main:app --reload --port 4000
+uvicorn app.main:app --reload --port 8000
 ```
 
-Server runs at **http://localhost:4000** by default.
+Server runs at **http://localhost:8000** by default (same as Docker).
 
 ## API
 
@@ -138,4 +138,4 @@ Server runs at **http://localhost:4000** by default.
 
 ## Frontend connection
 
-In the frontend, set `NEXT_PUBLIC_API_URL=http://localhost:4000` in `.env.local` and use the `api` client in `src/lib/api.ts` to call these endpoints.
+In the frontend, set `NEXT_PUBLIC_API_URL` in `.env.local` if your API is not on `http://localhost:8000` (see `src/lib/api.ts`) and use the `api` client to call these endpoints.

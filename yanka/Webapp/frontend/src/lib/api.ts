@@ -1,9 +1,9 @@
 /**
  * API client for the YANKA backend.
- * Set NEXT_PUBLIC_API_URL in .env.local (e.g. http://localhost:4000).
+ * Match the uvicorn/Docker port (default 8000). Override if needed, e.g. NEXT_PUBLIC_API_URL=http://localhost:4000
  */
 
-const BASE = process.env.NEXT_PUBLIC_API_URL ?? "http://localhost:4000";
+const BASE = process.env.NEXT_PUBLIC_API_URL ?? "http://localhost:8000";
 
 async function request<T>(
   path: string,
