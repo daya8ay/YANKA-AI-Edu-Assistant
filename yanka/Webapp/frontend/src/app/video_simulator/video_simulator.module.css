@@ -141,6 +141,28 @@
   background: rgba(255,255,255,0.15);
 }
 
+.replayButton {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 6px 10px;
+  font-size: 0.72rem;
+  font-weight: 600;
+  letter-spacing: 0.02em;
+  color: #e5e7eb;
+  background: rgba(255, 255, 255, 0.08);
+  border: 1px solid rgba(255, 255, 255, 0.22);
+  border-radius: 6px;
+  cursor: pointer;
+  transition: background 0.2s, border-color 0.2s;
+  flex-shrink: 0;
+}
+
+.replayButton:hover {
+  background: rgba(255, 255, 255, 0.15);
+  border-color: rgba(255, 255, 255, 0.35);
+}
+
 /* ── Volume ── */
 .volumeGroup {
   display: flex;
@@ -1004,6 +1026,236 @@
 
 .dark .avatarHint strong {
   color: #818cf8;
+}
+
+/* ── Help panel footer (feedback + chat) ── */
+.helpPanelFooter {
+  flex-shrink: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  padding: 14px 18px 16px;
+  border-top: 1px solid #e5e7eb;
+}
+
+.dark .helpPanelFooter {
+  border-top-color: #374151;
+}
+
+/* Was this helpful? */
+.helpFeedback {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  flex-wrap: wrap;
+}
+
+.helpFeedbackLabel {
+  font-size: 0.8rem;
+  font-weight: 600;
+  color: #6b7280;
+  white-space: nowrap;
+}
+
+.dark .helpFeedbackLabel {
+  color: #9ca3af;
+}
+
+.helpFeedbackBtns {
+  display: flex;
+  gap: 6px;
+}
+
+.helpFeedbackBtn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 32px;
+  height: 32px;
+  border-radius: 8px;
+  border: 1.5px solid #d1d5db;
+  background: transparent;
+  color: #6b7280;
+  cursor: pointer;
+  transition: all 0.15s ease;
+}
+
+.helpFeedbackBtn:hover {
+  border-color: #6366f1;
+  color: #6366f1;
+  background: #eef2ff;
+}
+
+.helpFeedbackBtnActive {
+  border-color: #6366f1;
+  background: #6366f1;
+  color: #fff;
+}
+
+.helpFeedbackBtnActive:hover {
+  background: #4f46e5;
+  color: #fff;
+}
+
+.dark .helpFeedbackBtn {
+  border-color: #374151;
+  color: #9ca3af;
+}
+
+.dark .helpFeedbackBtn:hover {
+  border-color: #818cf8;
+  color: #818cf8;
+  background: rgba(99, 102, 241, 0.12);
+}
+
+.dark .helpFeedbackBtnActive,
+.dark .helpFeedbackBtnActive:hover {
+  border-color: #6366f1;
+  background: #6366f1;
+  color: #fff;
+}
+
+.helpFeedbackConfirm {
+  font-size: 0.76rem;
+  color: #6366f1;
+  font-style: italic;
+}
+
+.dark .helpFeedbackConfirm {
+  color: #818cf8;
+}
+
+/* Need more help? chat */
+.helpChat {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.helpChatLabel {
+  font-size: 0.8rem;
+  font-weight: 600;
+  color: #6b7280;
+}
+
+.dark .helpChatLabel {
+  color: #9ca3af;
+}
+
+.helpChatMessages {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  max-height: 220px;
+  overflow-y: auto;
+  padding: 10px 12px;
+  border-radius: 10px;
+  background: #f9fafb;
+  border: 1px solid #e5e7eb;
+}
+
+.dark .helpChatMessages {
+  background: #1f2937;
+  border-color: #374151;
+}
+
+.helpChatMsg {
+  max-width: 88%;
+  padding: 8px 12px;
+  border-radius: 10px;
+  font-size: 0.82rem;
+  line-height: 1.5;
+  white-space: pre-wrap;
+  word-break: break-word;
+}
+
+.helpChatMsgUser {
+  align-self: flex-end;
+  background: #6366f1;
+  color: #fff;
+  border-bottom-right-radius: 3px;
+}
+
+.helpChatMsgAssistant {
+  align-self: flex-start;
+  background: #e5e7eb;
+  color: #1f2937;
+  border-bottom-left-radius: 3px;
+}
+
+.dark .helpChatMsgAssistant {
+  background: #374151;
+  color: #e5e7eb;
+}
+
+.helpChatMsgLoading {
+  font-style: italic;
+  opacity: 0.7;
+}
+
+.helpChatInputRow {
+  display: flex;
+  gap: 8px;
+  align-items: center;
+}
+
+.helpChatInput {
+  flex: 1;
+  padding: 8px 12px;
+  font-size: 0.83rem;
+  border: 1.5px solid #d1d5db;
+  border-radius: 8px;
+  background: #fff;
+  color: #111827;
+  outline: none;
+  transition: border-color 0.15s;
+}
+
+.helpChatInput:focus {
+  border-color: #6366f1;
+}
+
+.helpChatInput:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+.dark .helpChatInput {
+  background: #1f2937;
+  border-color: #374151;
+  color: #f3f4f6;
+}
+
+.dark .helpChatInput:focus {
+  border-color: #818cf8;
+}
+
+.helpChatSend {
+  flex-shrink: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 36px;
+  height: 36px;
+  border-radius: 8px;
+  border: none;
+  background: #6366f1;
+  color: #fff;
+  cursor: pointer;
+  transition: background 0.15s;
+}
+
+.helpChatSend:hover:not(:disabled) {
+  background: #4f46e5;
+}
+
+.helpChatSend:disabled {
+  background: #c7d2fe;
+  cursor: not-allowed;
+}
+
+.dark .helpChatSend:disabled {
+  background: #3730a3;
 }
 
 /* ── Responsive ── */

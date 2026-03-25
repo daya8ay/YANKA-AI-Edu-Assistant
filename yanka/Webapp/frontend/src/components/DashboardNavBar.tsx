@@ -51,7 +51,6 @@ const DashboardNavBar: React.FC = () => {
           <li><Link href="/avatar_creation">Avatar Creation</Link></li>
           <li><Link href="/video">Video</Link></li>
           <li><Link href="/video_simulator">Video Simulator</Link></li>
-          <li><Link href="/video_analytics">Video Analytics</Link></li>
           <li><button onClick={handleLogout} className={styles.logoutBtn}>Logout</button></li>
           <li>
             <Image

@@ -18,7 +18,8 @@ load_dotenv()
 
 # ── Paths ──
 BACKEND_DIR   = Path(__file__).resolve().parent.parent          # .../backend/
-VIDEO_PATH    = BACKEND_DIR.parent / "frontend" / "public" / "video" / "test.mp4"
+default_video = BACKEND_DIR.parent / "frontend" / "public" / "video" / "test.mp4"
+VIDEO_PATH    = Path(os.getenv("VIDEO_PATH_OVERRIDE", str(default_video)))
 TRANSCRIPT_PATH = BACKEND_DIR / "app" / "transcript.json"
 
 
@@ -287,6 +288,7 @@ async def stop_avatar_session(session_id: str):
 
 class VideoHelpRequest(BaseModel):
     timestamp: float  # seconds into the video
+    lookback: float | None = None  # optional context window in seconds
 
 
 def load_transcript_context(timestamp: float, lookback: float = 180.0) -> str:
@@ -306,7 +308,8 @@ def video_help(request: VideoHelpRequest):
     Returns an AI-generated summary, key points, and suggested questions
     for the portion of the video around the given timestamp.
     """
-    context = load_transcript_context(request.timestamp)
+    lookback = request.lookback if request.lookback is not None else 180.0
+    context = load_transcript_context(request.timestamp, lookback=lookback)
 
     if not context:
         return {
@@ -365,3 +368,49 @@ def video_help(request: VideoHelpRequest):
             for q in data.get("suggestedQuestions", [])
         ],
     }
+
+
+class VideoHelpChatRequest(BaseModel):
+    message: str
+    timestamp: float
+
+
+@app.post("/api/video-help/chat")
+def video_help_chat(request: VideoHelpChatRequest):
+    """
+    Answers a student's follow-up question using the transcript context
+    around their current video position.
+    """
+    context = load_transcript_context(request.timestamp)
+
+    client = OpenAI(api_key=os.getenv("OPENAI_API_KEY"))
+
+    system = (
+        "You are a helpful educational assistant. A student is watching a video lesson "
+        "and has a follow-up question about the content. "
+        "Use the provided transcript excerpt as context to give a clear, concise answer. "
+        "Speak directly to the student in plain, friendly language. "
+        "Keep your response focused and to the point — 2-4 sentences unless more detail is genuinely needed."
+    )
+
+    messages = [{"role": "system", "content": system}]
+
+    if context:
+        messages.append({
+            "role": "user",
+            "content": (
+                f"Here is the relevant part of the video transcript "
+                f"(around {int(request.timestamp // 60)}m {int(request.timestamp % 60)}s):\n\n"
+                f"{context}\n\n"
+                f"Student's question: {request.message}"
+            ),
+        })
+    else:
+        messages.append({"role": "user", "content": request.message})
+
+    completion = client.chat.completions.create(
+        model="gpt-4o-mini",
+        messages=messages,
+    )
+
+    return {"response": completion.choices[0].message.content or ""}

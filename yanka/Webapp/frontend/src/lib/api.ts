@@ -66,13 +66,20 @@ export const api = {
     request<{ ok: boolean }>(`/api/avatar/session/${sessionId}`, { method: "DELETE" }),
 
   /** Get AI-generated help content for a video section */
-  getVideoHelp: (params: { timestamp: number }) =>
+  getVideoHelp: (params: { timestamp: number; lookback?: number }) =>
     request<{
       summary: string;
       keyPoints: { point: string; explanation: string }[];
       suggestedQuestions: { question: string; answer: string }[];
     }>(
       "/api/video-help",
+      { method: "POST", body: params }
+    ),
+
+  /** Send a follow-up chat question about the current video section */
+  videoHelpChat: (params: { message: string; timestamp: number }) =>
+    request<{ response: string }>(
+      "/api/video-help/chat",
       { method: "POST", body: params }
     ),
 };
