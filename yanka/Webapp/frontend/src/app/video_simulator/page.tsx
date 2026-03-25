@@ -53,13 +53,21 @@ const VideoSimulator = () => {
   const endCheckSent   = useRef(false);
 
   // ── Help state ──
-  const helpDecision = useRef<"none" | "snoozed" | "dismissed">("none");
+  const helpDecision = useRef<"none" | "snoozed" | "dismissed" | "accepted_help">("none");
   const [showHelpPanel, setShowHelpPanel] = useState(false);
   const [helpContent, setHelpContent] = useState<HelpContent | null>(null);
   const [helpLoading, setHelpLoading] = useState(false);
   const [helpTimestamp, setHelpTimestamp] = useState(0);
+  const [showLookbackPicker, setShowLookbackPicker] = useState(false);
+  const [pendingHelpTimestamp, setPendingHelpTimestamp] = useState(0);
   const [revealedAnswers, setRevealedAnswers] = useState<Set<number>>(new Set());
   const [revealedPoints, setRevealedPoints] = useState<Set<number>>(new Set());
+
+  // ── Help feedback + chat state ──
+  const [helpfulness, setHelpfulness] = useState<"up" | "down" | null>(null);
+  const [chatInput, setChatInput] = useState("");
+  const [chatMessages, setChatMessages] = useState<{ role: "user" | "assistant"; text: string }[]>([]);
+  const [chatLoading, setChatLoading] = useState(false);
 
   // ── Avatar state ──
   const [avatarMode, setAvatarMode] = useState(false);
@@ -73,6 +81,7 @@ const VideoSimulator = () => {
   // ── UI state ──
   const [darkMode, setDarkMode] = useState(false);
   const [showConfusionModal, setShowConfusionModal] = useState(false);
+  const [confusionModalFromEnd, setConfusionModalFromEnd] = useState(false);
   const [isCompleted, setIsCompleted] = useState(false);
 
   // ── Resizable panel (horizontal + vertical) ──
@@ -131,21 +140,24 @@ const VideoSimulator = () => {
       const result = await api.getVideoPrediction(metrics);
       const p = (result.prediction as string).trim().toLowerCase();
 
-      if (helpDecision.current !== "dismissed") {
-        const isHigh   = p === "high";
-        const isMedEnd = p === "medium" && trigger === "end";
-        if (isHigh || isMedEnd) {
-          if (videoRef.current && !videoRef.current.paused) {
-            if (watchStartVideoTimeRef.current !== null) {
-              const watched = videoRef.current.currentTime - watchStartVideoTimeRef.current;
-              if (watched > 0) setTotalWatchTime((prev) => prev + watched);
-              watchStartVideoTimeRef.current = null;
-            }
-            videoRef.current.pause();
-            setIsPlaying(false);
+      const qualifies = p === "high" || (p === "medium" && trigger === "end");
+      const blockedByAcceptedHelp =
+        helpDecision.current === "accepted_help" && (trigger === "mid" || trigger === "late");
+      const canShowPopup =
+        helpDecision.current !== "dismissed" && qualifies && !blockedByAcceptedHelp;
+
+      if (canShowPopup) {
+        if (videoRef.current && !videoRef.current.paused) {
+          if (watchStartVideoTimeRef.current !== null) {
+            const watched = videoRef.current.currentTime - watchStartVideoTimeRef.current;
+            if (watched > 0) setTotalWatchTime((prev) => prev + watched);
+            watchStartVideoTimeRef.current = null;
           }
-          setShowConfusionModal(true);
+          videoRef.current.pause();
+          setIsPlaying(false);
         }
+        setConfusionModalFromEnd(trigger === "end");
+        setShowConfusionModal(true);
       }
     } catch (err) {
       console.error("Prediction error:", err);
@@ -280,6 +292,52 @@ const VideoSimulator = () => {
     setAvatarError(null);
   }, []);
 
+  const handleReplay = useCallback(async () => {
+    await stopAvatarSession();
+    earlyCheckSent.current = false;
+    midCheckSent.current = false;
+    lateCheckSent.current = false;
+    endCheckSent.current = false;
+    helpDecision.current = "none";
+
+    setPauseCount(0);
+    setSeekCount(0);
+    setTotalWatchTime(0);
+    watchStartVideoTimeRef.current = null;
+    setShowConfusionModal(false);
+    setConfusionModalFromEnd(false);
+    setShowLookbackPicker(false);
+    setPendingHelpTimestamp(0);
+    setIsCompleted(false);
+    setPredictionLoading(false);
+
+    setShowHelpPanel(false);
+    setHelpContent(null);
+    setHelpTimestamp(0);
+    setRevealedAnswers(new Set());
+    setRevealedPoints(new Set());
+    setHelpfulness(null);
+    setChatInput("");
+    setChatMessages([]);
+
+    const v = videoRef.current;
+    if (!v) {
+      setIsPlaying(false);
+      return;
+    }
+    v.pause();
+    v.currentTime = 0;
+    setCurrentTime(0);
+    try {
+      await v.play();
+      setIsPlaying(true);
+      watchStartVideoTimeRef.current = 0;
+    } catch {
+      setIsPlaying(false);
+      watchStartVideoTimeRef.current = null;
+    }
+  }, [stopAvatarSession]);
+
   // ── Avatar: start session and speak the help content ──
   const startAvatarSession = useCallback(async (content: typeof helpContent) => {
     if (!content) return;
@@ -358,15 +416,18 @@ const VideoSimulator = () => {
   }, [showHelpPanel, stopAvatarSession]);
 
   // ── Open help panel with AI content ──
-  const openHelpPanel = async (timestamp: number) => {
+  const openHelpPanel = async (timestamp: number, lookback?: number) => {
     setHelpTimestamp(timestamp);
     setShowHelpPanel(true);
     setHelpContent(null);
     setHelpLoading(true);
     setRevealedAnswers(new Set());
     setRevealedPoints(new Set());
+    setHelpfulness(null);
+    setChatInput("");
+    setChatMessages([]);
     try {
-      const result = await api.getVideoHelp({ timestamp });
+      const result = await api.getVideoHelp({ timestamp, lookback });
       setHelpContent(result);
     } catch (err) {
       console.error("Help fetch error:", err);
@@ -380,19 +441,56 @@ const VideoSimulator = () => {
     }
   };
 
+  const sendChatMessage = useCallback(async () => {
+    const msg = chatInput.trim();
+    if (!msg || chatLoading) return;
+    setChatMessages((prev) => [...prev, { role: "user", text: msg }]);
+    setChatInput("");
+    setChatLoading(true);
+    try {
+      const res = await api.videoHelpChat({ message: msg, timestamp: helpTimestamp });
+      setChatMessages((prev) => [...prev, { role: "assistant", text: res.response }]);
+    } catch {
+      setChatMessages((prev) => [
+        ...prev,
+        { role: "assistant", text: "Sorry, I couldn't get a response. Please try again." },
+      ]);
+    } finally {
+      setChatLoading(false);
+    }
+  }, [chatInput, chatLoading, helpTimestamp]);
+
   const handleModalResponse = (response: string) => {
     if (response === "Maybe later") {
       helpDecision.current = helpDecision.current === "snoozed" ? "dismissed" : "snoozed";
+    } else if (response === "Yes, help me") {
+      helpDecision.current = isCompleted ? "dismissed" : "accepted_help";
     } else {
       helpDecision.current = "dismissed";
     }
     setShowConfusionModal(false);
+    setConfusionModalFromEnd(false);
 
     if (response === "Yes, help me") {
       const ts = videoRef.current?.currentTime ?? 0;
-      openHelpPanel(ts);
+      setPendingHelpTimestamp(ts);
+      setShowLookbackPicker(true);
     }
   };
+
+  const handleLookbackSelection = (lookbackSeconds: number | null) => {
+    const timestamp = pendingHelpTimestamp || (videoRef.current?.currentTime ?? 0);
+    const clampedLookback =
+      lookbackSeconds === null ? timestamp : Math.min(lookbackSeconds, timestamp);
+    setShowLookbackPicker(false);
+    setPendingHelpTimestamp(0);
+    openHelpPanel(timestamp, clampedLookback);
+  };
+  const watchedSoFar = Math.max(1, Math.round(pendingHelpTimestamp || currentTime));
+  const lookback50 = Math.max(1, Math.round(watchedSoFar * 0.5));
+  const lookback25 = Math.max(1, Math.round(watchedSoFar * 0.25));
+  const lookback50Mins = Math.max(1, Math.round(lookback50 / 60));
+  const lookback25Mins = Math.max(1, Math.round(lookback25 / 60));
 
   return (
     <>
@@ -458,6 +556,16 @@ const VideoSimulator = () => {
                           <path d="M8 5v14l11-7z" />
                         </svg>
                       )}
+                    </button>
+
+                    <button
+                      type="button"
+                      className={styles.replayButton}
+                      onClick={() => void handleReplay()}
+                      aria-label="Replay from start"
+                      title="Reset analytics and play from the beginning"
+                    >
+                      Replay
                     </button>
 
                     <div className={styles.volumeGroup}>
@@ -655,6 +763,88 @@ const VideoSimulator = () => {
                   )}
                 </div>
 
+                {/* ── Feedback + chat footer ── */}
+                {helpContent && !helpLoading && (
+                  <div className={styles.helpPanelFooter}>
+                    {/* Was this helpful? */}
+                    <div className={styles.helpFeedback}>
+                      <span className={styles.helpFeedbackLabel}>Was this helpful?</span>
+                      <div className={styles.helpFeedbackBtns}>
+                        <button
+                          className={`${styles.helpFeedbackBtn} ${helpfulness === "up" ? styles.helpFeedbackBtnActive : ""}`}
+                          onClick={() => setHelpfulness((prev) => prev === "up" ? null : "up")}
+                          aria-label="Yes, this was helpful"
+                          title="Yes, this helped"
+                        >
+                          <svg viewBox="0 0 24 24" fill={helpfulness === "up" ? "currentColor" : "none"} stroke="currentColor" strokeWidth="2" width="18" height="18">
+                            <path d="M14 9V5a3 3 0 0 0-3-3l-4 9v11h11.28a2 2 0 0 0 2-1.7l1.38-9a2 2 0 0 0-2-2.3H14z" strokeLinecap="round" strokeLinejoin="round" />
+                            <path d="M7 22H4a2 2 0 0 1-2-2v-7a2 2 0 0 1 2-2h3" strokeLinecap="round" strokeLinejoin="round" />
+                          </svg>
+                        </button>
+                        <button
+                          className={`${styles.helpFeedbackBtn} ${helpfulness === "down" ? styles.helpFeedbackBtnActive : ""}`}
+                          onClick={() => setHelpfulness((prev) => prev === "down" ? null : "down")}
+                          aria-label="No, this wasn't helpful"
+                          title="No, I still need help"
+                        >
+                          <svg viewBox="0 0 24 24" fill={helpfulness === "down" ? "currentColor" : "none"} stroke="currentColor" strokeWidth="2" width="18" height="18">
+                            <path d="M10 15v4a3 3 0 0 0 3 3l4-9V2H5.72a2 2 0 0 0-2 1.7l-1.38 9a2 2 0 0 0 2 2.3H10z" strokeLinecap="round" strokeLinejoin="round" />
+                            <path d="M17 2h2.67A2.31 2.31 0 0 1 22 4v7a2.31 2.31 0 0 1-2.33 2H17" strokeLinecap="round" strokeLinejoin="round" />
+                          </svg>
+                        </button>
+                      </div>
+                      {helpfulness && (
+                        <span className={styles.helpFeedbackConfirm}>
+                          {helpfulness === "up" ? "Thanks for the feedback!" : "Got it — we'll keep improving!"}
+                        </span>
+                      )}
+                    </div>
+
+                    {/* Need more help? */}
+                    <div className={styles.helpChat}>
+                      <span className={styles.helpChatLabel}>Need more help?</span>
+                      {chatMessages.length > 0 && (
+                        <div className={styles.helpChatMessages}>
+                          {chatMessages.map((msg, i) => (
+                            <div
+                              key={i}
+                              className={`${styles.helpChatMsg} ${msg.role === "user" ? styles.helpChatMsgUser : styles.helpChatMsgAssistant}`}
+                            >
+                              {msg.text}
+                            </div>
+                          ))}
+                          {chatLoading && (
+                            <div className={`${styles.helpChatMsg} ${styles.helpChatMsgAssistant} ${styles.helpChatMsgLoading}`}>
+                              Thinking…
+                            </div>
+                          )}
+                        </div>
+                      )}
+                      <div className={styles.helpChatInputRow}>
+                        <input
+                          type="text"
+                          className={styles.helpChatInput}
+                          placeholder="Ask a follow-up question…"
+                          value={chatInput}
+                          onChange={(e) => setChatInput(e.target.value)}
+                          onKeyDown={(e) => { if (e.key === "Enter" && !e.shiftKey) { e.preventDefault(); sendChatMessage(); } }}
+                          disabled={chatLoading}
+                        />
+                        <button
+                          className={styles.helpChatSend}
+                          onClick={sendChatMessage}
+                          disabled={!chatInput.trim() || chatLoading}
+                          aria-label="Send"
+                        >
+                          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" width="16" height="16">
+                            <path d="M22 2L11 13M22 2l-7 20-4-9-9-4 20-7z" strokeLinecap="round" strokeLinejoin="round" />
+                          </svg>
+                        </button>
+                      </div>
+                    </div>
+                  </div>
+                )}
+
                 {/* ── Vertical drag-to-resize handle ── */}
                 <div className={styles.verticalResizeHandle} onMouseDown={onVerticalResizeStart} title="Drag to resize height" />
               </div>
@@ -669,7 +859,8 @@ const VideoSimulator = () => {
                 onClick={() => {
                   const ts = videoRef.current?.currentTime ?? 0;
                   if (isPlaying) handlePause();
-                  openHelpPanel(ts);
+                  setPendingHelpTimestamp(ts);
+                  setShowLookbackPicker(true);
                 }}
               >
                 Get help
@@ -723,17 +914,62 @@ const VideoSimulator = () => {
               >
                 Yes, help me
               </button>
-              <button
-                className={`${styles.modalBtn} ${styles.modalBtnSecondary}`}
-                onClick={() => handleModalResponse("Maybe later")}
-              >
-                Maybe later
-              </button>
+              {!confusionModalFromEnd && (
+                <button
+                  className={`${styles.modalBtn} ${styles.modalBtnSecondary}`}
+                  onClick={() => handleModalResponse("Maybe later")}
+                >
+                  Maybe later
+                </button>
+              )}
               <button
                 className={`${styles.modalBtn} ${styles.modalBtnGhost}`}
                 onClick={() => handleModalResponse("No thanks")}
               >
                 No thanks
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {showLookbackPicker && (
+        <div className={styles.modalOverlay} role="dialog" aria-modal="true" aria-labelledby="lookbackTitle">
+          <div className={styles.modal}>
+            <h2 className={styles.modalTitle} id="lookbackTitle">
+              Choose Help Scope
+            </h2>
+            <p className={styles.modalBody}>
+              Select how much recent content you want help with.
+            </p>
+            <div className={styles.modalActions}>
+              
+              <button
+                className={`${styles.modalBtn} ${styles.modalBtnSecondary}`}
+                onClick={() => handleLookbackSelection(lookback25)}
+              >
+                Last {lookback25Mins} minute{lookback25Mins === 1 ? "" : "s"}
+              </button>
+              <button
+                className={`${styles.modalBtn} ${styles.modalBtnSecondary}`}
+                onClick={() => handleLookbackSelection(lookback50)}
+              >
+                Last {lookback50Mins} minute{lookback50Mins === 1 ? "" : "s"}
+              </button>
+              <button
+                className={`${styles.modalBtn} ${styles.modalBtnPrimary}`}
+                onClick={() => handleLookbackSelection(null)}
+              >
+                Whole video so far
+              </button>
+              <button
+                className={`${styles.modalBtn} ${styles.modalBtnGhost}`}
+                onClick={() => {
+                  setShowLookbackPicker(false);
+                  setPendingHelpTimestamp(0);
+                }}
+              >
+                Cancel
               </button>
             </div>
           </div>

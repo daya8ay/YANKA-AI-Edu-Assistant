@@ -38,16 +38,17 @@ const VideoAnalytics = () => {
   const [predictionError, setPredictionError] = useState<string | null>(null);
   const [lastSentMetrics, setLastSentMetrics] = useState<Record<string, number | string> | null>(null);
 
-  // Confusion popup
+  // Confusion popup (end-of-video: no "Maybe later" — nothing left to defer to in-session)
   const [showConfusionModal, setShowConfusionModal] = useState(false);
+  const [confusionModalFromEnd, setConfusionModalFromEnd] = useState(false);
 
   // Trigger guards — prevent each milestone from firing more than once per session
   const midCheckSent  = useRef(false);
   const lateCheckSent = useRef(false);
   const endCheckSent  = useRef(false);
 
-  // "none" → not yet shown | "snoozed" → student said "Maybe later" once | "dismissed" → stop asking
-  const helpDecision = useRef<"none" | "snoozed" | "dismissed">("none");
+  // "none" | "snoozed" (maybe later once) | "accepted_help" (yes mid-video — allow end popup again) | "dismissed"
+  const helpDecision = useRef<"none" | "snoozed" | "dismissed" | "accepted_help">("none");
 
   // Track analytics event
   const trackEvent = (type: string, value?: string | number | boolean | Record<string, unknown> | null) => {
@@ -155,23 +156,26 @@ const VideoAnalytics = () => {
       const p = (result.prediction as string).trim().toLowerCase();
       setPrediction(p);
 
-      if (helpDecision.current !== "dismissed") {
-        const isHigh   = p === "high";
-        const isMedEnd = p === "medium" && trigger === "end";
-        if (isHigh || isMedEnd) {
-          // Pause directly on the element so pauseCount isn't incremented.
-          // Flush the in-progress watch segment first so that time isn't lost.
-          if (videoRef.current && !videoRef.current.paused) {
-            if (watchStartVideoTimeRef.current !== null) {
-              const watched = videoRef.current.currentTime - watchStartVideoTimeRef.current;
-              if (watched > 0) setTotalWatchTime((prev) => prev + watched);
-              watchStartVideoTimeRef.current = null;
-            }
-            videoRef.current.pause();
-            setIsPlaying(false);
+      const qualifies = p === "high" || (p === "medium" && trigger === "end");
+      const blockedByAcceptedHelp =
+        helpDecision.current === "accepted_help" && (trigger === "mid" || trigger === "late");
+      const canShowPopup =
+        helpDecision.current !== "dismissed" && qualifies && !blockedByAcceptedHelp;
+
+      if (canShowPopup) {
+        // Pause directly on the element so pauseCount isn't incremented.
+        // Flush the in-progress watch segment first so that time isn't lost.
+        if (videoRef.current && !videoRef.current.paused) {
+          if (watchStartVideoTimeRef.current !== null) {
+            const watched = videoRef.current.currentTime - watchStartVideoTimeRef.current;
+            if (watched > 0) setTotalWatchTime((prev) => prev + watched);
+            watchStartVideoTimeRef.current = null;
           }
-          setShowConfusionModal(true);
+          videoRef.current.pause();
+          setIsPlaying(false);
         }
+        setConfusionModalFromEnd(trigger === "end");
+        setShowConfusionModal(true);
       }
     } catch (err) {
       setPredictionError(err instanceof Error ? err.message : "Failed to get prediction");
@@ -365,11 +369,14 @@ const VideoAnalytics = () => {
       // First snooze → allow one more popup at the next qualifying trigger.
       // Second snooze → stop asking for the rest of the session.
       helpDecision.current = helpDecision.current === "snoozed" ? "dismissed" : "snoozed";
+    } else if (response === "Yes, help me") {
+      // Mid-session help: suppress further 50%/75% popups but allow one more at video end if model qualifies.
+      helpDecision.current = isCompleted ? "dismissed" : "accepted_help";
     } else {
-      // "Yes, help me" or "No thanks" — both permanently close for this session
       helpDecision.current = "dismissed";
     }
     setShowConfusionModal(false);
+    setConfusionModalFromEnd(false);
 
     // Resume playback for dismissals — but not when the student wants help
     if (response !== "Yes, help me" && videoRef.current && !isCompleted) {
@@ -600,12 +607,14 @@ const VideoAnalytics = () => {
               >
                 Yes, help me
               </button>
-              <button
-                className={`${styles.modalBtn} ${styles.modalBtnSecondary}`}
-                onClick={() => handleModalResponse("Maybe later")}
-              >
-                Maybe later
-              </button>
+              {!confusionModalFromEnd && (
+                <button
+                  className={`${styles.modalBtn} ${styles.modalBtnSecondary}`}
+                  onClick={() => handleModalResponse("Maybe later")}
+                >
+                  Maybe later
+                </button>
+              )}
               <button
                 className={`${styles.modalBtn} ${styles.modalBtnGhost}`}
                 onClick={() => handleModalResponse("No thanks")}
