@@ -32,3 +32,4 @@ Thumbs.db
 .env
 *.pkl
 *.mp4
+!yanka/Webapp/frontend/public/video/test.mp4
