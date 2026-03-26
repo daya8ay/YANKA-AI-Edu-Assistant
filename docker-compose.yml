@@ -15,8 +15,8 @@ services:
 
   backend:
     build:
-      context: ./yanka/Webapp/backend
-      dockerfile: Dockerfile
+      context: .
+      dockerfile: yanka/Webapp/backend/Dockerfile
     restart: unless-stopped
     container_name: yanka_backend
     ports:

@@ -1,0 +1,13 @@
+# Used when building the backend image with context = repository root.
+.git
+**/.git
+**/node_modules
+**/.next
+database/db-data
+.DS_Store
+.env
+**/.venv
+
+# Only the demo clip is needed for the backend image; skip other large public assets in context.
+yanka/Webapp/frontend/public/video/*.mp4
+!yanka/Webapp/frontend/public/video/test.mp4
