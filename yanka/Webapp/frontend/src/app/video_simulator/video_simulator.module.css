@@ -1132,6 +1132,20 @@
   gap: 8px;
 }
 
+.helpChatHeader {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+}
+
+.helpChatControls {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex-shrink: 0;
+}
+
 .helpChatLabel {
   font-size: 0.8rem;
   font-weight: 600;
@@ -1139,6 +1153,54 @@
 }
 
 .dark .helpChatLabel {
+  color: #9ca3af;
+}
+
+.helpChatToggleBtn {
+  padding: 4px 10px;
+  font-size: 0.74rem;
+  font-weight: 700;
+  border-radius: 8px;
+  border: 1.5px solid #1E3A8A;
+  background: transparent;
+  color: #1E3A8A;
+  cursor: pointer;
+  white-space: nowrap;
+  transition: background 0.15s, color 0.15s;
+}
+
+.helpChatToggleBtn:hover {
+  background: #1E3A8A;
+  color: #fff;
+}
+
+.helpChatToggleBtnActive {
+  background: #1E3A8A;
+  color: #fff;
+}
+
+.dark .helpChatToggleBtn {
+  border-color: #93c5fd;
+  color: #93c5fd;
+}
+
+.dark .helpChatToggleBtn:hover {
+  background: #93c5fd;
+  color: #1e2640;
+}
+
+.dark .helpChatToggleBtnActive {
+  background: #93c5fd;
+  color: #1e2640;
+}
+
+.helpChatEmpty {
+  margin: 0;
+  color: #6b7280;
+  font-size: 0.82rem;
+}
+
+.dark .helpChatEmpty {
   color: #9ca3af;
 }
 

@@ -68,6 +68,7 @@ const VideoSimulator = () => {
   const [chatInput, setChatInput] = useState("");
   const [chatMessages, setChatMessages] = useState<{ role: "user" | "assistant"; text: string }[]>([]);
   const [chatLoading, setChatLoading] = useState(false);
+  const [chatMinimized, setChatMinimized] = useState(true);
 
   // ── Avatar state ──
   const [avatarMode, setAvatarMode] = useState(false);
@@ -86,7 +87,7 @@ const VideoSimulator = () => {
 
   // ── Resizable panel (horizontal + vertical) ──
   const [videoPct, setVideoPct] = useState(50);
-  const [panelHeight, setPanelHeight] = useState(560);
+  const [panelHeight, setPanelHeight] = useState(720);
   const playerRowRef = useRef<HTMLDivElement>(null);
   const helpPanelRef = useRef<HTMLDivElement>(null);
 
@@ -319,6 +320,7 @@ const VideoSimulator = () => {
     setHelpfulness(null);
     setChatInput("");
     setChatMessages([]);
+    setChatMinimized(true);
 
     const v = videoRef.current;
     if (!v) {
@@ -424,6 +426,7 @@ const VideoSimulator = () => {
     setRevealedAnswers(new Set());
     setRevealedPoints(new Set());
     setHelpfulness(null);
+    setChatMinimized(true);
     setChatInput("");
     setChatMessages([]);
     try {
@@ -444,6 +447,7 @@ const VideoSimulator = () => {
   const sendChatMessage = useCallback(async () => {
     const msg = chatInput.trim();
     if (!msg || chatLoading) return;
+    setChatMinimized(false);
     setChatMessages((prev) => [...prev, { role: "user", text: msg }]);
     setChatInput("");
     setChatLoading(true);
@@ -635,14 +639,14 @@ const VideoSimulator = () => {
                           onClick={() => { if (avatarMode || avatarLoading) stopAvatarSession(); }}
                           disabled={!avatarMode && !avatarLoading}
                         >
-                          Read
+                          Written Explanation
                         </button>
                         <button
                           className={`${styles.avatarToggleBtn} ${(avatarMode || avatarLoading) ? styles.avatarToggleBtnActive : ""}`}
                           onClick={() => { if (!avatarMode && !avatarLoading) startAvatarSession(helpContent); }}
                           disabled={avatarMode || avatarLoading}
                         >
-                          {avatarLoading ? "Connecting…" : "Avatar"}
+                          {avatarLoading ? "Connecting…" : "Video Explanation"}
                         </button>
                       </div>
                     )}
@@ -719,46 +723,47 @@ const VideoSimulator = () => {
                             </ul>
                           </section>
                         )}
-
-                        {helpContent.suggestedQuestions.length > 0 && (
-                          <section className={styles.helpSection}>
-                            <h3 className={styles.helpSectionTitle}>Questions to Consider</h3>
-                            <ul className={styles.helpQuestions}>
-                              {helpContent.suggestedQuestions.map((sq, i) => {
-                                const isRevealed = revealedAnswers.has(i);
-                                return (
-                                  <li key={i}>
-                                    <div className={styles.helpQuestionRow}>
-                                      <span className={styles.helpQuestionLabel}>{sq.question}</span>
-                                      <button
-                                        className={`${styles.helpRevealBtn} ${isRevealed ? styles.helpRevealBtnOpen : ""}`}
-                                        onClick={() => setRevealedAnswers((prev) => {
-                                          const next = new Set(prev);
-                                          isRevealed ? next.delete(i) : next.add(i);
-                                          return next;
-                                        })}
-                                        aria-expanded={isRevealed}
-                                      >
-                                        {isRevealed ? "Hide answer" : "Show answer"}
-                                      </button>
-                                    </div>
-                                    {isRevealed && sq.answer && (
-                                      <p className={styles.helpQuestionAnswer}>{sq.answer}</p>
-                                    )}
-                                  </li>
-                                );
-                              })}
-                            </ul>
-                          </section>
-                        )}
                       </>
                     ) : null
+                  )}
+
+                  {/* Questions to Consider — available under the avatar too */}
+                  {helpContent && !helpLoading && helpContent.suggestedQuestions.length > 0 && (
+                    <section className={styles.helpSection}>
+                      <h3 className={styles.helpSectionTitle}>Questions to Consider</h3>
+                      <ul className={styles.helpQuestions}>
+                        {helpContent.suggestedQuestions.map((sq, i) => {
+                          const isRevealed = revealedAnswers.has(i);
+                          return (
+                            <li key={i}>
+                              <div className={styles.helpQuestionRow}>
+                                <span className={styles.helpQuestionLabel}>{sq.question}</span>
+                                <button
+                                  className={`${styles.helpRevealBtn} ${isRevealed ? styles.helpRevealBtnOpen : ""}`}
+                                  onClick={() => setRevealedAnswers((prev) => {
+                                    const next = new Set(prev);
+                                    isRevealed ? next.delete(i) : next.add(i);
+                                    return next;
+                                  })}
+                                  aria-expanded={isRevealed}
+                                >
+                                  {isRevealed ? "Hide answer" : "Show answer"}
+                                </button>
+                              </div>
+                              {isRevealed && sq.answer && (
+                                <p className={styles.helpQuestionAnswer}>{sq.answer}</p>
+                              )}
+                            </li>
+                          );
+                        })}
+                      </ul>
+                    </section>
                   )}
 
                   {/* Avatar mode hint */}
                   {(avatarMode || avatarLoading) && !avatarError && (
                     <p className={styles.avatarHint}>
-                      Switch to <strong>Read</strong> to review the summary and key points at your own pace.
+                      Switch to <strong>Read</strong> to review the summary and key points at your own pace. The questions (and answers) are available here too.
                     </p>
                   )}
                 </div>
@@ -766,7 +771,7 @@ const VideoSimulator = () => {
                 {/* ── Feedback + chat footer ── */}
                 {helpContent && !helpLoading && (
                   <div className={styles.helpPanelFooter}>
-                    {/* Was this helpful? */}
+                    {/* Was this helpful?
                     <div className={styles.helpFeedback}>
                       <span className={styles.helpFeedbackLabel}>Was this helpful?</span>
                       <div className={styles.helpFeedbackBtns}>
@@ -798,23 +803,48 @@ const VideoSimulator = () => {
                           {helpfulness === "up" ? "Thanks for the feedback!" : "Got it — we'll keep improving!"}
                         </span>
                       )}
-                    </div>
+                    </div> */}
 
                     {/* Need more help? */}
                     <div className={styles.helpChat}>
-                      <span className={styles.helpChatLabel}>Need more help?</span>
-                      {chatMessages.length > 0 && (
-                        <div className={styles.helpChatMessages}>
-                          {chatMessages.map((msg, i) => (
-                            <div
-                              key={i}
-                              className={`${styles.helpChatMsg} ${msg.role === "user" ? styles.helpChatMsgUser : styles.helpChatMsgAssistant}`}
-                            >
-                              {msg.text}
-                            </div>
-                          ))}
+                      <div className={styles.helpChatHeader}>
+                        <span className={styles.helpChatLabel}>Need more help?</span>
+                        <div className={styles.helpChatControls}>
+                          <button
+                            type="button"
+                            className={`${styles.helpChatToggleBtn} ${!chatMinimized ? styles.helpChatToggleBtnActive : ""}`}
+                            onClick={() => setChatMinimized((prev) => !prev)}
+                            aria-expanded={!chatMinimized}
+                            aria-label={chatMinimized ? "Expand chat" : "Minimize chat"}
+                          >
+                            {chatMinimized
+                              ? `Open chat${chatMessages.length > 0 ? ` (${chatMessages.length})` : ""}`
+                              : "Minimize"}
+                          </button>
+                        </div>
+                      </div>
+
+                      {!chatMinimized && (
+                        <div
+                          className={styles.helpChatMessages}
+                        >
+                          {chatMessages.length > 0 ? (
+                            chatMessages.map((msg, i) => (
+                              <div
+                                key={i}
+                                className={`${styles.helpChatMsg} ${msg.role === "user" ? styles.helpChatMsgUser : styles.helpChatMsgAssistant}`}
+                              >
+                                {msg.text}
+                              </div>
+                            ))
+                          ) : (
+                            <p className={styles.helpChatEmpty}>No messages yet. Ask your question below.</p>
+                          )}
+
                           {chatLoading && (
-                            <div className={`${styles.helpChatMsg} ${styles.helpChatMsgAssistant} ${styles.helpChatMsgLoading}`}>
+                            <div
+                              className={`${styles.helpChatMsg} ${styles.helpChatMsgAssistant} ${styles.helpChatMsgLoading}`}
+                            >
                               Thinking…
                             </div>
                           )}
