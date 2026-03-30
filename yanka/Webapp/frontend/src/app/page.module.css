@@ -390,7 +390,8 @@
 .planIcon {
     width: 70px;
     height: 70px;
-    margin-bottom: 20px;
+    margin: 0 auto 20px;   /* 👈 centers horizontally */
+    display: block;        /* 👈 required for margin auto to work */
     object-fit: contain;
 }
 
@@ -398,7 +399,7 @@
     position: absolute;
     top: -12px;
     right: -12px;
-    background: #0047ac;
+    background: #b30514;
     color: white;
     font-size: 0.8rem;
     font-weight: 600;
