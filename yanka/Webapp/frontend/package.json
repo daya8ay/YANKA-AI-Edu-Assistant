@@ -9,21 +9,23 @@
     "lint": "eslint"
   },
   "dependencies": {
-    "@aws-amplify/ui-react": "^6.15.1",
-    "aws-amplify": "^6.16.2",
-    "jose": "^6.2.1",
+    "@aws-amplify/ui-react": "^6.15.2",
+    "aws-amplify": "^6.16.3",
+    "jose": "^6.2.2",
     "next": "15.5.6",
     "openai": "^6.25.0",
     "react": "19.1.0",
     "react-color": "^2.19.3",
     "react-colorful": "^5.6.1",
-    "react-dom": "19.1.0"
+    "react-dom": "19.1.0",
+    "uuid": "^13.0.0"
   },
   "devDependencies": {
     "@eslint/eslintrc": "^3",
     "@types/node": "^20",
     "@types/react": "^19.2.2",
     "@types/react-dom": "^19.2.2",
+    "@types/uuid": "^10.0.0",
     "eslint": "^9",
     "eslint-config-next": "15.5.6",
     "typescript": "^5"

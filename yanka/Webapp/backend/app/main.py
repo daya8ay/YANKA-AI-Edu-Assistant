@@ -1,13 +1,14 @@
-from fastapi import FastAPI, HTTPException, Depends
-from fastapi.middleware.cors import CORSMiddleware
-from fastapi.security import HTTPBearer, HTTPAuthorizationCredentials
-from dotenv import load_dotenv
-from pydantic import BaseModel
-from openai import OpenAI
 import os
+
 import httpx
 import jwt  # pip install PyJWT cryptography
+from dotenv import load_dotenv
+from fastapi import Depends, FastAPI, HTTPException
+from fastapi.middleware.cors import CORSMiddleware
+from fastapi.security import HTTPAuthorizationCredentials, HTTPBearer
 from jwt import PyJWKClient
+from openai import OpenAI
+from pydantic import BaseModel
 
 load_dotenv()
 
@@ -37,7 +38,9 @@ jwks_client = PyJWKClient(JWKS_URL)
 security = HTTPBearer()
 
 
-def verify_cognito_token(credentials: HTTPAuthorizationCredentials = Depends(security)) -> dict:
+def verify_cognito_token(
+    credentials: HTTPAuthorizationCredentials = Depends(security),
+) -> dict:
     """
     Validates the Bearer JWT from Cognito.
     Raises 401 if the token is missing, expired, or tampered with.
@@ -62,13 +65,16 @@ def verify_cognito_token(credentials: HTTPAuthorizationCredentials = Depends(sec
 
 #### Routes ####
 
+
 @app.get("/health")
 def health():
     return {"status": "ok"}
 
+
 @app.get("/")
 def root():
     return {"message": "YANKA API", "docs": "/docs"}
+
 
 class ChatRequest(BaseModel):
     message: str
@@ -98,6 +104,7 @@ Wide Range of Courses | AI Data Analysis & Visualization | Thesis & Dissertation
 If a user wants to talk to a human, tell them to call "123-456-7890".
 """
 
+
 @app.post("/chat")
 def chat(
     request: ChatRequest,
@@ -117,5 +124,4 @@ def chat(
         ],
     )
 
-    return {
-        "response": completion.choices[0].message.content}
+    return {"response": completion.choices[0].message.content}
