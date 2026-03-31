@@ -18,44 +18,112 @@ const VideoCreation = () => {
   const [language, setLanguage] = useState("english");
   const [subtitle, setSubtitle] = useState("none");
   const [avatar, setAvatar] = useState("");
+  const [generatedScript, setGeneratedScript] = useState("");
+  const [videoId, setVideoId] = useState("");
+  const [videoUrl, setVideoUrl] = useState("");
+  const [videoStatus, setVideoStatus] = useState("");
+  const [isCheckingStatus, setIsCheckingStatus] = useState(false);
+  const [templateStyle, setTemplateStyle] = useState("presentation");
+  const [contentMode, setContentMode] = useState("slides_avatar");
+  const [lessonVisualNotes, setLessonVisualNotes] = useState("");
 
   const handleSubmit = async () => {
-    if (!title) {
+    if (!title.trim()) {
       setError("Please enter a video title.");
       return;
     }
-    if (!script && !file) {
+  
+    if (!script.trim() && !file) {
       setError("Please provide a script or upload a lesson file.");
       return;
     }
-
+  
     setError("");
     setIsGenerating(true);
-
     setShowSummary(false);
-
-    setTimeout(() => {
-      setIsGenerating(false);
-      setShowSummary(true);
-      alert("Form is valid. This feature is still under development.");
-    }, 1500);
-  };
-
-  const handleUpload = async () => {
-    if (!file) {
-      setError("Please select a file first.");
-      return;
-    }
-    const formData = new FormData();
-    formData.append("file", file);
+  
     try {
-      const response = await fetch("http://localhost:8000/upload", {
+      const formData = new FormData();
+      formData.append("title", title);
+      formData.append("avatar", avatar);
+      formData.append("language", language);
+      formData.append("subtitle", subtitle);
+      formData.append("video_type", videoType);
+      formData.append("custom_video_type", customVideoType);
+      formData.append("script", script);
+      formData.append("template_style", templateStyle);
+      formData.append("content_mode", contentMode);
+      formData.append("lesson_visual_notes", lessonVisualNotes);
+        
+      if (file) {
+        formData.append("file", file);
+      }
+  
+      const response = await fetch("http://localhost:8000/video/generate", {
         method: "POST",
         body: formData,
       });
-      if (response.ok) alert("File uploaded successfully!");
-    } catch (err) {
-      setError("Error uploading file.");
+  
+      const data = await response.json();
+  
+      if (!response.ok || !data.success) {
+        throw new Error(data.detail || data.error || "Failed to submit video request.");
+      }
+  
+      console.log("Video generation response:", data);
+      setGeneratedScript(data.generated_script || "");
+      setVideoId(data.video_id || "");
+      setVideoUrl("");
+      setVideoStatus(data.status || "processing");
+      setShowSummary(true);
+      alert("Your lesson video is being generated.");
+    } catch (err: unknown) {
+      if (err instanceof Error) {
+        setError(err.message);
+      } else {
+        setError("Something went wrong while generating the video.");
+      }
+    } finally {
+      setIsGenerating(false);
+    }
+  };
+
+  const checkVideoStatus = async () => {
+    if (!videoId) {
+      setError("No video has been created yet.");
+      return;
+    }
+  
+    setIsCheckingStatus(true);
+    setError("");
+  
+    try {
+      const response = await fetch(`http://localhost:8000/video/status/${videoId}`);
+      const data = await response.json();
+  
+      console.log("Video status response:", data);
+  
+      const status = data?.data?.status || "";
+      const url = data?.data?.video_url || "";
+  
+      setVideoStatus(status);
+  
+      if (url) {
+        setVideoUrl(url);
+        alert("Your video is ready!");
+      } else if (status === "processing") {
+        alert("Your lesson video is still being generated.");
+      } else if (status === "failed") {
+        setError("Video generation failed. Please try again.");
+      }
+    } catch (err: unknown) {
+      if (err instanceof Error) {
+        setError(err.message);
+      } else {
+        setError("Failed to check video status.");
+      }
+    } finally {
+      setIsCheckingStatus(false);
     }
   };
 
@@ -197,23 +265,43 @@ const VideoCreation = () => {
             }}
           >
             <h2 style={{ marginBottom: "1rem" }}>Video Preview</h2>
-            <div
-              style={{
-                width: "100%",
-                height: "350px",
-                background: "#f0f4f8",
-                borderRadius: "8px",
-                display: "flex",
-                alignItems: "center",
-                justifyContent: "center",
-                color: "#777",
-                fontSize: "18px",
-                fontWeight: 500,
-                marginBottom: "24px", 
-              }}
-            >
-              Preview Coming Soon
-            </div>
+            {videoUrl ? (
+              <video
+                controls
+                style={{
+                  width: "100%",
+                  maxHeight: "350px",
+                  borderRadius: "8px",
+                  marginBottom: "24px",
+                  background: "#000",
+                }}
+              >
+                <source src={videoUrl} type="video/mp4" />
+                Your browser does not support the video tag.
+              </video>
+            ) : (
+              <div
+                style={{
+                  width: "100%",
+                  height: "350px",
+                  background: "#f0f4f8",
+                  borderRadius: "8px",
+                  display: "flex",
+                  alignItems: "center",
+                  justifyContent: "center",
+                  color: "#777",
+                  fontSize: "18px",
+                  fontWeight: 500,
+                  marginBottom: "24px",
+                  textAlign: "center",
+                  padding: "20px",
+                }}
+              >
+                {videoStatus === "processing"
+                  ? "Your lesson video is being generated..."
+                  : "Preview Coming Soon"}
+              </div>
+            )}
             <div className={styles.stackContainer}>
               <div className={styles.infoCard}>
                 <h3 style={{ color: "#1E3A8A", marginBottom: "10px", fontSize: "1rem" }}>
@@ -238,6 +326,33 @@ const VideoCreation = () => {
                     Subtitles: <strong>{subtitle}</strong><br />
                     Video Type: <strong>{videoType || "None selected"}</strong><br />
                     Script: <strong>{script ? "Provided" : "Not provided"}</strong>
+                  </p>
+                </div>
+              )}
+              {generatedScript && (
+                <div className={`${styles.infoCard} ${styles.summaryBox}`}>
+                  <h3 style={{ color: "#1E3A8A", marginBottom: "10px", fontSize: "1rem" }}>
+                    Generated Script
+                  </h3>
+                  <p
+                    style={{
+                      color: "#4B5563",
+                      fontSize: "0.9rem",
+                      lineHeight: "1.6",
+                      whiteSpace: "pre-wrap",
+                    }}
+                  >
+                    {generatedScript}
+                  </p>
+                </div>
+              )}
+              {videoStatus && (
+                <div className={`${styles.infoCard} ${styles.summaryBox}`}>
+                  <h3 style={{ color: "#1E3A8A", marginBottom: "10px", fontSize: "1rem" }}>
+                    Video Status
+                  </h3>
+                  <p style={{ color: "#4B5563", fontSize: "0.9rem", lineHeight: "1.6" }}>
+                    Current status: <strong>{videoStatus}</strong>
                   </p>
                 </div>
               )}
@@ -388,6 +503,55 @@ const VideoCreation = () => {
                 }}
               />
             )}
+              <label>Template Style</label>
+              <select
+                value={templateStyle}
+                onChange={(e) => setTemplateStyle(e.target.value)}
+                style={{
+                  width: "100%",
+                  padding: "10px",
+                  marginBottom: "1rem",
+                  borderRadius: "6px",
+                  border: "1px solid #ccc",
+                }}
+              >
+                <option value="presentation">Presentation / Lesson</option>
+                <option value="explainer_clean">Clean Explainer</option>
+                <option value="training">Training Module</option>
+                <option value="news">News / Presenter Style</option>
+              </select>
+              <label>Video Layout</label>
+              <select
+                value={contentMode}
+                onChange={(e) => setContentMode(e.target.value)}
+                style={{
+                  width: "100%",
+                  padding: "10px",
+                  marginBottom: "1rem",
+                  borderRadius: "6px",
+                  border: "1px solid #ccc",
+                }}
+              >
+                <option value="avatar_only">Avatar Only</option>
+                <option value="slides_avatar">Slides + Avatar Corner</option>
+                <option value="visual_focus">Visual Content Focus</option>
+                <option value="cutaway_presenter">Cut Between Avatar and Content</option>
+              </select>
+
+              <label>Visual Notes (Optional)</label>
+              <textarea
+                placeholder="Example: Show slides, keep avatar bottom-right, highlight key points visually..."
+                value={lessonVisualNotes}
+                onChange={(e) => setLessonVisualNotes(e.target.value)}
+                style={{
+                  width: "100%",
+                  height: "110px",
+                  marginBottom: "1rem",
+                  padding: "10px",
+                  borderRadius: "6px",
+                  border: "1px solid #ccc",
+                }}
+              />
             <label>Script (Optional)</label>
             <textarea
               placeholder="Write lesson script here..."
@@ -410,20 +574,6 @@ const VideoCreation = () => {
               style={{ marginBottom: "1rem" }}
             />
             <button
-              onClick={handleUpload}
-              style={{
-                marginBottom: "1rem",
-                padding: "10px",
-                background: "#003366",
-                color: "white",
-                border: "none",
-                borderRadius: "6px",
-                cursor: "pointer",
-              }}
-            >
-              Upload File
-            </button>
-            <button
               onClick={handleSubmit}
               disabled={isGenerating}
               style={{
@@ -437,11 +587,30 @@ const VideoCreation = () => {
                 cursor: isGenerating ? "not-allowed" : "pointer",
                 fontSize: "16px",
                 transition: "0.3s ease",
-                marginBottom: "100px",
+                marginBottom: "16px",
               }}
             >
               {isGenerating ? "Generating..." : "Generate AI Video"}
-                        </button>
+            </button>
+
+            <button
+              onClick={checkVideoStatus}
+              disabled={!videoId || isCheckingStatus}
+              style={{
+                padding: "12px",
+                width: "100%",
+                background: !videoId || isCheckingStatus ? "#a0a0a0" : "#1E3A8A",
+                color: "white",
+                border: "none",
+                borderRadius: "6px",
+                cursor: !videoId || isCheckingStatus ? "not-allowed" : "pointer",
+                fontSize: "16px",
+                transition: "0.3s ease",
+                marginBottom: "40px",
+              }}
+            >
+              {isCheckingStatus ? "Checking Status..." : "Check Video Status"}
+            </button>
           </div>
         </main>
       </div>
