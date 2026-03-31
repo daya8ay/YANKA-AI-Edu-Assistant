@@ -16,7 +16,7 @@ CREATE TABLE Users (
     first_name VARCHAR(255),
     last_name VARCHAR(255),
     email VARCHAR(255) NOT NULL UNIQUE,
-    password_hash VARCHAR(255) NOT NULL,
+    password_hash VARCHAR(255),
     role VARCHAR(50) NOT NULL,
     language_preference VARCHAR(10),
     profile_picture_url VARCHAR(255),
