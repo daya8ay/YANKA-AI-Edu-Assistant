@@ -2,7 +2,7 @@
 database/db-data/
 
 # Environment variables
-.env
+# .env
 .env.*
 .env.local
 .env.*.local
