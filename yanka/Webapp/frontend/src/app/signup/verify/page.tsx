@@ -11,6 +11,7 @@ function VerifyForm() {
   const router = useRouter();
   const searchParams = useSearchParams();
   const email = searchParams.get("email") ?? "";
+  const username = searchParams.get("username") ?? email;
 
   const [code, setCode] = useState("");
   const [error, setError] = useState<string | null>(null);
@@ -25,7 +26,7 @@ function VerifyForm() {
 
     try {
       await confirmSignUp({
-        username: email,
+        username: username,
         confirmationCode: code,
       });
       router.push("/login");
@@ -45,7 +46,7 @@ function VerifyForm() {
     setResendMessage(null);
 
     try {
-      await resendSignUpCode({ username: email });
+      await resendSignUpCode({ username: username });
       setResendMessage("A new code has been sent to your email.");
     } catch (err: unknown) {
       if (err instanceof Error) {
@@ -68,7 +69,9 @@ function VerifyForm() {
           className={styles.logo}
         />
 
-        <h1 style={{ fontWeight: 700, color: "#0041ad", marginBottom: "0.4rem" }}>
+        <h1
+          style={{ fontWeight: 700, color: "#0041ad", marginBottom: "0.4rem" }}
+        >
           Verify your email
         </h1>
         <p className={styles.subtitle}>
@@ -104,11 +107,7 @@ function VerifyForm() {
             />
           </div>
 
-          <button
-            type="submit"
-            className={styles.signupBtn}
-            disabled={loading}
-          >
+          <button type="submit" className={styles.signupBtn} disabled={loading}>
             {loading ? "Verifying…" : "Verify Email"}
           </button>
         </form>

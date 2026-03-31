@@ -22,8 +22,9 @@ export default function SignUp() {
     setLoading(true);
 
     try {
+      const username = uuidv4();
       await signUp({
-        username: uuidv4(),
+        username,
         password,
         options: {
           userAttributes: {
@@ -32,7 +33,9 @@ export default function SignUp() {
         },
       });
 
-      router.push(`/signup/verify?email=${encodeURIComponent(email)}`);
+      router.push(
+        `/signup/verify?email=${encodeURIComponent(email)}&username=${encodeURIComponent(username)}`,
+      );
     } catch (err: unknown) {
       if (err instanceof Error) {
         setError(err.message);
