@@ -456,31 +456,39 @@ export default function Home() {
   </p>
 
   <div className={styles.contactCenter}>
-    <form className={styles.contactForm}>
-      <div className={styles.formGroup}>
-        <label>Name</label>
-        <input type="text" placeholder="Enter your name" required />
+    <div className={styles.contactWrapper}>
+      {/* Left Image */}
+      <div className={styles.contactImage}>
+        <img src="/pics/contactus.jpeg" alt="Contact Us" />
       </div>
 
-      <div className={styles.formGroup}>
-        <label>Email</label>
-        <input type="email" placeholder="Enter your email" required />
-      </div>
+      {/* Contact Form */}
+      <form className={styles.contactForm}>
+        <div className={styles.formGroup}>
+          <label>Name</label>
+          <input type="text" placeholder="Enter your name" required />
+        </div>
 
-      <div className={styles.formGroup}>
-        <label>Phone</label>
-        <input type="tel" placeholder="Enter your phone number" />
-      </div>
+        <div className={styles.formGroup}>
+          <label>Email</label>
+          <input type="email" placeholder="Enter your email" required />
+        </div>
 
-      <div className={styles.formGroup}>
-        <label>Message</label>
-        <textarea placeholder="Write your message..." rows={4}></textarea>
-      </div>
+        <div className={styles.formGroup}>
+          <label>Phone</label>
+          <input type="tel" placeholder="Enter your phone number" />
+        </div>
 
-      <button type="submit" className={styles.btnPrimary}>
-        Submit
-      </button>
-    </form>
+        <div className={styles.formGroup}>
+          <label>Message</label>
+          <textarea placeholder="Write your message..." rows={4}></textarea>
+        </div>
+
+        <button type="submit" className={styles.btnPrimary}>
+          Submit
+        </button>
+      </form>
+    </div>
   </div>
 </section>
 
