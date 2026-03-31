@@ -1,6 +1,5 @@
 "use client";
 
-
 import React, { useState, useEffect } from "react";
 import Link from "next/link";
 import Image from "next/image";
@@ -8,72 +7,84 @@ import { useRouter } from "next/navigation";
 import { signOut } from "aws-amplify/auth";
 import styles from "./DashboardNavBar.module.css";
 
-
 const DashboardNavBar: React.FC = () => {
- const [isScrolled, setIsScrolled] = useState(false);
- const [lastScroll, setLastScroll] = useState(0);
- const router = useRouter();
+  const [isScrolled, setIsScrolled] = useState(false);
+  const [lastScroll, setLastScroll] = useState(0);
+  const router = useRouter();
 
+  const handleLogout = async () => {
+    await signOut();
+    router.push("/login");
+  };
 
- const handleLogout = async () => {
-   await signOut();
-   router.push("/login");
- };
+  useEffect(() => {
+    const handleScroll = () => {
+      const currentScroll = window.pageYOffset;
+      if (currentScroll <= 0) setIsScrolled(false);
+      else if (currentScroll > lastScroll) setIsScrolled(true);
+      else setIsScrolled(false);
+      setLastScroll(currentScroll);
+    };
 
+    window.addEventListener("scroll", handleScroll);
+    return () => window.removeEventListener("scroll", handleScroll);
+  }, [lastScroll]);
 
- useEffect(() => {
-   const handleScroll = () => {
-     const currentScroll = window.pageYOffset;
-     if (currentScroll <= 0) setIsScrolled(false);
-     else if (currentScroll > lastScroll) setIsScrolled(true);
-     else setIsScrolled(false);
-     setLastScroll(currentScroll);
-   };
+  return (
+    <header
+      className={`${styles.navbar} ${isScrolled ? styles.scrollDown : ""}`}
+    >
+      <Link href="/dashboard" className={styles.logoContainer}>
+        <div className={styles.logoWrapper}>
+          <Image
+            src="/pics/Y_Logo.jpeg"
+            alt="YANKA Logo"
+            width={80}
+            height={80}
+            className={styles.logoImg}
+          />
+          <span className={styles.logoSubtitle}>Yanka AI</span>
+        </div>
+      </Link>
 
-
-   window.addEventListener("scroll", handleScroll);
-   return () => window.removeEventListener("scroll", handleScroll);
- }, [lastScroll]);
-
-
- return (
-   <header className={`${styles.navbar} ${isScrolled ? styles.scrollDown : ""}`}>
-     <Link href="/dashboard" className={styles.logoContainer}>
-       <div className={styles.logoWrapper}>
-         <Image
-           src="/pics/Y_Logo.jpeg"
-           alt="YANKA Logo"
-           width={80}
-           height={80}
-           className={styles.logoImg}
-         />
-         <span className={styles.logoSubtitle}>Yanka AI</span>
-       </div>
-     </Link>
-
-
-     <nav>
-       <ul>
-         <li><Link href="/courses">Courses</Link></li>
-         <li><Link href="/avatar_creation">Avatar Creation</Link></li>
-         <li><Link href="/video">Video</Link></li>
-         <li><Link href="/video_simulator">Video Simulator</Link></li>
-         <li><Link href="/video_analytics">Video Analytics</Link></li>
-         <li><button onClick={handleLogout} className={styles.logoutBtn}>Logout</button></li>
-         <li>
-           <Image
-             src="/pics/user_avatar.jpeg"
-             alt="User Avatar"
-             width={36}
-             height={36}
-             className={styles.userAvatar}
-           />
-         </li>
-       </ul>
-     </nav>
-   </header>
- );
+      <nav>
+        <ul>
+          <li>
+            <Link href="/courses">Courses</Link>
+          </li>
+          <li>
+            <Link href="/avatar_creation">Avatar Creation</Link>
+          </li>
+          <li>
+            <Link href="/video">Video</Link>
+          </li>
+          <li>
+            <Link href="/video_simulator">Video Simulator</Link>
+          </li>
+          <li>
+            <Link href="/video_analytics">Video Analytics</Link>
+          </li>
+          <li>
+            <Link href="/support">Support</Link>
+          </li>
+          <li>
+            <button onClick={handleLogout} className={styles.logoutBtn}>
+              Logout
+            </button>
+          </li>
+          <li>
+            <Image
+              src="/pics/user_avatar.jpeg"
+              alt="User Avatar"
+              width={36}
+              height={36}
+              className={styles.userAvatar}
+            />
+          </li>
+        </ul>
+      </nav>
+    </header>
+  );
 };
-
 
 export default DashboardNavBar;
