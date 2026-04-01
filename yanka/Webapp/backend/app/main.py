@@ -1,6 +1,5 @@
 from fastapi import FastAPI, HTTPException, Depends, UploadFile, File, Form
 from fastapi.middleware.cors import CORSMiddleware
-from fastapi.security import HTTPBearer, HTTPAuthorizationCredentials
 from dotenv import load_dotenv
 from pydantic import BaseModel
 from openai import OpenAI
@@ -8,9 +7,9 @@ from typing import Optional
 import os
 
 import httpx
-import uuid
-import jwt  # pip install PyJWT cryptography
-from jwt import PyJWKClient
+
+from .auth import verify_cognito_token
+from .routers import users, progress
 
 load_dotenv()
 
@@ -28,51 +27,15 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
-#### Cognito settings ####
-COGNITO_REGION = "us-east-2"
-USER_POOL_ID = "us-east-2_yURBgXWYb"
-APP_CLIENT_ID = "1pet7h6f4ddn8fam0v1681gpdm"
-ISSUER = f"https://cognito-idp.{COGNITO_REGION}.amazonaws.com/{USER_POOL_ID}"
-JWKS_URL = f"{ISSUER}/.well-known/jwks.json"
-
 # HeyGen Route
 HEYGEN_VIDEO_API_URL = "https://api.heygen.com/v2/video/generate"
 DEFAULT_HEYGEN_AVATAR_ID = "Maria_public_2_20240111"
 DEFAULT_HEYGEN_VOICE_ID = "6c417ccc9d63481ab08699c325d7dccd"
 
-# Cache the JWKS client so keys are only fetched once
-jwks_client = PyJWKClient(JWKS_URL)
-security = HTTPBearer()
-
-
-def verify_cognito_token(
-    credentials: HTTPAuthorizationCredentials = Depends(security),
-) -> dict:
-    """
-    Validates the Bearer JWT from Cognito.
-    Raises 401 if the token is missing, expired, or tampered with.
-    Returns the decoded token claims on success.
-    """
-    token = credentials.credentials
-    try:
-        signing_key = jwks_client.get_signing_key_from_jwt(token)
-        payload = jwt.decode(
-            token,
-            signing_key.key,
-            algorithms=["RS256"],
-            audience=APP_CLIENT_ID,
-            issuer=ISSUER,
-        )
-        return payload
-    except jwt.ExpiredSignatureError:
-        raise HTTPException(status_code=401, detail="Token expired")
-    except jwt.InvalidTokenError as e:
-        raise HTTPException(status_code=401, detail=f"Invalid token: {e}")
-
+app.include_router(users.router)
+app.include_router(progress.router)
 
 #### Routes ####
-
-
 @app.get("/health")
 def health():
     return {"status": "ok"}
