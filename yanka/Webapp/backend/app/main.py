@@ -6,6 +6,7 @@ from pydantic import BaseModel
 from openai import OpenAI
 from typing import Optional
 import os
+
 import httpx
 import uuid
 import jwt  # pip install PyJWT cryptography
@@ -44,7 +45,9 @@ jwks_client = PyJWKClient(JWKS_URL)
 security = HTTPBearer()
 
 
-def verify_cognito_token(credentials: HTTPAuthorizationCredentials = Depends(security)) -> dict:
+def verify_cognito_token(
+    credentials: HTTPAuthorizationCredentials = Depends(security),
+) -> dict:
     """
     Validates the Bearer JWT from Cognito.
     Raises 401 if the token is missing, expired, or tampered with.
@@ -69,13 +72,16 @@ def verify_cognito_token(credentials: HTTPAuthorizationCredentials = Depends(sec
 
 #### Routes ####
 
+
 @app.get("/health")
 def health():
     return {"status": "ok"}
 
+
 @app.get("/")
 def root():
     return {"message": "YANKA API", "docs": "/docs"}
+
 
 class ChatRequest(BaseModel):
     message: str
@@ -104,6 +110,7 @@ Wide Range of Courses | AI Data Analysis & Visualization | Thesis & Dissertation
 ## Support
 If a user wants to talk to a human, tell them to call "123-456-7890".
 """
+
 
 @app.post("/chat")
 def chat(
