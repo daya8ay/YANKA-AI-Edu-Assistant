@@ -29,13 +29,16 @@ app.include_router(progress.router)
 
 #### Routes ####
 
+
 @app.get("/health")
 def health():
     return {"status": "ok"}
 
+
 @app.get("/")
 def root():
     return {"message": "YANKA API", "docs": "/docs"}
+
 
 class ChatRequest(BaseModel):
     message: str
@@ -65,6 +68,7 @@ Wide Range of Courses | AI Data Analysis & Visualization | Thesis & Dissertation
 If a user wants to talk to a human, tell them to call "123-456-7890".
 """
 
+
 @app.post("/chat")
 def chat(
     request: ChatRequest,
@@ -84,5 +88,4 @@ def chat(
         ],
     )
 
-    return {
-        "response": completion.choices[0].message.content}
+    return {"response": completion.choices[0].message.content}
