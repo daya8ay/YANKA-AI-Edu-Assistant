@@ -313,7 +313,7 @@ export default function Home() {
   {/* Search Bar */}
   <div
     className={styles.searchWrapper}
-    onClick={() => window.location.href = "/signup"}
+    onClick={() => (window.location.href = "/signup")}
   >
     <span className={styles.searchIcon}>🔍</span>
     <input
@@ -327,23 +327,96 @@ export default function Home() {
   {/* Horizontal Scroll Wrapper */}
   <div className={styles.horizontalScroll}>
     {[
-      { title: "AI for Everyone", teacher: "Schan Gya", price: "$30", img: "/pics/ai.jpeg" },
-      { title: "Beginners Spanish", teacher: "Rujeta", price: "$20", img: "/pics/spanish.jpeg" },
-      { title: "Data Science", teacher: "Rolan", price: "$30", img: "/pics/data.jpeg" },
-      { title: "Project Management", teacher: "Sach", price: "$25", img: "/pics/pm.jpeg" },
-      { title: "Digital Marketing", teacher: "Dami", price: "$35", img: "/pics/marketing.jpeg" },
-      { title: "English Literature", teacher: "English", price: "$20", img: "/pics/english.jpeg" }
+      {
+        title: "AI for Everyone",
+        teacher: "Dr. Schan Gya",
+        summary:
+          "A beginner-friendly introduction to artificial intelligence, machine learning, and how AI is shaping industries today.",
+        price: "$30.99",
+        img: "/pics/ai.jpeg",
+        tag: "Bestseller",
+        rating: "4.8",
+        reviews: "2,145 ratings",
+      },
+      {
+        title: "Beginners Spanish",
+        teacher: "Prof. Rujeta Morales",
+        summary:
+          "Build confidence in everyday Spanish through practical vocabulary, speaking exercises, and real-world conversations.",
+        price: "$20.99",
+        img: "/pics/spanish.jpeg",
+        tag: "Popular",
+        rating: "4.6",
+        reviews: "1,084 ratings",
+      },
+      {
+        title: "Data Science",
+        teacher: "Dr. Rolan Peters",
+        summary:
+          "Learn data analysis, visualization, statistics, and predictive modeling using modern tools and practical datasets.",
+        price: "$30.99",
+        img: "/pics/data.jpeg",
+        tag: "Top Rated",
+        rating: "4.7",
+        reviews: "1,732 ratings",
+      },
+      {
+        title: "Project Management",
+        teacher: "Prof. Sach Mehra",
+        summary:
+          "Master planning, stakeholder communication, agile workflows, and execution strategies for successful projects.",
+        price: "$25.99",
+        img: "/pics/pm.jpeg",
+        tag: "Bestseller",
+        rating: "4.5",
+        reviews: "963 ratings",
+      },
+      {
+        title: "Digital Marketing",
+        teacher: "Dami Cole",
+        summary:
+          "Understand branding, social media strategy, SEO, content planning, and campaign performance measurement.",
+        price: "$35.99",
+        img: "/pics/marketing.jpeg",
+        tag: "Trending",
+        rating: "4.7",
+        reviews: "1,268 ratings",
+      },
+      {
+        title: "English Literature",
+        teacher: "Prof. Elena Brooks",
+        summary:
+          "Dive into classic and modern literary works while strengthening analysis, writing, and interpretation skills.",
+        price: "$20.99",
+        img: "/pics/english.jpeg",
+        tag: "Recommended",
+        rating: "4.4",
+        reviews: "812 ratings",
+      },
     ].map((course, index) => (
       <div
         key={index}
         className={styles.courseCard}
-        onClick={() => window.location.href = "/signup"}
+        onClick={() => (window.location.href = "/signup")}
       >
-        <img src={course.img} className={styles.courseImage} />
+        <img src={course.img} alt={course.title} className={styles.courseImage} />
+
         <div className={styles.courseInfo}>
-          <h3>{course.title}</h3>
-          <p className={styles.teacher}>{course.teacher}</p>
-          <p className={styles.price}>{course.price}</p>
+          <div className={styles.courseContentTop}>
+            <h3>{course.title}</h3>
+            <p className={styles.teacher}>{course.teacher}</p>
+            <p className={styles.courseSummary}>{course.summary}</p>
+
+            <div className={styles.courseMeta}>
+              <span className={styles.courseTag}>{course.tag}</span>
+              <span className={styles.ratingBox}>⭐ {course.rating}</span>
+              <span className={styles.reviewBox}>{course.reviews}</span>
+            </div>
+          </div>
+
+          <div className={styles.priceRow}>
+            <p className={styles.price}>{course.price}</p>
+          </div>
         </div>
       </div>
     ))}
@@ -351,7 +424,7 @@ export default function Home() {
 
   <button
     className={styles.viewAllBtn}
-    onClick={() => window.location.href = "/signup"}
+    onClick={() => (window.location.href = "/signup")}
   >
     View All Courses →
   </button>
