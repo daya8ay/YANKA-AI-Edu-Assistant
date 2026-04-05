@@ -39,7 +39,8 @@
   border-radius: 16px;
   padding: 30px;
   box-shadow: 0 4px 12px rgba(30, 67, 134, 0.1);
-  height: 500px;
+  min-height: 500px;
+  height: auto;
   display: flex;
   flex-direction: column;
 }
@@ -59,6 +60,29 @@
   max-width: 100%;
   max-height: 100%;
   object-fit: contain;
+}
+
+.previewEmpty {
+  text-align: center;
+  color: #6B7FA8;
+  font-size: 0.95rem;
+  line-height: 1.5;
+  padding: 24px 16px;
+  max-width: 280px;
+}
+
+.previewImageWrapFixed {
+  min-height: 320px;
+}
+
+.optionKindBadge {
+  display: block;
+  font-size: 0.65rem;
+  font-weight: 600;
+  color: #2E5AA8;
+  margin-top: 4px;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
 }
 
 .customizationCard h3,
@@ -392,6 +416,47 @@
 .resetButton:hover {
   background: #DCE6F7;
   color: #1E4386;
+}
+
+/* Avatar grid pagination */
+.avatarPagination {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: center;
+  gap: 12px;
+  margin-top: 20px;
+  padding-top: 16px;
+  border-top: 1px solid #E6EEFF;
+}
+
+.avatarPaginationInfo {
+  font-size: 0.9rem;
+  color: #3B4F8E;
+  min-width: 140px;
+  text-align: center;
+}
+
+.avatarPaginationBtn {
+  padding: 8px 18px;
+  border-radius: 8px;
+  font-weight: 600;
+  font-size: 0.9rem;
+  cursor: pointer;
+  border: none;
+  background: #E6EEFF;
+  color: #1E4386;
+  transition: background 0.2s, color 0.2s;
+}
+
+.avatarPaginationBtn:hover:not(:disabled) {
+  background: #DCE6F7;
+  color: #1E4386;
+}
+
+.avatarPaginationBtn:disabled {
+  opacity: 0.45;
+  cursor: not-allowed;
 }
 
 /* Responsive Design */
