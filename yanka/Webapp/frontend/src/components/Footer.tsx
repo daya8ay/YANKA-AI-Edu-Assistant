@@ -10,7 +10,6 @@ const Footer: React.FC = () => {
     <footer className={styles.footer}>
       {/* Top Section */}
       <div className={styles.footerTop}>
-
         {/* Brand + Mission */}
         <div className={styles.logoSection}>
           <Image
@@ -22,27 +21,44 @@ const Footer: React.FC = () => {
           />
 
           <p className={styles.tagline}>
-            AI that transforms how you learn—faster, smarter, limitless. Unlock your full potential with Yanka AI
+            AI that transforms how you learn—faster, smarter, limitless. Unlock
+            your full potential with Yanka AI
           </p>
 
           {/* Social Icons */}
           <div className={styles.socialLinks}>
-            <a href="https://www.instagram.com/yanka.ai_official" target="_blank" rel="noopener noreferrer">
+            <a
+              href="https://www.instagram.com/yanka.ai_official"
+              target="_blank"
+              rel="noopener noreferrer"
+            >
               <Image src="/pics/insta.jpeg" alt="Instagram" width={28} height={28} />
             </a>
 
-            <a href="https://www.facebook.com/yankaai" target="_blank" rel="noopener noreferrer">
+            <a
+              href="https://www.facebook.com/yankaai"
+              target="_blank"
+              rel="noopener noreferrer"
+            >
               <Image src="/pics/fbcopy.jpeg" alt="Facebook" width={28} height={28} />
             </a>
 
-            <a href="https://www.linkedin.com/company/yanka-ai" target="_blank" rel="noopener noreferrer">
-              <Image src="/pics/linkedincopy.jpeg" alt="LinkedIn" width={28} height={28} />
+            <a
+              href="https://www.linkedin.com/company/yanka-ai"
+              target="_blank"
+              rel="noopener noreferrer"
+            >
+              <Image
+                src="/pics/linkedincopy.jpeg"
+                alt="LinkedIn"
+                width={28}
+                height={28}
+              />
             </a>
           </div>
         </div>
 
         <div className={styles.linkColumns}>
-
           {/* Features */}
           <div className={styles.column}>
             <Link href="/features" className={styles.columnTitleLink}>
@@ -95,7 +111,6 @@ const Footer: React.FC = () => {
               <li><Link href="#">Careers</Link></li>
             </ul>
           </div>
-
         </div>
       </div>
 
@@ -104,7 +119,7 @@ const Footer: React.FC = () => {
         <p>© 2025 YANKA — An Academic AI Platform by Kimuntu Power Inc.</p>
         <div className={styles.bottomLinks}>
           <Link href="#">Privacy Policy</Link>
-          <Link href="#">Terms of Service</Link>
+          <Link href="/terms">Terms and Conditions</Link>
           <Link href="#">Licensing</Link>
         </div>
       </div>

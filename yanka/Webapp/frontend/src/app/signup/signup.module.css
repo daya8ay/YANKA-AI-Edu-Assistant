@@ -30,7 +30,7 @@
 }
 
 .logo {
-    width: 140px;
+    width: 110px;
     height: 100px;
 }
 
@@ -38,6 +38,12 @@
     color: #555;
     margin-bottom: 1.5rem;
     font-size: 0.95rem;
+}
+
+.errorText {
+    color: red;
+    margin-bottom: 12px;
+    font-size: 14px;
 }
 
 .signupForm {
@@ -92,6 +98,39 @@
     color: #555;
 }
 
+.termsWrapper {
+    text-align: left;
+    margin-top: -0.2rem;
+}
+
+.termsLabel {
+    display: flex;
+    align-items: flex-start;
+    gap: 0.65rem;
+    font-size: 0.9rem;
+    color: #555;
+    line-height: 1.5;
+    cursor: pointer;
+}
+
+.termsCheckbox {
+    width: 16px !important;
+    height: 16px;
+    margin-top: 2px;
+    accent-color: #0041ad;
+    flex-shrink: 0;
+}
+
+.termsLink {
+    color: #243b82;
+    font-weight: 600;
+    text-decoration: none;
+}
+
+.termsLink:hover {
+    text-decoration: underline;
+}
+
 .signupBtn {
     background: #0041ad;
     color: #fff;
@@ -106,6 +145,11 @@
 
 .signupBtn:hover {
     background: linear-gradient(135deg, #1b2a67, #0d1633);
+}
+
+.signupBtn:disabled {
+    opacity: 0.7;
+    cursor: not-allowed;
 }
 
 .socialSignup {
@@ -166,4 +210,3 @@
 .homeLink a:hover {
     text-decoration: underline;
 }
-

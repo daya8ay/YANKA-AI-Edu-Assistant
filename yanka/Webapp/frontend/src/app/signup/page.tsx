@@ -12,6 +12,7 @@ export default function SignUp() {
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+  const [agreedToTerms, setAgreedToTerms] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
   const router = useRouter();
@@ -19,6 +20,12 @@ export default function SignUp() {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setError(null);
+
+    if (!agreedToTerms) {
+      setError("Please agree to the Terms and Conditions before creating your account.");
+      return;
+    }
+
     setLoading(true);
 
     try {
@@ -63,7 +70,7 @@ export default function SignUp() {
 
         {/* Error banner */}
         {error && (
-          <p style={{ color: "red", marginBottom: "12px", fontSize: "14px" }}>
+          <p className={styles.errorText}>
             {error}
           </p>
         )}
@@ -104,6 +111,23 @@ export default function SignUp() {
                 required
               />
             </div>
+          </div>
+
+          <div className={styles.termsWrapper}>
+            <label className={styles.termsLabel}>
+              <input
+                type="checkbox"
+                checked={agreedToTerms}
+                onChange={(e) => setAgreedToTerms(e.target.checked)}
+                className={styles.termsCheckbox}
+              />
+              <span>
+                I agree with the{" "}
+                <Link href="/terms" className={styles.termsLink}>
+                  Terms and Conditions
+                </Link>
+              </span>
+            </label>
           </div>
 
           <button type="submit" className={styles.signupBtn} disabled={loading}>
