@@ -192,6 +192,7 @@ _CASUAL_AVATAR_SUBSTRINGS: Tuple[str, ...] = (
     "rapper",
     "hiphop",
     "hip-hop",
+    "santa",
 )
 
 # Short tokens matched as whole words to reduce false positives (e.g. "orc" inside "Orchestra").
@@ -211,6 +212,7 @@ _CASUAL_AVATAR_WORD_PATTERNS: Tuple[re.Pattern[str], ...] = tuple(
         "orc",
         "party",
         "park",
+        "santa",
         "plush",
         "streamer",
         "warrior",
@@ -326,7 +328,7 @@ def _looks_professional_studio_avatar(avatar: Dict[str, Any]) -> bool:
 # --- "Teacher / headshot" mode (default): bust-up office or presenter looks, not lifestyle wide shots ---
 
 _TEACHER_STUDIO_EXCLUDE_RE = re.compile(
-    r"gym|sofa|outdoor|beach|pool|bed(room)?|kitchen|\bparty\b|halloween|christmas|"
+    r"gym|sofa|outdoor|beach|pool|bed(room)?|kitchen|\bparty\b|halloween|christmas|santa|"
     r"bikini|swimsuit|\bsport|parkour|\bskate|picnic|camping|full_body|full body|"
     r"outdoorchair|outdoorcasual|living_?room|nightclub|festival|\brave\b|\bdj\b|"
     r"rollerskate|\broller\b|snowboard|surf\b|yoga\b|workout\b|clubbing",
