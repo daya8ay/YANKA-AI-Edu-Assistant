@@ -9,3 +9,5 @@ python-multipart
 pydantic[email]>=2.0.0      # Request/response validation
 sqlalchemy>=2.0.0           # Maps Python classes to DB tables
 psycopg2-binary>=2.9.0      # PostgreSQL driver - lets SQLAlchemy talk to Postgres
+pypdf
+python-docx
