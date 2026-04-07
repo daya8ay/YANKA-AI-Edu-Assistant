@@ -850,13 +850,39 @@
 .contactCenter {
   margin-top: 40px;
   display: flex;
-  justify-content: center;  /* Center the form */
+  justify-content: center;
   align-items: center;
   width: 100%;
 }
 
-/* Form Only */
+/* Wrapper for image + form */
+.contactWrapper {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 40px;
+  width: 100%;
+  max-width: 1000px;
+}
+
+/* Left image */
+.contactImage {
+  flex: 1;
+  display: flex;
+  justify-content: center;
+}
+
+.contactImage img {
+  width: 100%;
+  max-width: 400px;
+  border-radius: 16px;
+  object-fit: cover;
+  box-shadow: 0 6px 20px rgba(0, 71, 172, 0.12);
+}
+
+/* Form */
 .contactForm {
+  flex: 1;
   max-width: 450px;
   width: 100%;
   background: white;
@@ -906,6 +932,8 @@
   padding: 12px;
   font-size: 1rem;
   border-radius: 10px;
+  border: none;
+  cursor: pointer;
 }
 
 .contactForm button:hover {
@@ -914,6 +942,19 @@
 
 /* Mobile */
 @media (max-width: 768px) {
+  .contactSection {
+    padding: 30px 20px;
+  }
+
+  .contactWrapper {
+    flex-direction: column;
+    gap: 25px;
+  }
+
+  .contactImage img {
+    max-width: 300px;
+  }
+
   .contactForm {
     width: 90%;
   }

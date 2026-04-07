@@ -1,9 +1,10 @@
+import os
+
+from dotenv import load_dotenv
 from fastapi import FastAPI, Depends
 from fastapi.middleware.cors import CORSMiddleware
-from dotenv import load_dotenv
-from pydantic import BaseModel
 from openai import OpenAI
-import os
+from pydantic import BaseModel
 
 from .auth import verify_cognito_token
 from .routers import users, progress
@@ -29,13 +30,16 @@ app.include_router(progress.router)
 
 #### Routes ####
 
+
 @app.get("/health")
 def health():
     return {"status": "ok"}
 
+
 @app.get("/")
 def root():
     return {"message": "YANKA API", "docs": "/docs"}
+
 
 class ChatRequest(BaseModel):
     message: str
@@ -65,6 +69,7 @@ Wide Range of Courses | AI Data Analysis & Visualization | Thesis & Dissertation
 If a user wants to talk to a human, tell them to call "123-456-7890".
 """
 
+
 @app.post("/chat")
 def chat(
     request: ChatRequest,
@@ -84,5 +89,4 @@ def chat(
         ],
     )
 
-    return {
-        "response": completion.choices[0].message.content}
+    return {"response": completion.choices[0].message.content}
