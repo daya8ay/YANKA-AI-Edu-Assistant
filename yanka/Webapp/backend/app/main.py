@@ -8,6 +8,9 @@ from fastapi import Depends, FastAPI, File, Form, HTTPException, Response, Uploa
 from fastapi.middleware.cors import CORSMiddleware
 from openai import OpenAI
 from pydantic import BaseModel
+from io import BytesIO
+from pypdf import PdfReader
+from docx import Document
 
 from .auth import verify_cognito_token
 from .routers import users, progress
@@ -30,8 +33,8 @@ app.add_middleware(
 
 # HeyGen Route
 HEYGEN_VIDEO_API_URL = "https://api.heygen.com/v2/video/generate"
-DEFAULT_HEYGEN_AVATAR_ID = "Maria_public_2_20240111"
-DEFAULT_HEYGEN_VOICE_ID = "6c417ccc9d63481ab08699c325d7dccd"
+DEFAULT_HEYGEN_AVATAR_ID = "Vemon_sitting_office_front"
+DEFAULT_HEYGEN_VOICE_ID = "cc5fb6c924064712ba9f690852aa4646"
 
 app.include_router(users.router)
 app.include_router(progress.router)
@@ -192,6 +195,7 @@ _CASUAL_AVATAR_SUBSTRINGS: Tuple[str, ...] = (
     "rapper",
     "hiphop",
     "hip-hop",
+    "santa",
 )
 
 # Short tokens matched as whole words to reduce false positives (e.g. "orc" inside "Orchestra").
@@ -211,6 +215,7 @@ _CASUAL_AVATAR_WORD_PATTERNS: Tuple[re.Pattern[str], ...] = tuple(
         "orc",
         "party",
         "park",
+        "santa",
         "plush",
         "streamer",
         "warrior",
@@ -326,7 +331,7 @@ def _looks_professional_studio_avatar(avatar: Dict[str, Any]) -> bool:
 # --- "Teacher / headshot" mode (default): bust-up office or presenter looks, not lifestyle wide shots ---
 
 _TEACHER_STUDIO_EXCLUDE_RE = re.compile(
-    r"gym|sofa|outdoor|beach|pool|bed(room)?|kitchen|\bparty\b|halloween|christmas|"
+    r"gym|sofa|outdoor|beach|pool|bed(room)?|kitchen|\bparty\b|halloween|christmas|santa|"
     r"bikini|swimsuit|\bsport|parkour|\bskate|picnic|camping|full_body|full body|"
     r"outdoorchair|outdoorcasual|living_?room|nightclub|festival|\brave\b|\bdj\b|"
     r"rollerskate|\broller\b|snowboard|surf\b|yoga\b|workout\b|clubbing",
@@ -601,6 +606,75 @@ Lesson content:
 
     return completion.choices[0].message.content or ""
 
+def extract_text_from_pdf(file_bytes: bytes) -> str:
+    try:
+        reader = PdfReader(BytesIO(file_bytes))
+        pages: List[str] = []
+
+        for page in reader.pages:
+            text = page.extract_text() or ""
+            if text.strip():
+                pages.append(text)
+
+        return "\n".join(pages).strip()
+    except Exception as e:
+        raise HTTPException(
+            status_code=400,
+            detail=f"Failed to read PDF file: {str(e)}",
+        )
+
+
+def extract_text_from_docx(file_bytes: bytes) -> str:
+    try:
+        doc = Document(BytesIO(file_bytes))
+        paragraphs = [p.text for p in doc.paragraphs if p.text.strip()]
+        return "\n".join(paragraphs).strip()
+    except Exception as e:
+        raise HTTPException(
+            status_code=400,
+            detail=f"Failed to read DOCX file: {str(e)}",
+        )
+
+
+def clean_extracted_text(text: str) -> str:
+    text = text.replace("\r", "\n")
+    text = re.sub(r"\n{3,}", "\n\n", text)
+    text = re.sub(r"[ \t]+", " ", text)
+    return text.strip()
+
+
+async def extract_lesson_content_from_upload(file: UploadFile) -> str:
+    filename = (file.filename or "").lower()
+
+    file_bytes = await file.read()
+    if not file_bytes:
+        raise HTTPException(status_code=400, detail="Uploaded file is empty.")
+
+    if filename.endswith(".pdf"):
+        extracted = extract_text_from_pdf(file_bytes)
+    elif filename.endswith(".docx"):
+        extracted = extract_text_from_docx(file_bytes)
+    elif filename.endswith(".doc"):
+        raise HTTPException(
+            status_code=400,
+            detail="DOC files are not supported yet. Please upload a PDF or DOCX file.",
+        )
+    else:
+        raise HTTPException(
+            status_code=400,
+            detail="Unsupported file type. Please upload a PDF or DOCX file.",
+        )
+
+    extracted = clean_extracted_text(extracted)
+
+    if not extracted:
+        raise HTTPException(
+            status_code=400,
+            detail="Could not extract readable text from the uploaded file.",
+        )
+
+    return extracted
+
 @app.post("/video/generate")
 async def generate_video(
     title: str = Form(...),
@@ -631,7 +705,7 @@ async def generate_video(
     lesson_content = script.strip()
 
     if not lesson_content and file is not None:
-        lesson_content = f"Uploaded file received: {file.filename}"
+        lesson_content = await extract_lesson_content_from_upload(file)
 
     enhanced_prompt = f"""
     You are creating an educational AI video script AND visual plan.

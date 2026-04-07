@@ -74,24 +74,24 @@ const SupportContent: React.FC = () => {
         />
       </main>
 
-      <div className={styles.suggestions}>
-        <h3>New?</h3>
-      </div>
-
       <div className={styles.imageRow}>
         <div className={styles.imageItem}>
-          <Link href="/#pricing">
+          <Link href="/#marketplace">
             <img src="/pics/support-img1.jpg" alt="Image 1" />
           </Link>
           <p>Getting started</p>
         </div>
         <div className={styles.imageItem}>
-          <img src="/pics/support-img3.jpg" alt="Image 2" />
-          <p>Video Tutorials</p>
+          <Link href="/about#mission">
+            <img src="/pics/support-img3.jpg" alt="Image 2" />
+          </Link>
+          <p>Our Mission</p>
         </div>
         <div className={styles.imageItem}>
-          <img src="/pics/support-img2.webp" alt="Image 3" />
-          <p>Navigating the interface</p>
+          <Link href="/#features">
+            <img src="/pics/support-img2.webp" alt="Image 3" />
+          </Link>
+          <p>Capabilities</p>
         </div>
       </div>
 
@@ -139,15 +139,15 @@ const SupportContent: React.FC = () => {
                 <p>
                   YANKA is built for:
                   <br />
-                  - Students (secondary school to university)
+                  • Students (secondary school to university)
                   <br />
-                  - Researchers & academics <br />
-                  - Teachers & educational institutions <br />
-                  - Professionals & companies <br />
-                  - Content creators & trainers <br />
-                  - NGOs & governments
+                  • Researchers & academics <br />
+                  • Teachers & educational institutions <br />
+                  • Professionals & companies <br />
+                  • Content creators & trainers <br />
+                  • NGOs & governments
                   <br />
-                  - Lifelong learners worldwide
+                  • Lifelong learners worldwide
                   <br />
                 </p>
               </div>
@@ -188,7 +188,7 @@ const SupportContent: React.FC = () => {
                   alt={msg.sender === "bot" ? "YANKA" : "Guest"}
                   className={styles.avatar}
                 />
-                <div className={styles.messageContent}>
+                <div className={msg.sender === 'bot' ? styles.messageContent : styles.userMessageContent}>
                   <span className={styles.senderName}>
                     {msg.sender === "bot" ? "YANKA" : "Guest"}
                   </span>
