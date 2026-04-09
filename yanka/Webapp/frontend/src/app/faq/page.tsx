@@ -3,20 +3,39 @@ import { useState, useEffect, useRef } from 'react';
 import Link from 'next/link';
 import { faqs } from './faqData';
 import styles from './faq.module.css';
+import { useSearchParams } from 'next/navigation';
+
+const getSectionId = (faqIndex: number): string => {
+  if (faqIndex < 5)  return "section1";
+  if (faqIndex < 8)  return "section2";
+  if (faqIndex < 10) return "section3";
+  if (faqIndex < 12) return "section4";
+  if (faqIndex < 15) return "section5";
+  if (faqIndex < 17) return "section6";
+  if (faqIndex < 20) return "section7";
+  if (faqIndex < 22) return "section8";
+  if (faqIndex < 24) return "section9";
+  return "section10";
+};
 
 export default function FAQPage() {
   const [openIndex, setOpenIndex] = useState<number | null>(null);
   const [activeSection, setActiveSection] = useState('section1');
   const [stuck, setStuck] = useState(false);
+  const searchParams = useSearchParams();
 
   useEffect(() => {
-    const handleScroll = () => {
-      setStuck(window.scrollY > 80);
-
-    };
-    window.addEventListener('scroll', handleScroll);
-    return () => window.removeEventListener('scroll', handleScroll);
-  }, []);
+    const openParam = searchParams.get('open');
+    if (openParam !== null) {
+      const index = parseInt(openParam);
+      setOpenIndex(index);
+      // Wait for render then scroll
+      setTimeout(() => {
+        const el = document.getElementById(getSectionId(index));
+        if (el) el.scrollIntoView({ behavior: 'smooth', block: 'start' });
+      }, 100);
+    }
+  }, [searchParams]);
 
   const scrollTo = (id: string) => {
     const el = document.getElementById(id);
@@ -83,7 +102,7 @@ export default function FAQPage() {
         </section>
               
         {/* Section 4 */}
-        <section id="section3" className={styles.section}>
+        <section id="section4" className={styles.section}>
           <h2 className={styles.sectionTitle}>4. Academic Research & Thesis Tools</h2>
           <div className={styles.list}>
             {faqs.slice(10, 12).map((faq, i) => (
@@ -99,7 +118,7 @@ export default function FAQPage() {
         </section>
               
         {/* Section 5 */}
-        <section id="section3" className={styles.section}>
+        <section id="section5" className={styles.section}>
           <h2 className={styles.sectionTitle}>5. AI Avatars, Voice & Video Creation</h2>
           <div className={styles.list}>
             {faqs.slice(12, 15).map((faq, i) => (
@@ -115,7 +134,7 @@ export default function FAQPage() {
         </section>
               
         {/* Section 6 */}
-        <section id="section3" className={styles.section}>
+        <section id="section6" className={styles.section}>
           <h2 className={styles.sectionTitle}>6. Course, Training & Content Creation</h2>
           <div className={styles.list}>
             {faqs.slice(15, 17).map((faq, i) => (
@@ -131,7 +150,7 @@ export default function FAQPage() {
         </section>
 
         {/* Section 7 */}
-        <section id="section3" className={styles.section}>
+        <section id="section7" className={styles.section}>
           <h2 className={styles.sectionTitle}>7. Marketplace, Monetization & Earnings</h2>
           <div className={styles.list}>
             {faqs.slice(17, 20).map((faq, i) => (
@@ -147,7 +166,7 @@ export default function FAQPage() {
         </section>
 
         {/* Section 8 */}
-        <section id="section3" className={styles.section}>
+        <section id="section8" className={styles.section}>
           <h2 className={styles.sectionTitle}>8. Partners & Affiliates</h2>
           <div className={styles.list}>
             {faqs.slice(20, 22).map((faq, i) => (
@@ -163,7 +182,7 @@ export default function FAQPage() {
         </section>
 
         {/* Section 9 */}
-        <section id="section3" className={styles.section}>
+        <section id="section9" className={styles.section}>
           <h2 className={styles.sectionTitle}>9. Institutions, Companies & Governments</h2>
           <div className={styles.list}>
             {faqs.slice(22, 24).map((faq, i) => (
@@ -179,7 +198,7 @@ export default function FAQPage() {
         </section>
 
         {/* Section 10 */}
-        <section id="section3" className={styles.section}>
+        <section id="section10" className={styles.section}>
           <h2 className={styles.sectionTitle}>10. PRIVACY, SECURITY & ETHICS</h2>
           <div className={styles.list}>
             {faqs.slice(24, 27).map((faq, i) => (
