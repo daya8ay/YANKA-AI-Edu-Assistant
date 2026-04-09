@@ -16,12 +16,12 @@ const PrivacyPolicy: React.FC = () => {
             <Link href="/">Home</Link> / Privacy Policy
           </div>
 
-          <span className={styles.badge}>YANKA Legal</span>
+          <span className={styles.badge}>Yanka AI Legal</span>
 
           <h1>Privacy Policy</h1>
 
           <p className={styles.heroText}>
-            At YANKA, we are committed to protecting your privacy and handling
+            At Yanka AI, we are committed to protecting your privacy and handling
             your data responsibly. This Privacy Policy explains what information
             we collect, how we use it, and the choices you have while using our
             platform.
@@ -62,7 +62,7 @@ const PrivacyPolicy: React.FC = () => {
         <div className={styles.mainContent}>
           <div className={styles.introCard}>
             <p>
-              YANKA is committed to privacy by design, data minimization, and
+              Yanka AI is committed to privacy by design, data minimization, and
               strong security practices. We do not sell personal data, and we do
               not use your private content to train external AI models without
               your explicit informed consent.
@@ -72,7 +72,7 @@ const PrivacyPolicy: React.FC = () => {
           <div className={styles.card} id="commitment">
             <h2>1. Our Commitment to Privacy</h2>
             <p>
-              At YANKA, privacy is a core value, not an afterthought. Our
+              At Yanka AI, privacy is a core value, not an afterthought. Our
               platform is built on three foundational principles:
             </p>
             <ul>
@@ -96,7 +96,7 @@ const PrivacyPolicy: React.FC = () => {
               <li>Account credentials and profile information</li>
               <li>Payment and billing information processed by secure third-party gateways</li>
               <li>Content you create or upload, such as courses, videos, scripts, documents, and research</li>
-              <li>Communications with YANKA, including support tickets, feedback, and survey responses</li>
+              <li>Communications with Yanka AI, including support tickets, feedback, and survey responses</li>
             </ul>
 
             <h3>2.2 AI-Generated & Educational Content</h3>
@@ -107,7 +107,7 @@ const PrivacyPolicy: React.FC = () => {
             </ul>
             <p>
               <strong>Important:</strong> You own all content you create on
-              YANKA. We do not sell your personal or educational content to any
+              Yanka AI. We do not sell your personal or educational content to any
               third party.
             </p>
 
@@ -131,9 +131,9 @@ const PrivacyPolicy: React.FC = () => {
 
           <div className={styles.card} id="usage">
             <h2>3. How We Use Your Information</h2>
-            <p>YANKA uses your information exclusively to:</p>
+            <p>Yanka AI uses your information exclusively to:</p>
             <ul>
-              <li>Operate and deliver the YANKA platform and its services</li>
+              <li>Operate and deliver the Yanka AI platform and its services</li>
               <li>Power AI learning, avatar generation, and content creation tools</li>
               <li>Enable course publishing, marketplace sales, and creator monetization</li>
               <li>Process payments, subscriptions, and revenue distributions</li>
@@ -173,7 +173,7 @@ const PrivacyPolicy: React.FC = () => {
 
             <h3>5.2 Legal Requirements</h3>
             <p>
-              YANKA may disclose data only when legally required, such as in
+              Yanka AI may disclose data only when legally required, such as in
               response to a court order, regulatory investigation, or
               enforcement of our Terms & Conditions.
             </p>
@@ -189,7 +189,7 @@ const PrivacyPolicy: React.FC = () => {
           <div className={styles.card} id="transfers">
             <h2>6. International Data Transfers</h2>
             <p>
-              YANKA operates globally, and your data may be processed in
+              Yanka AI operates globally, and your data may be processed in
               different countries. All international data transfers are
               conducted with appropriate legal safeguards, including Standard
               Contractual Clauses where required and data processing agreements
@@ -223,7 +223,7 @@ const PrivacyPolicy: React.FC = () => {
             <h3>7.3 How to Exercise Your Rights</h3>
             <p>
               Submit privacy requests through your account privacy settings
-              dashboard or by contacting the YANKA privacy team. Identity
+              dashboard or by contacting the Yanka AI privacy team. Identity
               verification may be required.
             </p>
           </div>
@@ -249,7 +249,7 @@ const PrivacyPolicy: React.FC = () => {
               <li>Regular security testing and privacy impact assessments</li>
             </ul>
             <p>
-              No system is 100% secure, but YANKA takes strong measures to
+              No system is 100% secure, but Yanka AI takes strong measures to
               protect user information and will notify affected users of data
               breaches where required by law.
             </p>
@@ -258,7 +258,7 @@ const PrivacyPolicy: React.FC = () => {
           <div className={styles.card} id="children">
             <h2>10. Children & Minors</h2>
             <p>
-              YANKA is not intended for children under 13 without parental or
+              Yanka AI is not intended for children under 13 without parental or
               institutional supervision. For institutional deployments involving
               minors, enhanced consent workflows, safety protections, and
               educational-use restrictions may apply.
@@ -269,7 +269,7 @@ const PrivacyPolicy: React.FC = () => {
             <h2>11. Contact & Complaints</h2>
             <p>
               For privacy questions, complaints, or requests, users may contact
-              the YANKA privacy team through designated support channels and
+              the Yanka AI privacy team through designated support channels and
               account settings.
             </p>
           </div>

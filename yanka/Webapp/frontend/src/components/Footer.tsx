@@ -116,7 +116,7 @@ const Footer: React.FC = () => {
 
       {/* Bottom Section */}
       <div className={styles.footerBottom}>
-        <p>© 2025 YANKA — An Academic AI Platform by Kimuntu Power Inc.</p>
+        <p>© 2025 Yanka — An Academic AI Platform by Kimuntu Power Inc.</p>
         <div className={styles.bottomLinks}>
           <Link href="/privacy">Privacy Policy</Link>
           <Link href="/terms">Terms and Conditions</Link>

@@ -13,7 +13,7 @@ export default function SolutionsPage() {
       {/* HERO */}
         <section className={styles.hero}>
         <div className={styles.heroInner}>
-            <h1>Who Yanka Serves</h1>
+            <h1>Who Yanka AI Serves</h1>
             <p className={styles.heroSubtitle}>
             An AI-Powered Ecosystem for Learning, Research, and Academic Growth
             </p>
@@ -30,7 +30,7 @@ export default function SolutionsPage() {
         <div className={styles.contentRight}>
           <h2>Students</h2>
           <p>
-            Yanka empowers students with intelligent study tools designed for
+            Yanka AI empowers students with intelligent study tools designed for
             modern academic success. From an AI-powered tutor that explains
             complex concepts instantly, to assignment assistance and research
             guidance, students receive 24/7 personalized support.
@@ -48,7 +48,7 @@ export default function SolutionsPage() {
         <div className={styles.contentLeft}>
           <h2>Researchers</h2>
           <p>
-            Yanka accelerates academic research with advanced thesis-building
+            Yanka AI accelerates academic research with advanced thesis-building
             tools, literature review automation, and AI-driven writing
             enhancement. Researchers can organize citations, structure
             arguments, and refine manuscripts effortlessly.
@@ -72,7 +72,7 @@ export default function SolutionsPage() {
         <div className={styles.contentRight}>
           <h2>Teachers & Institutions</h2>
           <p>
-            Yanka enables educators to design interactive courses, generate
+            Yanka AI enables educators to design interactive courses, generate
             lesson plans instantly, and personalize classroom content using AI.
             Integrated dashboards provide real-time student analytics and
             engagement insights.
@@ -89,7 +89,7 @@ export default function SolutionsPage() {
         <div className={styles.contentLeft}>
           <h2>Course Creators</h2>
           <p>
-            Yanka allows creators to build and monetize AI-powered courses
+            Yanka AI allows creators to build and monetize AI-powered courses
             globally. With avatar-based video generation and automated
             translation, courses can reach multilingual audiences instantly.
           </p>
@@ -111,7 +111,7 @@ export default function SolutionsPage() {
         <div className={styles.contentRight}>
           <h2>Universities</h2>
           <p>
-            Universities can integrate Yanka’s full research and learning suite
+            Universities can integrate Yanka AI’s full research and learning suite
             into their ecosystem. From enterprise-level AI deployment to
             research-grade analytics, institutions gain scalable and secure
             infrastructure.

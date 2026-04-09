@@ -14,7 +14,7 @@ export default function About() {
 <section className={styles.hero}>
   <div className={styles.heroContent}>
     <h1>
-      About <span>YANKA</span>
+      About <span>Yanka AI</span>
     </h1>
 
     <p className={styles.heroTagline}>
@@ -35,14 +35,14 @@ export default function About() {
       <section className={styles.introSection}>
         <h2>Empowering the Future of Learning Through AI</h2>
         <p>
-          YANKA is an all-in-one intelligent platform designed to revolutionize 
+          Yanka AI is an all-in-one intelligent platform designed to revolutionize 
           how the world learns, teaches, researches, and creates. Built with 
-          cutting-edge AI, YANKA combines voice-enabled tutoring, AI avatar 
+          cutting-edge AI, Yanka AI combines voice-enabled tutoring, AI avatar 
           video creation, academic research tools, professional training 
           development, and a fully integrated knowledge marketplace.
         </p>
         <p>
-          YANKA is more than an app — it is a 21st-century global learning 
+          Yanka AI is more than an app — it is a 21st-century global learning 
           ecosystem empowering students, researchers, educators, professionals, 
           institutions, NGOs, governments, and lifelong learners worldwide.
         </p>
@@ -152,7 +152,7 @@ export default function About() {
             that adapts to each learner’s goals, culture, and language.
           </p>
           <p>
-            With the Training & Course Builder, YANKA evolves into a complete 
+            With the Training & Course Builder, Yanka AI evolves into a complete 
             AI-powered education & training marketplace.
           </p>
         </div>
@@ -164,12 +164,12 @@ export default function About() {
     <h2>Why We Exist</h2>
     <p>
       Education is evolving, yet access and personalization remain global 
-      challenges. YANKA bridges that gap — giving every learner the tools 
+      challenges. Yanka AI bridges that gap — giving every learner the tools 
       to think critically, learn independently, and create globally.
     </p>
     <p>
       Whether you’re writing your first essay or defending your PhD, 
-      YANKA is with you — every step of the way.
+      Yanka AI is with you — every step of the way.
     </p>
   </div>
 </section>

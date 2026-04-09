@@ -14,7 +14,7 @@ const SupportContent: React.FC = () => {
   const [input, setInput] = useState("");
   const [messages, setMessages] = useState<Message[]>([
     {
-      text: "Hello! My name is YANKA. How can I help you today?",
+      text: "Hello! My name is Yanka AI. How can I help you today?",
       sender: "bot",
     },
   ]);
@@ -108,9 +108,9 @@ const SupportContent: React.FC = () => {
             <div className={styles.faqBox}>
               <span></span>
               <div className={styles.faqContent}>
-                <h2>What is YANKA?</h2>
+                <h2>What is Yanka AI?</h2>
                 <p>
-                  YANKA is an AI-powered, multilingual learning, training, and
+                  Yanka is an AI-powered, multilingual learning, training, and
                   creator ecosystem designed to help people learn, teach, create
                   content, and monetize knowledge. It combines AI tutoring,
                   academic research tools, AI avatars, voice and video
@@ -123,7 +123,7 @@ const SupportContent: React.FC = () => {
             <div className={styles.faqBox}>
               <span></span>
               <div className={styles.faqContent}>
-                <h2>Do I need to create an account to use YANKA?</h2>
+                <h2>Do I need to create an account to use Yanka AI?</h2>
                 <p>
                   You can explore the Marketplace and public content without an
                   account. To learn, create content, publish courses, or earn
@@ -137,7 +137,7 @@ const SupportContent: React.FC = () => {
               <div className={styles.faqContent}>
                 <h2>How do I get started?</h2>
                 <p>
-                  YANKA is built for:
+                  Yanka AI is built for:
                   <br />
                   • Students (secondary school to university)
                   <br />
@@ -185,12 +185,12 @@ const SupportContent: React.FC = () => {
                       ? "pics/chat_bot.png"
                       : "pics/guest_user.png"
                   }
-                  alt={msg.sender === "bot" ? "YANKA" : "Guest"}
+                  alt={msg.sender === "bot" ? "Yanka AI" : "Guest"}
                   className={styles.avatar}
                 />
                 <div className={msg.sender === 'bot' ? styles.messageContent : styles.userMessageContent}>
                   <span className={styles.senderName}>
-                    {msg.sender === "bot" ? "YANKA" : "Guest"}
+                    {msg.sender === "bot" ? "Yanka AI" : "Guest"}
                   </span>
                   <p>{msg.text}</p>
                 </div>

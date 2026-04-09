@@ -19,7 +19,7 @@ export default function Home() {
             Reimagining Education with <span>AI</span>
           </h1>
           <p>
-            Yanka unifies learning, research, and creativity into one intelligent 
+            Yanka AI unifies learning, research, and creativity into one intelligent 
             ecosystem built to empower students and educators worldwide.
           </p>
           <div className={styles.heroButtons}>
@@ -193,7 +193,7 @@ export default function Home() {
     className={styles.suiteButton}
     onClick={() => window.location.href = "/solutions"}
   >
-    Explore Who Yanka Serves
+    Explore Who Yanka AI Serves
   </button>
 </div>
 </section>
@@ -442,7 +442,7 @@ export default function Home() {
       {
         user: "Emma Johnson",
         handle: "@emma_learning",
-        text: "YANKA helped me summarize 40 pages of research into key insights in minutes. Game changer for thesis writing!",
+        text: "Yanka AI helped me summarize 40 pages of research into key insights in minutes. Game changer for thesis writing!",
         time: "2h ago",
       },
       {
@@ -460,13 +460,13 @@ export default function Home() {
       {
         user: "Ethan Wright",
         handle: "@ethan_creates",
-        text: "Created my first AI-assisted research draft today using YANKA. It’s efficient, intuitive, and powerful!",
+        text: "Created my first AI-assisted research draft today using Yanka AI. It’s efficient, intuitive, and powerful!",
         time: "3d ago",
       },
       {
         user: "Olivia Brown",
         handle: "@olivia_inspires",
-        text: "Education should be intelligent, accessible, and inclusive — that’s exactly what YANKA is building.",
+        text: "Education should be intelligent, accessible, and inclusive — that’s exactly what Yanka AI is building.",
         time: "1w ago",
       },
     ].map((post, i) => (
