@@ -135,7 +135,7 @@ const SupportContent: React.FC = () => {
             <div className={styles.faqBox}>
               <span></span>
               <div className={styles.faqContent}>
-                <h2>How do I get started?</h2>
+                <h2>Who is YANKA designed for?</h2>
                 <p>
                   Yanka AI is built for:
                   <br />
