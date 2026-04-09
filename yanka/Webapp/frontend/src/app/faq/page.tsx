@@ -38,7 +38,7 @@ export default function FAQPage() {
         <section id="section1" className={styles.section}>
           <h2 className={styles.sectionTitle}>1. General Questions About Yanka AI</h2>
           <div className={styles.list}>
-            {faqs.slice(0, 3).map((faq, i) => (
+            {faqs.slice(0, 5).map((faq, i) => (
               <div key={i} className={styles.item} onClick={() => setOpenIndex(openIndex === i ? null : i)}>
                 <div className={styles.question}>
                   <span>{faq.question}</span>
@@ -54,23 +54,7 @@ export default function FAQPage() {
         <section id="section2" className={styles.section}>
           <h2 className={styles.sectionTitle}>2. Getting Started & Accounts</h2>
           <div className={styles.list}>
-            {faqs.slice(3, 5).map((faq, i) => (
-              <div key={i} className={styles.item} onClick={() => setOpenIndex(openIndex === (i + 3) ? null : (i + 3))}>
-                <div className={styles.question}>
-                  <span>{faq.question}</span>
-                  <span>{openIndex === (i + 3) ? '∧' : '∨'}</span>
-                </div>
-                {openIndex === (i + 3) && <p className={styles.answer}>{faq.answer}</p>}
-              </div>
-            ))}
-          </div>
-        </section>
-
-        {/* Section 3 */}
-        <section id="section3" className={styles.section}>
-          <h2 className={styles.sectionTitle}>3. AI Learning & Student Support</h2>
-          <div className={styles.list}>
-            {faqs.slice(5, 7).map((faq, i) => (
+            {faqs.slice(5, 8).map((faq, i) => (
               <div key={i} className={styles.item} onClick={() => setOpenIndex(openIndex === (i + 5) ? null : (i + 5))}>
                 <div className={styles.question}>
                   <span>{faq.question}</span>
@@ -81,18 +65,34 @@ export default function FAQPage() {
             ))}
           </div>
         </section>
+
+        {/* Section 3 */}
+        <section id="section3" className={styles.section}>
+          <h2 className={styles.sectionTitle}>3. AI Learning & Student Support</h2>
+          <div className={styles.list}>
+            {faqs.slice(8, 10).map((faq, i) => (
+              <div key={i} className={styles.item} onClick={() => setOpenIndex(openIndex === (i + 8) ? null : (i + 8))}>
+                <div className={styles.question}>
+                  <span>{faq.question}</span>
+                  <span>{openIndex === (i + 8) ? '∧' : '∨'}</span>
+                </div>
+                {openIndex === (i + 8) && <p className={styles.answer}>{faq.answer}</p>}
+              </div>
+            ))}
+          </div>
+        </section>
               
         {/* Section 4 */}
         <section id="section3" className={styles.section}>
           <h2 className={styles.sectionTitle}>4. Academic Research & Thesis Tools</h2>
           <div className={styles.list}>
-            {faqs.slice(7, 9).map((faq, i) => (
-              <div key={i} className={styles.item} onClick={() => setOpenIndex(openIndex === (i + 7) ? null : (i + 7))}>
+            {faqs.slice(10, 12).map((faq, i) => (
+              <div key={i} className={styles.item} onClick={() => setOpenIndex(openIndex === (i + 10) ? null : (i + 10))}>
                 <div className={styles.question}>
                   <span>{faq.question}</span>
-                  <span>{openIndex === (i + 7) ? '∧' : '∨'}</span>
+                  <span>{openIndex === (i + 10) ? '∧' : '∨'}</span>
                 </div>
-                {openIndex === (i + 7) && <p className={styles.answer}>{faq.answer}</p>}
+                {openIndex === (i + 10) && <p className={styles.answer}>{faq.answer}</p>}
               </div>
             ))}
           </div>
@@ -102,13 +102,13 @@ export default function FAQPage() {
         <section id="section3" className={styles.section}>
           <h2 className={styles.sectionTitle}>5. AI Avatars, Voice & Video Creation</h2>
           <div className={styles.list}>
-            {faqs.slice(9, 11).map((faq, i) => (
-              <div key={i} className={styles.item} onClick={() => setOpenIndex(openIndex === (i + 9) ? null : (i + 9))}>
+            {faqs.slice(12, 15).map((faq, i) => (
+              <div key={i} className={styles.item} onClick={() => setOpenIndex(openIndex === (i + 12) ? null : (i + 12))}>
                 <div className={styles.question}>
                   <span>{faq.question}</span>
-                  <span>{openIndex === (i + 9) ? '∧' : '∨'}</span>
+                  <span>{openIndex === (i + 12) ? '∧' : '∨'}</span>
                 </div>
-                {openIndex === (i + 9) && <p className={styles.answer}>{faq.answer}</p>}
+                {openIndex === (i + 12) && <p className={styles.answer}>{faq.answer}</p>}
               </div>
             ))}
           </div>
@@ -118,13 +118,13 @@ export default function FAQPage() {
         <section id="section3" className={styles.section}>
           <h2 className={styles.sectionTitle}>6. Course, Training & Content Creation</h2>
           <div className={styles.list}>
-            {faqs.slice(11, 13).map((faq, i) => (
-              <div key={i} className={styles.item} onClick={() => setOpenIndex(openIndex === (i + 11) ? null : (i + 11))}>
+            {faqs.slice(15, 17).map((faq, i) => (
+              <div key={i} className={styles.item} onClick={() => setOpenIndex(openIndex === (i + 15) ? null : (i + 15))}>
                 <div className={styles.question}>
                   <span>{faq.question}</span>
-                  <span>{openIndex === (i + 11) ? '∧' : '∨'}</span>
+                  <span>{openIndex === (i + 15) ? '∧' : '∨'}</span>
                 </div>
-                {openIndex === (i + 11) && <p className={styles.answer}>{faq.answer}</p>}
+                {openIndex === (i + 15) && <p className={styles.answer}>{faq.answer}</p>}
               </div>
             ))}
           </div>
@@ -134,13 +134,13 @@ export default function FAQPage() {
         <section id="section3" className={styles.section}>
           <h2 className={styles.sectionTitle}>7. Marketplace, Monetization & Earnings</h2>
           <div className={styles.list}>
-            {faqs.slice(13, 16).map((faq, i) => (
-              <div key={i} className={styles.item} onClick={() => setOpenIndex(openIndex === (i + 13) ? null : (i + 13))}>
+            {faqs.slice(17, 20).map((faq, i) => (
+              <div key={i} className={styles.item} onClick={() => setOpenIndex(openIndex === (i + 17) ? null : (i + 17))}>
                 <div className={styles.question}>
                   <span>{faq.question}</span>
-                  <span>{openIndex === (i + 13) ? '∧' : '∨'}</span>
+                  <span>{openIndex === (i + 17) ? '∧' : '∨'}</span>
                 </div>
-                {openIndex === (i + 13) && <p className={styles.answer}>{faq.answer}</p>}
+                {openIndex === (i + 17) && <p className={styles.answer}>{faq.answer}</p>}
               </div>
             ))}
           </div>
@@ -150,55 +150,7 @@ export default function FAQPage() {
         <section id="section3" className={styles.section}>
           <h2 className={styles.sectionTitle}>8. Partners & Affiliates</h2>
           <div className={styles.list}>
-            {faqs.slice(16, 18).map((faq, i) => (
-              <div key={i} className={styles.item} onClick={() => setOpenIndex(openIndex === (i + 16) ? null : (i + 16))}>
-                <div className={styles.question}>
-                  <span>{faq.question}</span>
-                  <span>{openIndex === (i + 16) ? '∧' : '∨'}</span>
-                </div>
-                {openIndex === (i + 16) && <p className={styles.answer}>{faq.answer}</p>}
-              </div>
-            ))}
-          </div>
-        </section>
-
-        {/* Section 9 */}
-        <section id="section3" className={styles.section}>
-          <h2 className={styles.sectionTitle}>9. Institutions, Companies & Governments</h2>
-          <div className={styles.list}>
-            {faqs.slice(18, 19).map((faq, i) => (
-              <div key={i} className={styles.item} onClick={() => setOpenIndex(openIndex === (i + 18) ? null : (i + 18))}>
-                <div className={styles.question}>
-                  <span>{faq.question}</span>
-                  <span>{openIndex === (i + 18) ? '∧' : '∨'}</span>
-                </div>
-                {openIndex === (i + 18) && <p className={styles.answer}>{faq.answer}</p>}
-              </div>
-            ))}
-          </div>
-        </section>
-
-        {/* Section 10 */}
-        <section id="section3" className={styles.section}>
-          <h2 className={styles.sectionTitle}>10. Pricing, Plans & Payments</h2>
-          <div className={styles.list}>
-            {faqs.slice(19, 20).map((faq, i) => (
-                <div key={i} className={styles.item} onClick={() => setOpenIndex(openIndex === (i + 19) ? null : (i + 19))}>
-                <div className={styles.question}>
-                  <span>{faq.question}</span>
-                  <span>{openIndex === (i + 19) ? '∧' : '∨'}</span>
-                </div>
-                {openIndex === (i + 19) && <p className={styles.answer}>{faq.answer}</p>}
-              </div>
-            ))}
-          </div>
-        </section>
-
-        {/* Section 11 */}
-        <section id="section3" className={styles.section}>
-          <h2 className={styles.sectionTitle}>11. Privacy, Security & Ethics</h2>
-          <div className={styles.list}>
-            {faqs.slice(20, 21).map((faq, i) => (
+            {faqs.slice(20, 22).map((faq, i) => (
               <div key={i} className={styles.item} onClick={() => setOpenIndex(openIndex === (i + 20) ? null : (i + 20))}>
                 <div className={styles.question}>
                   <span>{faq.question}</span>
@@ -209,34 +161,34 @@ export default function FAQPage() {
             ))}
           </div>
         </section>
-              
-        {/* Section 12 */}
+
+        {/* Section 9 */}
         <section id="section3" className={styles.section}>
-          <h2 className={styles.sectionTitle}>12. Technical & Platform Questions</h2>
+          <h2 className={styles.sectionTitle}>9. Institutions, Companies & Governments</h2>
           <div className={styles.list}>
-            {faqs.slice(21, 23).map((faq, i) => (
-              <div key={i} className={styles.item} onClick={() => setOpenIndex(openIndex === (i + 21) ? null : (i + 21))}>
+            {faqs.slice(22, 24).map((faq, i) => (
+              <div key={i} className={styles.item} onClick={() => setOpenIndex(openIndex === (i + 22) ? null : (i + 22))}>
                 <div className={styles.question}>
                   <span>{faq.question}</span>
-                  <span>{openIndex === (i + 21) ? '∧' : '∨'}</span>
+                  <span>{openIndex === (i + 22) ? '∧' : '∨'}</span>
                 </div>
-                {openIndex === (i + 21) && <p className={styles.answer}>{faq.answer}</p>}
+                {openIndex === (i + 22) && <p className={styles.answer}>{faq.answer}</p>}
               </div>
             ))}
           </div>
         </section>
 
-        {/* Section 13 */}
+        {/* Section 10 */}
         <section id="section3" className={styles.section}>
-          <h2 className={styles.sectionTitle}>13. Support & Resources</h2>
+          <h2 className={styles.sectionTitle}>10. PRIVACY, SECURITY & ETHICS</h2>
           <div className={styles.list}>
-            {faqs.slice(23).map((faq, i) => (
-              <div key={i} className={styles.item} onClick={() => setOpenIndex(openIndex === (i + 27) ? null : (i + 27))}>
+            {faqs.slice(24, 27).map((faq, i) => (
+                <div key={i} className={styles.item} onClick={() => setOpenIndex(openIndex === (i + 24) ? null : (i + 24))}>
                 <div className={styles.question}>
                   <span>{faq.question}</span>
-                  <span>{openIndex === (i + 27) ? '∧' : '∨'}</span>
+                  <span>{openIndex === (i + 24) ? '∧' : '∨'}</span>
                 </div>
-                {openIndex === (i + 27) && <p className={styles.answer}>{faq.answer}</p>}
+                {openIndex === (i + 24) && <p className={styles.answer}>{faq.answer}</p>}
               </div>
             ))}
           </div>
