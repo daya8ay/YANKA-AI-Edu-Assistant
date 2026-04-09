@@ -13,6 +13,7 @@ router = APIRouter(prefix="/avatars", tags=["avatars"])
 def create_avatar(avatar: AvatarCreate, db: Session = Depends(get_db)):
     new_avatar = AIAvatar(
         name=avatar.name,
+        heygen_avatar_id=avatar.heygen_avatar_id,
         voice_id=avatar.voice_id,
     )
     db.add(new_avatar)
