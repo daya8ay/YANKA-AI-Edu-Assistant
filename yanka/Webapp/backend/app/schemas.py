@@ -33,12 +33,14 @@ class UserResponse(BaseModel):
 
 class AvatarCreate(BaseModel):
     name: Optional[str] = None
+    heygen_avatar_id: Optional[str] = None
     voice_id: str
 
 
 class AvatarResponse(BaseModel):
     avatar_id: int
     name: Optional[str]
+    heygen_avatar_id: Optional[str]
     voice_id: Optional[str]
 
     class Config:
