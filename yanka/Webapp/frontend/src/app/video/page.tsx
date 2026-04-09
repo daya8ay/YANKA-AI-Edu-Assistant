@@ -182,7 +182,7 @@ const VideoCreation = () => {
               fontFamily: "'Inter', sans-serif",
             }}
           >
-            The <strong>YANKA Video Lesson</strong> feature will allow educators and anyone to
+            The <strong>Yanka AI Video Lesson</strong> feature will allow educators and anyone to
             transform any teaching material into multilingual AI-generated videos.
             Each video will include avatars, voice narration, subtitles, and visuals, making
             learning more accessible and engaging for everyone.

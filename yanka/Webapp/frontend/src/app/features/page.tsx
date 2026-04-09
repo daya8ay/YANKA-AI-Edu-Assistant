@@ -13,7 +13,7 @@ export default function FeaturesPage() {
 
       {/* HERO */}
       <section className={styles.hero}>
-        <h1>YANKA – AI-Powered Educational Assistant</h1>
+        <h1>Yanka – AI-Powered Educational Assistant</h1>
         <p>
           An intelligent ecosystem for learning, research, content creation,
           and academic growth.

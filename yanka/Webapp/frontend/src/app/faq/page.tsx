@@ -36,7 +36,7 @@ export default function FAQPage() {
 
         {/* Section 1 */}
         <section id="section1" className={styles.section}>
-          <h2 className={styles.sectionTitle}>1. General Questions About YANKA</h2>
+          <h2 className={styles.sectionTitle}>1. General Questions About Yanka AI</h2>
           <div className={styles.list}>
             {faqs.slice(0, 3).map((faq, i) => (
               <div key={i} className={styles.item} onClick={() => setOpenIndex(openIndex === i ? null : i)}>

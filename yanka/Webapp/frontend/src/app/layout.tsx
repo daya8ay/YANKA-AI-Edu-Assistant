@@ -15,7 +15,7 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "YANKA - AI Educational Assistant",
+  title: "Yanka - AI Educational Assistant",
   description: "AI-Powered Multilingual Educational Assistant",
 };
 
