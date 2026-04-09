@@ -10,7 +10,6 @@ import styles from "./login.module.css";
 export default function Login() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
-  const [agreedToTerms, setAgreedToTerms] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
   const router = useRouter();
@@ -18,12 +17,6 @@ export default function Login() {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setError(null);
-
-    if (!agreedToTerms) {
-      setError("Please agree to the Terms and Conditions before logging in.");
-      return;
-    }
-
     setLoading(true);
 
     try {
@@ -55,7 +48,6 @@ export default function Login() {
   return (
     <div className={styles.loginContainer}>
       <div className={styles.loginBox}>
-        {/* LOGO */}
         <Image
           src="/pics/Y_Logo.jpeg"
           alt="YANKA Logo"
@@ -67,12 +59,7 @@ export default function Login() {
         <h1>Welcome Back</h1>
         <p className={styles.subtitle}>Log in to your AI-powered portfolio</p>
 
-        {/* Error banner */}
-        {error && (
-          <p className={styles.errorText}>
-            {error}
-          </p>
-        )}
+        {error && <p className={styles.errorText}>{error}</p>}
 
         <form className={styles.loginForm} onSubmit={handleSubmit}>
           <div className={styles.formGroup}>
@@ -101,23 +88,6 @@ export default function Login() {
             </div>
           </div>
 
-          <div className={styles.termsWrapper}>
-            <label className={styles.termsLabel}>
-              <input
-                type="checkbox"
-                checked={agreedToTerms}
-                onChange={(e) => setAgreedToTerms(e.target.checked)}
-                className={styles.termsCheckbox}
-              />
-              <span>
-                I agree with the{" "}
-                <Link href="/terms" className={styles.termsLink}>
-                  Terms and Conditions
-                </Link>
-              </span>
-            </label>
-          </div>
-
           <button type="submit" className={styles.loginBtn} disabled={loading}>
             {loading ? "Logging in…" : "Login"}
           </button>
@@ -127,28 +97,13 @@ export default function Login() {
           <p>Or continue with</p>
           <div className={styles.socialIcons}>
             <a href="#">
-              <Image
-                src="/pics/gmail.jpeg"
-                alt="Login with Gmail"
-                width={38}
-                height={38}
-              />
+              <Image src="/pics/gmail.jpeg" alt="Gmail" width={38} height={38} />
             </a>
             <a href="#">
-              <Image
-                src="/pics/fb.jpeg"
-                alt="Login with Facebook"
-                width={38}
-                height={38}
-              />
+              <Image src="/pics/fb.jpeg" alt="Facebook" width={38} height={38} />
             </a>
             <a href="#">
-              <Image
-                src="/pics/linkedin.jpeg"
-                alt="Login with LinkedIn"
-                width={38}
-                height={38}
-              />
+              <Image src="/pics/linkedin.jpeg" alt="LinkedIn" width={38} height={38} />
             </a>
           </div>
         </div>
