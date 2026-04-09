@@ -29,6 +29,22 @@ class UserResponse(BaseModel):
         from_attributes = True
 
 
+# --- AIAvatar Table Schemas ---
+
+class AvatarCreate(BaseModel):
+    name: Optional[str] = None
+    voice_id: str
+
+
+class AvatarResponse(BaseModel):
+    avatar_id: int
+    name: Optional[str]
+    voice_id: Optional[str]
+
+    class Config:
+        from_attributes = True
+
+
 # --- LearningProgress Table Schemas ---
 
 class LearningProgressCreate(BaseModel):

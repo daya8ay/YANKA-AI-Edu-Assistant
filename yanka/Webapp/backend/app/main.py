@@ -7,7 +7,7 @@ from openai import OpenAI
 from pydantic import BaseModel
 
 from .auth import verify_cognito_token
-from .routers import users, progress
+from .routers import users, progress, avatars
 
 load_dotenv()
 
@@ -27,6 +27,7 @@ app.add_middleware(
 
 app.include_router(users.router)
 app.include_router(progress.router)
+app.include_router(avatars.router)
 
 #### Routes ####
 
