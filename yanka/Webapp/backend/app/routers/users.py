@@ -1,10 +1,13 @@
 from fastapi import APIRouter, HTTPException, Depends
 from sqlalchemy.orm import Session
+import httpx
 
 from ..database import get_db
 from ..models import User
 from ..schemas import UserCreate, UserResponse
 from ..auth import verify_cognito_token
+
+ZAPIER_WEBHOOK_URL = "https://webhook.site/199322af-382d-4bd5-aba2-2e64ccc24f5c"
 
 router = APIRouter(prefix="/users", tags=["users"])
 
@@ -46,4 +49,17 @@ def create_user(user: UserCreate, db: Session = Depends(get_db)):
     db.add(new_user)
     db.commit()
     db.refresh(new_user)
+
+    # Notify Zapier (or webhook.site for demo) on every new signup
+    try:
+        httpx.post(ZAPIER_WEBHOOK_URL, json={
+            "event": "new_signup",
+            "email": new_user.email,
+            "first_name": new_user.first_name,
+            "last_name": new_user.last_name,
+            "role": new_user.role,
+        }, timeout=5)
+    except Exception:
+        pass  # Don't fail the signup if the webhook fails
+
     return new_user

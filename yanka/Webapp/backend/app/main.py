@@ -12,8 +12,14 @@ from io import BytesIO
 from pypdf import PdfReader
 from docx import Document
 
+from dotenv import load_dotenv
+from fastapi import FastAPI, Depends
+from fastapi.middleware.cors import CORSMiddleware
+from openai import OpenAI
+from pydantic import BaseModel
+
 from .auth import verify_cognito_token
-from .routers import users, progress
+from .routers import users, progress, avatars
 
 load_dotenv()
 
@@ -38,6 +44,7 @@ DEFAULT_HEYGEN_VOICE_ID = "cc5fb6c924064712ba9f690852aa4646"
 
 app.include_router(users.router)
 app.include_router(progress.router)
+app.include_router(avatars.router)
 
 #### Routes ####
 @app.get("/health")

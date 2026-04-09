@@ -21,6 +21,14 @@ class User(Base):
     progress = relationship("LearningProgress", back_populates="user")
 
 
+class AIAvatar(Base):
+    __tablename__ = "ai_avatars"
+
+    avatar_id = Column(Integer, primary_key=True, index=True)
+    name = Column(String(255))
+    voice_id = Column(String(255))
+
+
 class LearningProgress(Base):
     __tablename__ = "learningprogress"
 
