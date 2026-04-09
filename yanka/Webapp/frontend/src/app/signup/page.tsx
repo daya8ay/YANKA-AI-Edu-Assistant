@@ -13,6 +13,7 @@ export default function SignUp() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [agreedToTerms, setAgreedToTerms] = useState(false);
+  const [agreedToPrivacy, setAgreedToPrivacy] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
   const router = useRouter();
@@ -26,6 +27,11 @@ export default function SignUp() {
       return;
     }
 
+    if (!agreedToPrivacy) {
+      setError("Please agree to the Privacy Policy before creating your account.");
+      return;
+    }
+
     setLoading(true);
 
     try {
@@ -36,12 +42,13 @@ export default function SignUp() {
         options: {
           userAttributes: {
             email,
+            name,
           },
         },
       });
 
       router.push(
-        `/signup/verify?email=${encodeURIComponent(email)}&username=${encodeURIComponent(username)}`,
+        `/signup/verify?email=${encodeURIComponent(email)}&username=${encodeURIComponent(username)}`
       );
     } catch (err: unknown) {
       if (err instanceof Error) {
@@ -57,7 +64,6 @@ export default function SignUp() {
   return (
     <div className={styles.signupContainer}>
       <div className={styles.signupBox}>
-        {/* LOGO */}
         <Image
           src="/pics/Y_Logo.jpeg"
           alt="YANKA Logo"
@@ -68,12 +74,7 @@ export default function SignUp() {
 
         <p className={styles.subtitle}>Empower your academic journey with AI</p>
 
-        {/* Error banner */}
-        {error && (
-          <p className={styles.errorText}>
-            {error}
-          </p>
-        )}
+        {error && <p className={styles.errorText}>{error}</p>}
 
         <form className={styles.signupForm} onSubmit={handleSubmit}>
           <div className={styles.formGroup}>
@@ -130,6 +131,23 @@ export default function SignUp() {
             </label>
           </div>
 
+          <div className={styles.termsWrapper}>
+            <label className={styles.termsLabel}>
+              <input
+                type="checkbox"
+                checked={agreedToPrivacy}
+                onChange={(e) => setAgreedToPrivacy(e.target.checked)}
+                className={styles.termsCheckbox}
+              />
+              <span>
+                I agree with the{" "}
+                <Link href="/privacy" className={styles.termsLink}>
+                  Privacy Policy
+                </Link>
+              </span>
+            </label>
+          </div>
+
           <button type="submit" className={styles.signupBtn} disabled={loading}>
             {loading ? "Creating account…" : "Create Account"}
           </button>
@@ -139,28 +157,13 @@ export default function SignUp() {
           <p>Or sign up with</p>
           <div className={styles.socialIcons}>
             <a href="#">
-              <Image
-                src="/pics/gmail.jpeg"
-                alt="Gmail"
-                width={38}
-                height={38}
-              />
+              <Image src="/pics/gmail.jpeg" alt="Gmail" width={38} height={38} />
             </a>
             <a href="#">
-              <Image
-                src="/pics/fb.jpeg"
-                alt="Facebook"
-                width={38}
-                height={38}
-              />
+              <Image src="/pics/fb.jpeg" alt="Facebook" width={38} height={38} />
             </a>
             <a href="#">
-              <Image
-                src="/pics/linkedin.jpeg"
-                alt="LinkedIn"
-                width={38}
-                height={38}
-              />
+              <Image src="/pics/linkedin.jpeg" alt="LinkedIn" width={38} height={38} />
             </a>
           </div>
         </div>
@@ -168,6 +171,7 @@ export default function SignUp() {
         <p className={styles.loginLink}>
           Already have an account? <Link href="/login">Log in</Link>
         </p>
+
         <p className={styles.homeLink}>
           <Link href="/">← Back to Home</Link>
         </p>
