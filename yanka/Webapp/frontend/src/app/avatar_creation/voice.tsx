@@ -1,36 +1,314 @@
 "use client";
 
-import React, { useState } from "react";
+import React, { useEffect, useMemo, useRef, useState } from "react";
 import styles from "./avatar.module.css";
 
-const Voice = () => {
-    const [voice, setVoice] = useState("Voice 1");
+type HeygenVoice = {
+    voice_id: string;
+    name: string;
+    language?: string | null;
+    gender: string;
+    preview_audio: string;
+    support_pause?: boolean;
+    emotion_support?: boolean;
+};
 
-    const voiceOptions = [
-        { id: "Voice 1", label: "Voice 1" },
-        { id: "Voice 2", label: "Voice 2" },
-        { id: "Voice 3", label: "Voice 3" },
-        { id: "Voice 4", label: "Voice 4" },
-        { id: "Voice 5", label: "Voice 5" },
-    ];
+/** Canonical tab keys for voice language (HeyGen labels are inconsistent). */
+type VoiceLanguageTab = "English" | "French";
+
+function normalizeVoiceLanguage(raw: string | null | undefined): VoiceLanguageTab | null {
+    if (raw == null) return null;
+    const t = String(raw).trim();
+    if (t === "") return null;
+    const lower = t.toLowerCase();
+    if (lower === "unknown") return null;
+
+    if (lower === "multilingual") return "English";
+
+    if (lower === "en" || lower === "english") return "English";
+    if (lower === "fr" || lower === "french") return "French";
+
+    if (/^english$/i.test(t)) return "English";
+    if (/^french$/i.test(t)) return "French";
+
+    return null;
+}
+
+const Voice: React.FC<{
+    voices: HeygenVoice[];
+    selectedVoiceId: string | null;
+    onSelectVoiceId: (voiceId: string) => void;
+    loading?: boolean;
+    error?: string | null;
+}> = ({ voices, selectedVoiceId, onSelectVoiceId, loading, error }) => {
+    const audioRef = useRef<HTMLAudioElement | null>(null);
+
+    const VOICES_PER_PAGE = 18;
+    const [page, setPage] = useState(1);
+    const [languageTab, setLanguageTab] = useState<VoiceLanguageTab>("English");
+
+    const voicesWithPreview = useMemo(() => {
+        const hasPreview = (v: HeygenVoice) =>
+            typeof v.preview_audio === "string" && v.preview_audio.trim() !== "";
+
+        const isSingleWordName = (name: string) =>
+            name.trim().split(/\s+/).filter(Boolean).length === 1;
+
+        return voices.filter((v) => {
+            const nameOk = typeof v.name === "string" && isSingleWordName(v.name);
+            return hasPreview(v) && nameOk;
+        });
+    }, [voices]);
+
+    /** Preview + single-word names + English or French only (incl. Multilingual → English). */
+    const eligibleVoices = useMemo(() => {
+        return voicesWithPreview.filter((v) => normalizeVoiceLanguage(v.language) != null);
+    }, [voicesWithPreview]);
+
+    const selectedVoice = useMemo(() => {
+        if (!selectedVoiceId) return null;
+        return eligibleVoices.find((v) => v.voice_id === selectedVoiceId) ?? null;
+    }, [selectedVoiceId, eligibleVoices]);
+
+    // Drop invalid selection when the eligible list changes; align tab to that pick.
+    useEffect(() => {
+        if (eligibleVoices.length === 0) return;
+        if (!selectedVoiceId || !eligibleVoices.some((v) => v.voice_id === selectedVoiceId)) {
+            const pick = eligibleVoices[0];
+            onSelectVoiceId(pick.voice_id);
+            const n = normalizeVoiceLanguage(pick.language);
+            if (n) setLanguageTab(n);
+        }
+    }, [eligibleVoices, selectedVoiceId, onSelectVoiceId]);
+
+    // When data loads or parent changes selection, align tab to the selected voice (no fight with tab clicks:
+    // tab buttons also set selection in the same handler.)
+    useEffect(() => {
+        if (eligibleVoices.length === 0 || !selectedVoiceId) return;
+        const v = eligibleVoices.find((x) => x.voice_id === selectedVoiceId);
+        if (!v) return;
+        const n = normalizeVoiceLanguage(v.language);
+        if (!n) return;
+        setLanguageTab((tab) => (tab === n ? tab : n));
+    }, [eligibleVoices, selectedVoiceId]);
+
+    // Autoplay preview whenever the selected voice changes.
+    useEffect(() => {
+        if (!selectedVoice?.preview_audio) return;
+        if (!audioRef.current) return;
+
+        try {
+            // Reset so the preview always starts from the beginning.
+            audioRef.current.pause();
+            audioRef.current.currentTime = 0;
+        } catch {
+            // Ignore reset errors (some browsers may throw during rapid src swaps).
+        }
+
+        audioRef.current.play().catch(() => {
+            // Autoplay can be blocked if not triggered by user gesture; we ignore.
+        });
+    }, [selectedVoice?.voice_id, selectedVoice?.preview_audio]);
+
+    const sortedVoices = useMemo(() => {
+        const inTab = eligibleVoices.filter(
+            (v) => normalizeVoiceLanguage(v.language) === languageTab,
+        );
+        return [...inTab].sort((a, b) =>
+            (a.name || "").localeCompare(b.name || "", undefined, { sensitivity: "base" }),
+        );
+    }, [eligibleVoices, languageTab]);
+
+    const englishCount = useMemo(
+        () =>
+            eligibleVoices.filter((v) => normalizeVoiceLanguage(v.language) === "English").length,
+        [eligibleVoices],
+    );
+    const frenchCount = useMemo(
+        () =>
+            eligibleVoices.filter((v) => normalizeVoiceLanguage(v.language) === "French").length,
+        [eligibleVoices],
+    );
+
+    const goToLanguageTab = (tab: VoiceLanguageTab) => {
+        setLanguageTab(tab);
+        setPage(1);
+        const list = eligibleVoices
+            .filter((v) => normalizeVoiceLanguage(v.language) === tab)
+            .sort((a, b) =>
+                (a.name || "").localeCompare(b.name || "", undefined, { sensitivity: "base" }),
+            );
+        if (list[0]) onSelectVoiceId(list[0].voice_id);
+    };
+
+    const totalPages = Math.max(1, Math.ceil(sortedVoices.length / VOICES_PER_PAGE));
+    const safePage = Math.min(page, totalPages);
+    const pageStart = (safePage - 1) * VOICES_PER_PAGE;
+    const pageEnd = Math.min(pageStart + VOICES_PER_PAGE, sortedVoices.length);
+    const pageVoices = useMemo(
+        () => sortedVoices.slice(pageStart, pageEnd),
+        [sortedVoices, pageStart, pageEnd],
+    );
+
+    // Keep pagination page in a valid range when the list shrinks/changes.
+    useEffect(() => {
+        setPage((p) => Math.min(Math.max(1, p), totalPages));
+    }, [totalPages]);
+
+    // Jump to the page that contains the currently selected voice.
+    useEffect(() => {
+        if (!selectedVoiceId) {
+            setPage(1);
+            return;
+        }
+        if (sortedVoices.length === 0) {
+            setPage(1);
+            return;
+        }
+        const idx = sortedVoices.findIndex((v) => v.voice_id === selectedVoiceId);
+        if (idx === -1) {
+            setPage(1);
+            return;
+        }
+        setPage(Math.floor(idx / VOICES_PER_PAGE) + 1);
+    }, [selectedVoiceId, sortedVoices]);
 
     return (
         <div className={styles.tabContent}>
             <div className={styles.section}>
                 <h4>Select Voice</h4>
-                <div className={styles.styleOptions}>
-                    {voiceOptions.map((option) => (
-                        <button
-                            key={option.id}
-                            onClick={() => setVoice(option.id)}
-                            className={`${styles.styleOption} ${
-                                voice === option.id ? styles.selected : ""
-                            }`}
-                        >
-                            {option.label}
-                        </button>
-                    ))}
-                </div>
+
+                {loading ? <p style={{ color: "#6B7FA8" }}>Loading voices...</p> : null}
+                {error ? <p style={{ color: "red" }}>{error}</p> : null}
+
+                {!loading && !error ? (
+                    <>
+                        {voicesWithPreview.length === 0 ? (
+                            <p style={{ color: "#6B7FA8", marginTop: "12px" }}>
+                                No voices with preview audio available.
+                            </p>
+                        ) : eligibleVoices.length === 0 ? (
+                            <p style={{ color: "#6B7FA8", marginTop: "12px" }}>
+                                No English or French voices match the current filters (preview + single-word
+                                names). Other languages are hidden for now.
+                            </p>
+                        ) : (
+                            <>
+                                <h5
+                                    style={{
+                                        fontSize: "1.05rem",
+                                        color: "#1E4386",
+                                        marginTop: "12px",
+                                        marginBottom: "10px",
+                                    }}
+                                >
+                                    Language
+                                </h5>
+                                <div className={styles.styleOptions} style={{ marginBottom: "12px" }}>
+                                    <button
+                                        type="button"
+                                        onClick={() => goToLanguageTab("English")}
+                                        disabled={englishCount === 0}
+                                        className={`${styles.styleOption} ${
+                                            languageTab === "English" ? styles.selected : ""
+                                        }`}
+                                    >
+                                        English
+                                    </button>
+                                    <button
+                                        type="button"
+                                        onClick={() => goToLanguageTab("French")}
+                                        disabled={frenchCount === 0}
+                                        className={`${styles.styleOption} ${
+                                            languageTab === "French" ? styles.selected : ""
+                                        }`}
+                                    >
+                                        French
+                                    </button>
+                                </div>
+
+                                {selectedVoice?.preview_audio ? (
+                                    <div style={{ marginTop: "4px", marginBottom: "4px" }}>
+                                        <h5
+                                            style={{
+                                                marginBottom: "10px",
+                                                fontSize: "1rem",
+                                                color: "#1E4386",
+                                            }}
+                                        >
+                                            Preview
+                                        </h5>
+                                        <audio
+                                            ref={audioRef}
+                                            autoPlay
+                                            playsInline
+                                            controls
+                                            src={selectedVoice.preview_audio}
+                                            style={{ width: "100%" }}
+                                        />
+                                    </div>
+                                ) : null}
+
+                                {sortedVoices.length === 0 ? (
+                                    <p style={{ color: "#6B7FA8", marginTop: "8px" }}>
+                                        No voices in this language tab.
+                                    </p>
+                                ) : (
+                                    <div className={styles.styleOptions} style={{ marginTop: "12px" }}>
+                                        {pageVoices.map((v) => (
+                                            <button
+                                                key={v.voice_id}
+                                                type="button"
+                                                onClick={() => onSelectVoiceId(v.voice_id)}
+                                                className={`${styles.styleOption} ${
+                                                    selectedVoiceId === v.voice_id ? styles.selected : ""
+                                                }`}
+                                            >
+                                                {v.name}
+                                            </button>
+                                        ))}
+                                    </div>
+                                )}
+                            </>
+                        )}
+
+                        {eligibleVoices.length > 0 && sortedVoices.length > VOICES_PER_PAGE ? (
+                            <div className={styles.avatarPagination}>
+                                <button
+                                    type="button"
+                                    className={styles.avatarPaginationBtn}
+                                    disabled={safePage <= 1}
+                                    onClick={() =>
+                                        setPage((p) =>
+                                            Math.max(1, Math.min(totalPages, p) - 1),
+                                        )
+                                    }
+                                >
+                                    Previous
+                                </button>
+                                <span className={styles.avatarPaginationInfo}>
+                                    {pageStart + 1}–{pageEnd} of {sortedVoices.length} · Page{" "}
+                                    {safePage} / {totalPages}
+                                </span>
+                                <button
+                                    type="button"
+                                    className={styles.avatarPaginationBtn}
+                                    disabled={safePage >= totalPages}
+                                    onClick={() =>
+                                        setPage((p) =>
+                                            Math.min(
+                                                totalPages,
+                                                Math.max(1, p) + 1,
+                                            ),
+                                        )
+                                    }
+                                >
+                                    Next
+                                </button>
+                            </div>
+                        ) : null}
+                    </>
+                ) : null}
             </div>
         </div>
     );

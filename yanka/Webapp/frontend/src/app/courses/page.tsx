@@ -1,81 +1,212 @@
 "use client";
 
-import React from "react";
+import React, { useState } from "react";
 import Link from "next/link";
 import DashboardNavBar from "@/components/DashboardNavBar";
-import Footer from "@/components/Footer"; // ✅ import the shared Footer
+import Footer from "@/components/Footer";
 import styles from "./courses.module.css";
 
+type CourseType = "Course" | "Training";
+import Image from 'next/image';
+
+interface CourseItem {
+  title: string;
+  teacher: string;
+  summary: string;
+  price: string;
+  img: string;
+  tag: string;
+  rating: string;
+  reviews: string;
+  type: CourseType;
+}
+
 export default function Courses() {
-  const courses = [
+  const [activeFilter, setActiveFilter] = useState<"All" | "Courses" | "Training">("All");
+
+  const courses: CourseItem[] = [
     {
-      title: "AI & Machine Learning",
-      description: "Master algorithms, data processing, and neural networks with hands-on projects.",
-      category: "Technology"
+      title: "AI for Everyone",
+      teacher: "Dr. Schan Gya",
+      summary:
+        "A beginner-friendly introduction to artificial intelligence, machine learning, and how AI is shaping industries today.",
+      price: "$30.99",
+      img: "/pics/ai.jpeg",
+      tag: "Bestseller",
+      rating: "4.8",
+      reviews: "2,145 ratings",
+      type: "Course",
     },
     {
-      title: "Data Science & Analytics",
-      description: "Turn data into insights with Python, R, and visualization tools used by industry experts.",
-      category: "Technology"
+      title: "Beginners Spanish",
+      teacher: "Prof. Rujeta Morales",
+      summary:
+        "Build confidence in everyday Spanish through practical vocabulary, speaking exercises, and real-world conversations.",
+      price: "$20.99",
+      img: "/pics/spanish.jpeg",
+      tag: "Popular",
+      rating: "4.6",
+      reviews: "1,084 ratings",
+      type: "Course",
     },
     {
-      title: "Web & App Development",
-      description: "Build modern applications from scratch using React, Flutter, or full-stack technologies.",
-      category: "Technology"
+      title: "Data Science",
+      teacher: "Dr. Rolan Peters",
+      summary:
+        "Learn data analysis, visualization, statistics, and predictive modeling using modern tools and practical datasets.",
+      price: "$30.99",
+      img: "/pics/data.jpeg",
+      tag: "Top Rated",
+      rating: "4.7",
+      reviews: "1,732 ratings",
+      type: "Course",
     },
     {
-      title: "Academic Research & Writing",
-      description: "Enhance your academic writing, thesis structure, and research methodology with AI tools.",
-      category: "Academic"
+      title: "Project Management Training",
+      teacher: "Prof. Sach Mehra",
+      summary:
+        "Master planning, stakeholder communication, agile workflows, and execution strategies for successful projects.",
+      price: "$25.99",
+      img: "/pics/pm.jpeg",
+      tag: "Bestseller",
+      rating: "4.5",
+      reviews: "963 ratings",
+      type: "Training",
     },
     {
-      title: "Mathematics & Statistics",
-      description: "From calculus to probability theory, master mathematical concepts with AI-guided learning.",
-      category: "Academic"
+      title: "Digital Marketing Bootcamp",
+      teacher: "Dami Cole",
+      summary:
+        "Understand branding, social media strategy, SEO, content planning, and campaign performance measurement.",
+      price: "$35.99",
+      img: "/pics/marketing.jpeg",
+      tag: "Trending",
+      rating: "4.7",
+      reviews: "1,268 ratings",
+      type: "Training",
     },
     {
-      title: "Languages & Communication",
-      description: "Learn new languages and improve your communication skills with personalized tutoring.",
-      category: "Languages"
-    }
+      title: "English Literature",
+      teacher: "Prof. Elena Brooks",
+      summary:
+        "Dive into classic and modern literary works while strengthening analysis, writing, and interpretation skills.",
+      price: "$20.99",
+      img: "/pics/english.jpeg",
+      tag: "Recommended",
+      rating: "4.4",
+      reviews: "812 ratings",
+      type: "Course",
+    },
   ];
+
+  const filteredCourses =
+    activeFilter === "All"
+      ? courses
+      : courses.filter((course) =>
+          activeFilter === "Courses" ? course.type === "Course" : course.type === "Training"
+        );
 
   return (
     <>
       <DashboardNavBar />
-      
+
       <main className={styles.coursesMain}>
         <section className={styles.coursesHeader}>
-          <h1>Explore Courses & Learning Paths</h1>
-          <p>Discover curated AI-powered courses tailored to your goals and pace.</p>
+          <h1>Explore Courses & Training Programs</h1>
+          <p>
+            Discover curated AI-powered learning experiences designed to match your
+            academic, professional, and career goals.
+          </p>
+
+          <div className={styles.filterButtons}>
+            <button
+              className={`${styles.filterBtn} ${activeFilter === "All" ? styles.activeFilter : ""}`}
+              onClick={() => setActiveFilter("All")}
+            >
+              All
+            </button>
+            <button
+              className={`${styles.filterBtn} ${activeFilter === "Courses" ? styles.activeFilter : ""}`}
+              onClick={() => setActiveFilter("Courses")}
+            >
+              Courses
+            </button>
+            <button
+              className={`${styles.filterBtn} ${activeFilter === "Training" ? styles.activeFilter : ""}`}
+              onClick={() => setActiveFilter("Training")}
+            >
+              Training
+            </button>
+          </div>
         </section>
 
-        <section className={styles.coursesContent}>
+        <section className={styles.marketplacePreview}>
           <div className={styles.courseGrid}>
-            {courses.map((course, index) => (
-              <div key={index} className={styles.courseCard}>
-                <div className={styles.courseCategory}>{course.category}</div>
-                <h3>{course.title}</h3>
-                <p>{course.description}</p>
-                <Link href="#" className={styles.viewCourseBtn}>
-                  View Course
-                </Link>
+            {filteredCourses.map((course, index) => (
+              <div
+                key={index}
+                className={styles.courseCard}
+                onClick={() => (window.location.href = "/signup")}
+              >
+                <div style={{ position: 'relative', width: '100%', height: '250px' }}>
+                <Image
+                  src={course.img}
+                  alt={course.title}
+                  className={styles.courseImage}
+                  fill
+                  style={{ objectFit: 'cover' }}
+                />
+              </div>
+
+                <div className={styles.courseInfo}>
+                  <div className={styles.courseContentTop}>
+                    <div className={styles.topRow}>
+                      <span className={styles.courseType}>{course.type}</span>
+                    </div>
+
+                    <h3>{course.title}</h3>
+                    <p className={styles.teacher}>{course.teacher}</p>
+                    <p className={styles.courseSummary}>{course.summary}</p>
+
+                    <div className={styles.courseMeta}>
+                      <span className={styles.courseTag}>{course.tag}</span>
+                      <span className={styles.ratingBox}>⭐ {course.rating}</span>
+                      <span className={styles.reviewBox}>{course.reviews}</span>
+                    </div>
+                  </div>
+
+                  <div className={styles.priceRow}>
+                    <p className={styles.price}>{course.price}</p>
+                    <Link href="/signup" className={styles.viewCourseBtn}>
+                      View Details
+                    </Link>
+                  </div>
+                </div>
               </div>
             ))}
           </div>
+
+          <button
+            className={styles.viewAllBtn}
+            onClick={() => (window.location.href = "/signup")}
+          >
+            View All Learning Options →
+          </button>
         </section>
 
         <section className={styles.ctaSection}>
           <h2>Ready to Start Learning?</h2>
-          <p>Join thousands of students advancing their education with YANKA&apos;s AI-powered platform.</p>
+          <p>
+            Join thousands of students advancing their education with Yanka&apos;s
+            AI-powered platform.
+          </p>
           <Link href="/signup" className={styles.ctaBtn}>
             Get Started Today
           </Link>
         </section>
       </main>
-      {/* ✅ Global Footer */}
+
       <Footer />
     </>
   );
 }
-

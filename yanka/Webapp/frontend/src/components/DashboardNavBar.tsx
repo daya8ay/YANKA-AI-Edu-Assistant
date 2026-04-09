@@ -39,11 +39,11 @@ const DashboardNavBar: React.FC = () => {
           <Image
             src="/pics/Y_Logo.jpeg"
             alt="YANKA Logo"
-            width={80}
-            height={80}
+            width={72}
+            height={72}
             className={styles.logoImg}
+            priority
           />
-          <span className={styles.logoSubtitle}>Yanka AI</span>
         </div>
       </Link>
 

@@ -2,7 +2,7 @@
   background: #0041ad;
   color: #f4f8ff;
   padding: 40px 80px 30px;
-  font-family: 'Inter', sans-serif;
+  font-family: "Inter", sans-serif;
 }
 
 /* Top Section */
@@ -48,7 +48,7 @@
 }
 
 .socialLinks img {
-  border-radius: 6px; /* optional if icons are square */
+  border-radius: 6px;
 }
 
 /* Link Columns */
@@ -59,8 +59,8 @@
 .linkColumns {
   display: grid;
   grid-template-columns: repeat(4, 1fr);
-  gap: 60px;              /* keeps it spacious */
-  width: 100%;            /* 👈 THIS is the key fix */
+  gap: 60px;
+  width: 100%;
   max-width: 1200px;
   margin: 0 auto;
   padding: 0 20px;
@@ -116,6 +116,7 @@
 .bottomLinks {
   display: flex;
   gap: 20px;
+  flex-wrap: wrap;
 }
 
 .bottomLinks a {
@@ -126,6 +127,21 @@
 
 .bottomLinks a:hover {
   color: #ffffff;
+}
+
+/* Column Title Link */
+.columnTitleLink {
+  text-decoration: none;
+  display: inline-block;
+}
+
+.columnTitleLink h4 {
+  color: #ffffff;
+  transition: color 0.3s ease;
+}
+
+.columnTitleLink:hover h4 {
+  color: #9fc5ff;
 }
 
 /* Responsive */
@@ -155,19 +171,8 @@
     align-items: center;
     text-align: center;
   }
-}
 
-/* Column Title Link */
-.columnTitleLink {
-  text-decoration: none;
-  display: inline-block;
-}
-
-.columnTitleLink h4 {
-  color: #ffffff;
-  transition: color 0.3s ease;
-}
-
-.columnTitleLink:hover h4 {
-  color: #9fc5ff;
+  .bottomLinks {
+    justify-content: center;
+  }
 }
