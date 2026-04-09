@@ -4,6 +4,7 @@ import React from "react";
 import NavBar from "@/components/NavBar";
 import Footer from "@/components/Footer";
 import styles from "./page.module.css";
+import Image from 'next/image';
 
 export default function SolutionsPage() {
   return (
@@ -25,7 +26,7 @@ export default function SolutionsPage() {
       {/* STUDENTS */}
       <section id="students" className={styles.solutionSection}>
         <div className={styles.imageLeft}>
-          <img src="/pics/students.jpeg" alt="Students using AI tools" />
+          <Image src="/pics/students.jpeg" alt="Students using AI tools" width={600} height={400} />
         </div>
         <div className={styles.contentRight}>
           <h2>Students</h2>

@@ -4,6 +4,7 @@ import { fetchAuthSession } from "aws-amplify/auth";
 import styles from "./support.module.css";
 import Link from "next/link";
 import { faqs } from "../faq/faqData";
+import Image from 'next/image';
 
 interface Message {
   text: string;
@@ -114,9 +115,9 @@ const SupportContent: React.FC = () => {
               overflowY: "auto",
             }}>
               {results.length === 0 ? (
-                <div style={{ padding: "14px 16px", color: "#888", fontSize: "14px" }}>
-                  No results found for "{searchQuery}"
-                </div>
+            <div style={{ padding: "14px 16px", color: "#888", fontSize: "14px" }}>
+              No results found for &quot;{searchQuery}&quot;
+            </div>
               ) : (
                 results.map(({ faq, i }) => (
                   <Link
@@ -146,26 +147,28 @@ const SupportContent: React.FC = () => {
       </div>
     </main>
 
-      <div className={styles.imageRow}>
-        <div className={styles.imageItem}>
-          <Link href="/#marketplace">
-            <img src="/pics/support-img1.jpg" alt="Image 1" />
-          </Link>
-          <p>Getting started</p>
-        </div>
-        <div className={styles.imageItem}>
-          <Link href="/about#mission">
-            <img src="/pics/support-img3.jpg" alt="Image 2" />
-          </Link>
-          <p>Our Mission</p>
-        </div>
-        <div className={styles.imageItem}>
-          <Link href="/#features">
-            <img src="/pics/support-img2.webp" alt="Image 3" />
-          </Link>
-          <p>Capabilities</p>
-        </div>
+
+
+    <div className={styles.imageRow}>
+      <div className={styles.imageItem}>
+        <Link href="/#marketplace">
+          <Image src="/pics/support-img1.jpg" alt="Image 1" width={400} height={250} />
+        </Link>
+        <p>Getting started</p>
       </div>
+      <div className={styles.imageItem}>
+        <Link href="/about#mission">
+          <Image src="/pics/support-img3.jpg" alt="Image 2" width={400} height={250} />
+        </Link>
+        <p>Our Mission</p>
+      </div>
+      <div className={styles.imageItem}>
+        <Link href="/#features">
+          <Image src="/pics/support-img2.webp" alt="Image 3" width={400} height={250} />
+        </Link>
+        <p>Capabilities</p>
+      </div>
+    </div>
 
       {/* FAQ Section */}
       <div className={styles.faqSection}>
