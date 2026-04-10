@@ -74,10 +74,7 @@ const AvatarCreation = () => {
 
   const tabs = [
     { id: "Avatar", label: "Avatar" },
-    // { id: "Face", label: "Face" },
-    // { id: "Hair", label: "Hair" },
     { id: "Clothing", label: "Clothing" },
-    // { id: "Accessories", label: "Accessories" },
     { id: "Voice", label: "Voice" },
   ];
 

@@ -130,6 +130,14 @@ const Voice: React.FC<{
         [eligibleVoices],
     );
 
+    const voiceLanguageSelectStyle: React.CSSProperties = {
+        width: "100%",
+        padding: "10px",
+        marginBottom: "12px",
+        borderRadius: "6px",
+        border: "1px solid #ccc",
+    };
+
     const goToLanguageTab = (tab: VoiceLanguageTab) => {
         setLanguageTab(tab);
         setPage(1);
@@ -194,38 +202,36 @@ const Voice: React.FC<{
                             </p>
                         ) : (
                             <>
-                                <h5
+                                <label
+                                    htmlFor="avatar-voice-language"
                                     style={{
-                                        fontSize: "1.05rem",
-                                        color: "#1E4386",
+                                        display: "block",
                                         marginTop: "12px",
-                                        marginBottom: "10px",
+                                        marginBottom: "6px",
+                                        fontSize: "0.95rem",
+                                        color: "#1E4386",
+                                        fontWeight: 600,
                                     }}
                                 >
-                                    Language
-                                </h5>
-                                <div className={styles.styleOptions} style={{ marginBottom: "12px" }}>
-                                    <button
-                                        type="button"
-                                        onClick={() => goToLanguageTab("English")}
-                                        disabled={englishCount === 0}
-                                        className={`${styles.styleOption} ${
-                                            languageTab === "English" ? styles.selected : ""
-                                        }`}
-                                    >
+                                    Voice language
+                                </label>
+                                <select
+                                    id="avatar-voice-language"
+                                    value={languageTab === "English" ? "english" : "french"}
+                                    onChange={(e) => {
+                                        const v = e.target.value;
+                                        if (v === "english") goToLanguageTab("English");
+                                        else goToLanguageTab("French");
+                                    }}
+                                    style={voiceLanguageSelectStyle}
+                                >
+                                    <option value="english" disabled={englishCount === 0}>
                                         English
-                                    </button>
-                                    <button
-                                        type="button"
-                                        onClick={() => goToLanguageTab("French")}
-                                        disabled={frenchCount === 0}
-                                        className={`${styles.styleOption} ${
-                                            languageTab === "French" ? styles.selected : ""
-                                        }`}
-                                    >
+                                    </option>
+                                    <option value="french" disabled={frenchCount === 0}>
                                         French
-                                    </button>
-                                </div>
+                                    </option>
+                                </select>
 
                                 {selectedVoice?.preview_audio ? (
                                     <div style={{ marginTop: "4px", marginBottom: "4px" }}>

@@ -84,7 +84,7 @@ const Clothing: React.FC<{
           </p>
         ) : (
           <p style={{ color: "#6B7FA8" }}>
-            Outfit options for <strong>{personKey}</strong>. Tap an option to switch the HeyGen variant.
+            Outfit options for <strong>{personKey}</strong>. Tap an option to switch the clothing.
           </p>
         )}
       </div>
@@ -92,8 +92,7 @@ const Clothing: React.FC<{
       {personKey && labels.length === 0 ? (
         <div className={styles.section}>
           <p style={{ color: "#6B7FA8" }}>
-            No named outfit variants found for this presenter (names don&apos;t include an{" "}
-            <strong>in [color] [garment]</strong> pattern).
+            No outfit options found for this presenter.
           </p>
         </div>
       ) : null}
