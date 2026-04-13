@@ -1,5 +1,5 @@
 'use client';
-import { useState, useEffect, useRef } from 'react';
+import { useState, useEffect, Suspense } from 'react';
 import Link from 'next/link';
 import { faqs } from './faqData';
 import styles from './faq.module.css';
@@ -18,10 +18,8 @@ const getSectionId = (faqIndex: number): string => {
   return "section10";
 };
 
-export default function FAQPage() {
+function FAQContent() {
   const [openIndex, setOpenIndex] = useState<number | null>(null);
-  const [activeSection, setActiveSection] = useState('section1');
-  const [stuck, setStuck] = useState(false);
   const searchParams = useSearchParams();
 
   useEffect(() => {
@@ -29,7 +27,6 @@ export default function FAQPage() {
     if (openParam !== null) {
       const index = parseInt(openParam);
       setOpenIndex(index);
-      // Wait for render then scroll
       setTimeout(() => {
         const el = document.getElementById(getSectionId(index));
         if (el) el.scrollIntoView({ behavior: 'smooth', block: 'start' });
@@ -37,16 +34,9 @@ export default function FAQPage() {
     }
   }, [searchParams]);
 
-  const scrollTo = (id: string) => {
-    const el = document.getElementById(id);
-    if (el) el.scrollIntoView({ behavior: 'smooth', block: 'start' });
-  };
-
   return (
     <div className={styles.page}>
-
-      {/* Sticky Section Nav */}
-      <div className={`${styles.stickyNav} ${stuck ? styles.stickyNavScrolled : ''}`}>
+      <div className={styles.stickyNav}>
         <Link href="/support" className={styles.backBtn}>← Back</Link>
       </div>
 
@@ -100,7 +90,7 @@ export default function FAQPage() {
             ))}
           </div>
         </section>
-              
+
         {/* Section 4 */}
         <section id="section4" className={styles.section}>
           <h2 className={styles.sectionTitle}>4. Academic Research & Thesis Tools</h2>
@@ -116,7 +106,7 @@ export default function FAQPage() {
             ))}
           </div>
         </section>
-              
+
         {/* Section 5 */}
         <section id="section5" className={styles.section}>
           <h2 className={styles.sectionTitle}>5. AI Avatars, Voice & Video Creation</h2>
@@ -132,7 +122,7 @@ export default function FAQPage() {
             ))}
           </div>
         </section>
-              
+
         {/* Section 6 */}
         <section id="section6" className={styles.section}>
           <h2 className={styles.sectionTitle}>6. Course, Training & Content Creation</h2>
@@ -202,7 +192,7 @@ export default function FAQPage() {
           <h2 className={styles.sectionTitle}>10. PRIVACY, SECURITY & ETHICS</h2>
           <div className={styles.list}>
             {faqs.slice(24, 27).map((faq, i) => (
-                <div key={i} className={styles.item} onClick={() => setOpenIndex(openIndex === (i + 24) ? null : (i + 24))}>
+              <div key={i} className={styles.item} onClick={() => setOpenIndex(openIndex === (i + 24) ? null : (i + 24))}>
                 <div className={styles.question}>
                   <span>{faq.question}</span>
                   <span>{openIndex === (i + 24) ? '∧' : '∨'}</span>
@@ -214,5 +204,13 @@ export default function FAQPage() {
         </section>
       </div>
     </div>
+  );
+}
+
+export default function FAQPage() {
+  return (
+    <Suspense fallback={<div>Loading...</div>}>
+      <FAQContent />
+    </Suspense>
   );
 }

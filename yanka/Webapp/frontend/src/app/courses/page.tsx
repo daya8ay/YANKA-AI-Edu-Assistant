@@ -7,6 +7,7 @@ import Footer from "@/components/Footer";
 import styles from "./courses.module.css";
 
 type CourseType = "Course" | "Training";
+import Image from 'next/image';
 
 interface CourseItem {
   title: string;
@@ -147,7 +148,15 @@ export default function Courses() {
                 className={styles.courseCard}
                 onClick={() => (window.location.href = "/signup")}
               >
-                <img src={course.img} alt={course.title} className={styles.courseImage} />
+                <div style={{ position: 'relative', width: '100%', height: '250px' }}>
+                <Image
+                  src={course.img}
+                  alt={course.title}
+                  className={styles.courseImage}
+                  fill
+                  style={{ objectFit: 'cover' }}
+                />
+              </div>
 
                 <div className={styles.courseInfo}>
                   <div className={styles.courseContentTop}>

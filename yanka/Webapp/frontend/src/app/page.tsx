@@ -399,7 +399,7 @@ export default function Home() {
         className={styles.courseCard}
         onClick={() => (window.location.href = "/signup")}
       >
-        <img src={course.img} alt={course.title} className={styles.courseImage} />
+        <Image src={course.img} alt={course.title} className={styles.courseImage} width={400} height={250} />
 
         <div className={styles.courseInfo}>
           <div className={styles.courseContentTop}>
@@ -502,7 +502,7 @@ export default function Home() {
         "/pics/logo_4.jpeg",
       ].map((logo, i) => (
         <div key={i} className={styles.sponsorLogo}>
-          <img src={logo} alt={`Sponsor ${i}`} />
+          <Image src={logo} alt={`Sponsor ${i}`} width={150} height={50} />
         </div>
       ))}
 
@@ -514,7 +514,7 @@ export default function Home() {
         "/pics/logo_4.jpeg",
       ].map((logo, i) => (
         <div key={i + 4} className={styles.sponsorLogo}>
-          <img src={logo} alt={`Sponsor duplicate ${i}`} />
+          <Image src={logo} alt={`Sponsor duplicate ${i}`} width={150} height={50} />
         </div>
       ))}
     </div>
@@ -532,7 +532,7 @@ export default function Home() {
     <div className={styles.contactWrapper}>
       {/* Left Image */}
       <div className={styles.contactImage}>
-        <img src="/pics/contactus.jpeg" alt="Contact Us" />
+        <Image src="/pics/contactus.jpeg" alt="Contact Us" width={600} height={400} />
       </div>
 
       {/* Contact Form */}

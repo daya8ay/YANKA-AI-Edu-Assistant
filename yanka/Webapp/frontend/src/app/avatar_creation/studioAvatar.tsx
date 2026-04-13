@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useEffect, useMemo, useState } from "react";
+import React, { useEffect, useMemo, useState, type CSSProperties } from "react";
 import styles from "./avatar.module.css";
 
 const AVATARS_PER_PAGE = 21;
@@ -74,10 +74,13 @@ const StudioAvatar: React.FC<{
 }) => {
   const [page, setPage] = useState(1);
 
-  const genderOptions: { id: PresenterGender; label: string }[] = [
-    { id: "male", label: "Male" },
-    { id: "female", label: "Female" },
-  ];
+  const presenterGenderSelectStyle: CSSProperties = {
+    width: "100%",
+    padding: "10px",
+    marginBottom: "12px",
+    borderRadius: "6px",
+    border: "1px solid #ccc",
+  };
 
   const peopleCards = useMemo(() => {
     const groups = new Map<string, HeygenAvatarRow[]>();
@@ -129,30 +132,28 @@ const StudioAvatar: React.FC<{
     <div className={styles.tabContent}>
       <div className={styles.section}>
         <h4>Avatar</h4>
-        <h4
+        <label
+          htmlFor="avatar-presenter-gender"
           style={{
-            fontSize: "1.05rem",
+            display: "block",
+            marginTop: "12px",
+            marginBottom: "6px",
+            fontSize: "0.95rem",
             color: "#1E4386",
-            marginTop: "8px",
-            marginBottom: "12px",
+            fontWeight: 600,
           }}
         >
-          Filter by Gender
-        </h4>
-        <div className={styles.styleOptions} style={{ marginBottom: "12px" }}>
-          {genderOptions.map((option) => (
-            <button
-              key={option.id}
-              type="button"
-              onClick={() => onPresenterGenderChange(option.id)}
-              className={`${styles.styleOption} ${
-                presenterGender === option.id ? styles.selected : ""
-              }`}
-            >
-              {option.label}
-            </button>
-          ))}
-        </div>
+          Presenter gender
+        </label>
+        <select
+          id="avatar-presenter-gender"
+          value={presenterGender}
+          onChange={(e) => onPresenterGenderChange(e.target.value as PresenterGender)}
+          style={presenterGenderSelectStyle}
+        >
+          <option value="male">Male</option>
+          <option value="female">Female</option>
+        </select>
         <p
           style={{
             color: "#6B7FA8",
@@ -191,9 +192,6 @@ const StudioAvatar: React.FC<{
                     className={styles.optionImage}
                   />
                   <span className={styles.optionLabel}>{personKey}</span>
-                  {variantsCount > 1 ? (
-                    <span className={styles.optionKindBadge}>{variantsCount} outfits</span>
-                  ) : null}
                   {rep.kind === "talking_photo" ? (
                     <span className={styles.optionKindBadge}>Photo</span>
                   ) : null}

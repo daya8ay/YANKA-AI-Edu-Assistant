@@ -50,7 +50,8 @@ CREATE TABLE SourceContent (
 
 CREATE TABLE AI_Avatars (
     avatar_id SERIAL PRIMARY KEY,
-    name VARCHAR(255) NOT NULL,
+    name VARCHAR(255),
+    voice_id VARCHAR(255),
     type VARCHAR(50),
     owner_id INTEGER REFERENCES Users(user_id),
     configuration JSONB
