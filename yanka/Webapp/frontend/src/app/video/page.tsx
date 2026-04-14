@@ -272,8 +272,29 @@ const VideoCreation = () => {
                   <div className={`${styles.innerInfoCard} ${styles.summaryBox}`}>
                     <h3 className={styles.smallCardTitle}>Video Status</h3>
                     <p className={styles.summaryText}>
-                      Current status: <strong>{videoStatus}</strong>
+                      Current status:{" "}
+                      <strong
+                        className={
+                          videoStatus === "completed"
+                            ? styles.statusCompleted
+                            : videoStatus === "processing"
+                            ? styles.statusProcessing
+                            : videoStatus === "failed"
+                            ? styles.statusFailed
+                            : ""
+                        }
+                      >
+                        {videoStatus}
+                      </strong>
                     </p>
+
+                    <button
+                      onClick={checkVideoStatus}
+                      disabled={!videoId || isCheckingStatus}
+                      className={styles.leftStatusButton}
+                    >
+                      {isCheckingStatus ? "Checking Status..." : "Check Video Status"}
+                    </button>
                   </div>
                 )}
               </div>
@@ -296,6 +317,17 @@ const VideoCreation = () => {
                     value={title}
                     onChange={(e) => setTitle(e.target.value)}
                     className={styles.textInput}
+                  />
+                </div>
+
+                <div className={styles.formCard}>
+                  <label className={styles.formLabel}>Prompt</label>
+                  <textarea
+                    placeholder="Describe what you want the AI video to say or teach..."
+                    value={script}
+                    onChange={(e) => setScript(e.target.value)}
+                    className={styles.textAreaInput}
+                    style={{ minHeight: "140px" }}
                   />
                 </div>
 
@@ -444,33 +476,16 @@ const VideoCreation = () => {
                       style={{ minHeight: "120px", marginBottom: "14px" }}
                     />
 
-                    <label className={styles.formLabel} style={{ marginTop: "14px" }}>
-                      Script (Optional)
-                    </label>
-                    <textarea
-                      placeholder="Write lesson script here..."
-                      value={script}
-                      onChange={(e) => setScript(e.target.value)}
-                      className={styles.textAreaInput}
-                      style={{ minHeight: "140px" }}
-                    />
-
-                    <button
-                      onClick={handleSubmit}
-                      disabled={isGenerating}
-                      className={styles.primaryButton}
-                    >
-                      {isGenerating ? "Generating..." : "Generate AI Video"}
-                    </button>
-
-                    <button
-                      onClick={checkVideoStatus}
-                      disabled={!videoId || isCheckingStatus}
-                      className={styles.secondaryButton}
-                    >
-                      {isCheckingStatus ? "Checking Status..." : "Check Video Status"}
-                    </button>
                   </div>
+                </div>
+                <div className={styles.actionArea}>
+                  <button
+                    onClick={handleSubmit}
+                    disabled={isGenerating}
+                    className={styles.primaryButton}
+                  >
+                    {isGenerating ? "Generating..." : "Generate AI Video"}
+                  </button>
                 </div>
               </div>
             </div>

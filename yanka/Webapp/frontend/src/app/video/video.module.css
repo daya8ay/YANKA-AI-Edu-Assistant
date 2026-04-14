@@ -255,7 +255,7 @@
   grid-template-columns: minmax(420px, 0.95fr) minmax(620px, 1.25fr);
   gap: 28px;
   width: 100%;
-  align-items: start;
+  align-items: stretch;
 }
 
 .leftColumn,
@@ -263,6 +263,12 @@
   display: flex;
   flex-direction: column;
   gap: 24px;
+  height: 100%;
+}
+
+.rightColumn > .glassCard,
+.leftColumn > .glassCard:last-child {
+  flex: 1;
 }
 
 .glassCard {
@@ -741,4 +747,49 @@
   .formTitle {
     font-size: 2.2rem;
   }
+}
+
+.actionArea {
+  margin-top: 20px;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.leftStatusButton {
+  margin-top: 14px;
+  width: 100%;
+  border: 1px solid #d7def5;
+  border-radius: 12px;
+  padding: 12px 16px;
+  background: #ffffff;
+  color: #1E4386;
+  font-size: 0.98rem;
+  font-weight: 700;
+  cursor: pointer;
+  transition: transform 0.2s ease, box-shadow 0.2s ease, opacity 0.2s ease;
+}
+
+.leftStatusButton:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 8px 18px rgba(77, 99, 171, 0.12);
+}
+
+.leftStatusButton:disabled {
+  opacity: 0.65;
+  cursor: not-allowed;
+  transform: none;
+  box-shadow: none;
+}
+
+.statusCompleted {
+  color: #16a34a;
+}
+
+.statusProcessing {
+  color: #ca8a04;
+}
+
+.statusFailed {
+  color: #dc2626;
 }
