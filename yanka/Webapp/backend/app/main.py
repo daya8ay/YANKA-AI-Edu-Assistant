@@ -18,8 +18,19 @@ from fastapi.middleware.cors import CORSMiddleware
 from openai import OpenAI
 from pydantic import BaseModel
 
-from .auth import verify_cognito_token
+from .auth import verify_cognito_token, get_current_user
 from .routers import users, progress, avatars
+from .models import User, GeneratedVideos, SourceContent, AIAvatar
+from .schemas import (
+    SourceContentCreate, SourceContentResponse,
+    GeneratedVideoResponse, GeneratedVideoWithDetails,
+    VideoGenerateRequest, HeyGenAvatarData, UserAvatarCreate,
+    FileUploadResponse
+)
+from .database import get_db
+from .s3_service import s3_service
+from sqlalchemy.orm import Session, joinedload
+import json
 
 load_dotenv()
 
@@ -909,3 +920,169 @@ async def get_video_status(video_id: str):
         raise HTTPException(status_code=response.status_code, detail=response.text)
 
     return response.json()
+
+
+# ==================== USER-SPECIFIC ENDPOINTS ====================
+
+@app.post("/users/me/avatars", response_model=dict)
+async def save_user_avatar(
+    avatar_data: UserAvatarCreate,
+    current_user: User = Depends(get_current_user),
+    db: Session = Depends(get_db)
+):
+    """Save a user's selected HeyGen avatar to their collection."""
+    try:
+        # Create new avatar record
+        new_avatar = AIAvatar(
+            name=avatar_data.heygen_data.avatar_name,
+            voice_id=avatar_data.heygen_data.default_voice_id or "",
+            type="heygen",
+            owner_id=current_user.user_id,
+            configuration=json.dumps(avatar_data.heygen_data.dict())  # Serialize to JSON string
+        )
+
+        db.add(new_avatar)
+        db.commit()
+        db.refresh(new_avatar)
+
+        return {
+            "success": True,
+            "message": "Avatar saved successfully",
+            "avatar_id": new_avatar.avatar_id
+        }
+    except Exception as e:
+        db.rollback()
+        raise HTTPException(status_code=500, detail=f"Failed to save avatar: {str(e)}")
+
+
+@app.get("/users/me/avatars", response_model=List[dict])
+async def get_user_avatars(
+    current_user: User = Depends(get_current_user),
+    db: Session = Depends(get_db)
+):
+    """Get all avatars saved by the current user."""
+    avatars = db.query(AIAvatar).filter(
+        AIAvatar.owner_id == current_user.user_id
+    ).all()
+
+    result = []
+    for avatar in avatars:
+        # Deserialize JSON configuration back to dict
+        heygen_data = None
+        if avatar.configuration:
+            try:
+                heygen_data = json.loads(avatar.configuration) if isinstance(avatar.configuration, str) else avatar.configuration
+            except (json.JSONDecodeError, TypeError):
+                heygen_data = avatar.configuration  # Fallback to raw data
+
+        avatar_data = {
+            "avatar_id": avatar.avatar_id,
+            "name": avatar.name,
+            "voice_id": avatar.voice_id,
+            "type": avatar.type,
+            "heygen_data": heygen_data
+        }
+        result.append(avatar_data)
+
+    return result
+
+
+@app.post("/users/me/content", response_model=SourceContentResponse)
+async def upload_user_content(
+    title: str = Form(...),
+    source_type: str = Form("upload"),
+    file: Optional[UploadFile] = File(None),
+    content_text: str = Form(""),
+    current_user: User = Depends(get_current_user),
+    db: Session = Depends(get_db)
+):
+    """Upload and store lesson content for a user."""
+    try:
+        content_data = content_text
+
+        # If file is provided, extract text and optionally store file in S3
+        if file:
+            content_data = await extract_lesson_content_from_upload(file)
+
+            # Optionally store original file in S3
+            if file.content_type in ["application/pdf", "application/vnd.openxmlformats-officedocument.wordprocessingml.document"]:
+                file_bytes = await file.read()
+                s3_url = s3_service.upload_file(
+                    file_data=file_bytes,
+                    user_id=current_user.user_id,
+                    filename=file.filename or "document",
+                    content_type=file.content_type
+                )
+                if s3_url:
+                    content_data += f"\n\n[Original file stored at: {s3_url}]"
+
+        # Create source content record
+        source_content = SourceContent(
+            creator_id=current_user.user_id,
+            title=title,
+            source_type=source_type,
+            source_data=content_data
+        )
+
+        db.add(source_content)
+        db.commit()
+        db.refresh(source_content)
+
+        return source_content
+
+    except Exception as e:
+        db.rollback()
+        raise HTTPException(status_code=500, detail=f"Failed to save content: {str(e)}")
+
+
+@app.get("/users/me/content", response_model=List[SourceContentResponse])
+async def get_user_content(
+    current_user: User = Depends(get_current_user),
+    db: Session = Depends(get_db)
+):
+    """Get all content uploaded by the current user."""
+    content = db.query(SourceContent).filter(
+        SourceContent.creator_id == current_user.user_id
+    ).order_by(SourceContent.updated_at.desc()).all()
+
+    return content
+
+
+@app.get("/users/me/videos", response_model=List[GeneratedVideoWithDetails])
+async def get_user_videos(
+    current_user: User = Depends(get_current_user),
+    db: Session = Depends(get_db)
+):
+    """Get all videos generated by the current user."""
+    videos = db.query(GeneratedVideos).options(
+        joinedload(GeneratedVideos.source_content),
+        joinedload(GeneratedVideos.avatar)
+    ).filter(
+        GeneratedVideos.creator_id == current_user.user_id
+    ).order_by(GeneratedVideos.generated_at.desc()).all()
+
+    result = []
+    for video in videos:
+        video_data = {
+            "video_id": video.video_id,
+            "source_content_id": video.source_content_id,
+            "creator_id": video.creator_id,
+            "avatar_id": video.avatar_id,
+            "video_url": video.video_url,
+            "presigned_url": None,
+            "scorm_package_url": video.scorm_package_url,
+            "generation_status": video.generation_status,
+            "generated_at": video.generated_at,
+            "version": video.version,
+            "source_content": video.source_content,
+            "avatar": video.avatar
+        }
+
+        # Generate presigned URL if video is available
+        if video.video_url and video.generation_status == "completed":
+            presigned_url = s3_service.generate_presigned_url(video.video_url)
+            video_data["presigned_url"] = presigned_url
+
+        result.append(video_data)
+
+    return result
