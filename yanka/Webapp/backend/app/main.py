@@ -931,8 +931,22 @@ async def save_user_avatar(
     db: Session = Depends(get_db)
 ):
     """Save a user's selected HeyGen avatar to their collection."""
+    print(f"DEBUG: === save_user_avatar ENDPOINT CALLED ===")
+    print(f"DEBUG: avatar_data type: {type(avatar_data)}")
+    print(f"DEBUG: current_user type: {type(current_user)}")
+    print(f"DEBUG: current_user value: {current_user}")
+    print(f"DEBUG: db type: {type(db)}")
+
+    if current_user is None:
+        print(f"DEBUG: ERROR - current_user is None!")
+        raise HTTPException(status_code=401, detail="Authentication failed - current_user is None")
+
+    print(f"DEBUG: current_user.user_id: {current_user.user_id}")
+    print(f"DEBUG: avatar_data.heygen_data: {avatar_data.heygen_data}")
+
     try:
         # Create new avatar record
+        print(f"DEBUG: Creating new AIAvatar object")
         new_avatar = AIAvatar(
             name=avatar_data.heygen_data.avatar_name,
             voice_id=avatar_data.heygen_data.default_voice_id or "",
@@ -941,16 +955,21 @@ async def save_user_avatar(
             configuration=json.dumps(avatar_data.heygen_data.dict())  # Serialize to JSON string
         )
 
+        print(f"DEBUG: Adding avatar to database")
         db.add(new_avatar)
         db.commit()
         db.refresh(new_avatar)
 
+        print(f"DEBUG: Avatar saved successfully with ID: {new_avatar.avatar_id}")
         return {
             "success": True,
             "message": "Avatar saved successfully",
             "avatar_id": new_avatar.avatar_id
         }
     except Exception as e:
+        print(f"DEBUG: Exception in save_user_avatar: {type(e).__name__}: {e}")
+        import traceback
+        print(f"DEBUG: Traceback: {traceback.format_exc()}")
         db.rollback()
         raise HTTPException(status_code=500, detail=f"Failed to save avatar: {str(e)}")
 
