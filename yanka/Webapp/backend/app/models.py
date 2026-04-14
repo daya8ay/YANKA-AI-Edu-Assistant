@@ -45,3 +45,25 @@ class LearningProgress(Base):
     __table_args__ = (UniqueConstraint("user_id", "video_id"),)
 
     user = relationship("User", back_populates="progress")
+
+
+class GeneratedVideo(Base):
+    __tablename__ = "generatedvideos"
+
+    # Columns from init.sql (constraints relaxed to nullable for our use case)
+    video_id = Column(Integer, primary_key=True, index=True)
+    source_content_id = Column(Integer, ForeignKey("sourcecontent.content_id"), nullable=True)
+    creator_id = Column(Integer, ForeignKey("users.user_id"), nullable=True)
+    avatar_id = Column(Integer, ForeignKey("ai_avatars.avatar_id"), nullable=True)
+    video_url = Column(String(255))         # S3 URL stored here
+    scorm_package_url = Column(String(255))
+    generation_status = Column(String(50), default="ready")
+    generated_at = Column(TIMESTAMP(timezone=True), server_default=text("CURRENT_TIMESTAMP"))
+    version = Column(Integer, default=1)
+
+    # Added via migration (see migrate_add_generated_videos.py)
+    title = Column(String(255))
+    s3_key = Column(String(512))            # S3 object key — used to generate pre-signed URLs
+    heygen_video_id = Column(String(255))   # HeyGen's video_id (null for user uploads)
+    source = Column(String(50))             # 'heygen' or 'upload'
+    language = Column(String(50))
