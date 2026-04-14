@@ -25,6 +25,7 @@ class S3Service:
         self.bucket_name = os.getenv('S3_BUCKET_NAME')
 
         if not self.bucket_name:
+            logger.warning("S3_BUCKET_NAME environment variable not set - S3 functionality will be disabled")
             raise ValueError("S3_BUCKET_NAME environment variable is required")
 
     def upload_video(self, video_data: bytes, user_id: int, content_type: str = "video/mp4") -> Optional[str]:
@@ -219,5 +220,11 @@ class S3Service:
             return []
 
 
-# Global instance
-s3_service = S3Service()
+# Global instance - optional S3 setup
+s3_service = None
+try:
+    s3_service = S3Service()
+    logger.info("S3 service initialized successfully")
+except Exception as e:
+    logger.warning(f"S3 service not available: {e}")
+    s3_service = None

@@ -1023,17 +1023,20 @@ async def upload_user_content(
         if file:
             content_data = await extract_lesson_content_from_upload(file)
 
-            # Optionally store original file in S3
+            # Optionally store original file in S3 (if S3 is available)
             if file.content_type in ["application/pdf", "application/vnd.openxmlformats-officedocument.wordprocessingml.document"]:
-                file_bytes = await file.read()
-                s3_url = s3_service.upload_file(
-                    file_data=file_bytes,
-                    user_id=current_user.user_id,
-                    filename=file.filename or "document",
-                    content_type=file.content_type
-                )
-                if s3_url:
-                    content_data += f"\n\n[Original file stored at: {s3_url}]"
+                if s3_service is not None:
+                    file_bytes = await file.read()
+                    s3_url = s3_service.upload_file(
+                        file_data=file_bytes,
+                        user_id=current_user.user_id,
+                        filename=file.filename or "document",
+                        content_type=file.content_type
+                    )
+                    if s3_url:
+                        content_data += f"\n\n[Original file stored at: {s3_url}]"
+                else:
+                    content_data += f"\n\n[Note: File upload skipped - S3 not configured]"
 
         # Create source content record
         source_content = SourceContent(
@@ -1097,8 +1100,8 @@ async def get_user_videos(
             "avatar": video.avatar
         }
 
-        # Generate presigned URL if video is available
-        if video.video_url and video.generation_status == "completed":
+        # Generate presigned URL if video is available and S3 is configured
+        if video.video_url and video.generation_status == "completed" and s3_service is not None:
             presigned_url = s3_service.generate_presigned_url(video.video_url)
             video_data["presigned_url"] = presigned_url
 
