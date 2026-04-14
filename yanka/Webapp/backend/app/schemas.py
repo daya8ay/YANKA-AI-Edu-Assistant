@@ -47,6 +47,32 @@ class AvatarResponse(BaseModel):
         from_attributes = True
 
 
+# --- GeneratedVideo Table Schemas ---
+
+class VideoCreate(BaseModel):
+    title: str
+    creator_id: Optional[int] = None
+    avatar_id: Optional[int] = None
+    language: Optional[str] = None
+
+
+class VideoResponse(BaseModel):
+    video_id: int
+    creator_id: Optional[int]
+    avatar_id: Optional[int]
+    title: Optional[str]
+    s3_key: Optional[str]
+    playback_url: Optional[str]         # pre-signed S3 URL, generated on the fly
+    heygen_video_id: Optional[str]
+    source: Optional[str]
+    generation_status: Optional[str]
+    language: Optional[str]
+    generated_at: Optional[datetime]
+
+    class Config:
+        from_attributes = True
+
+
 # --- LearningProgress Table Schemas ---
 
 class LearningProgressCreate(BaseModel):
