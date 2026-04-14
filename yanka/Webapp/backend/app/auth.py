@@ -63,6 +63,9 @@ def get_or_create_user(cognito_payload: dict, db: Session) -> User:
     Returns:
         User object from database
     """
+    # Clear any failed transactions to start with clean session
+    db.rollback()
+
     print(f"DEBUG: === get_or_create_user CALLED ===")
     print(f"DEBUG: Function entry - cognito_payload type: {type(cognito_payload)}")
     print(f"DEBUG: Function entry - db type: {type(db)}")
