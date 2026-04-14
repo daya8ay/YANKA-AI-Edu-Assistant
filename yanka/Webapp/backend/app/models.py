@@ -52,7 +52,7 @@ class GeneratedVideo(Base):
 
     # Columns from init.sql (constraints relaxed to nullable for our use case)
     video_id = Column(Integer, primary_key=True, index=True)
-    source_content_id = Column(Integer, ForeignKey("sourcecontent.content_id"), nullable=True)
+    source_content_id = Column(Integer, nullable=True)  # FK to sourcecontent enforced at DB level
     creator_id = Column(Integer, ForeignKey("users.user_id"), nullable=True)
     avatar_id = Column(Integer, ForeignKey("ai_avatars.avatar_id"), nullable=True)
     video_url = Column(String(255))         # S3 URL stored here
