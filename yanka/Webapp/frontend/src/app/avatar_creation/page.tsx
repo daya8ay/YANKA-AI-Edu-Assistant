@@ -11,6 +11,8 @@ import Clothing from "./clothing";
 import Voice from "./voice";
 import StudioAvatar, { type PresenterGender } from "./studioAvatar";
 import AvatarChat from "./AvatarChat";
+import { useAuth } from "@/hooks/useAuth";
+import { avatarService, type HeyGenAvatarData, type SavedAvatar } from "@/services/avatarService";
 
 type HeygenAvatar = {
   id: string;
@@ -72,10 +74,22 @@ const AvatarCreation = () => {
     useState<PresenterGender>(DEFAULT_PRESENTER_GENDER);
   const [selectedPersonKey, setSelectedPersonKey] = useState<string | null>(null);
 
+  // Avatar saving state
+  const [isSaving, setIsSaving] = useState(false);
+  const [saveMessage, setSaveMessage] = useState<{ type: 'success' | 'error'; text: string } | null>(null);
+
+  // Saved avatars state
+  const [savedAvatars, setSavedAvatars] = useState<SavedAvatar[]>([]);
+  const [loadingSavedAvatars, setLoadingSavedAvatars] = useState(false);
+
+  // Auth hook
+  const { authStatus, authFetch } = useAuth();
+
   const tabs = [
     { id: "Avatar", label: "Avatar" },
     { id: "Clothing", label: "Clothing" },
     { id: "Voice", label: "Voice" },
+    { id: "MyAvatars", label: "My Avatars" },
   ];
 
   const selectedAvatar =
@@ -175,6 +189,82 @@ const AvatarCreation = () => {
     return filteredAvatars.filter((a) => getPersonKey(a) === selectedPersonKey);
   }, [filteredAvatars, selectedPersonKey]);
 
+  // Save avatar function
+  const handleSaveAvatar = async () => {
+    if (!selectedAvatar || authStatus !== 'authenticated') {
+      setSaveMessage({
+        type: 'error',
+        text: authStatus !== 'authenticated' ? 'Please log in to save avatars' : 'Please select an avatar first'
+      });
+      return;
+    }
+
+    setIsSaving(true);
+    setSaveMessage(null);
+
+    try {
+      const heygenData: HeyGenAvatarData = {
+        avatar_id: selectedAvatar.id,
+        avatar_name: selectedAvatar.name,
+        gender: selectedAvatar.gender,
+        preview_image_url: selectedAvatar.preview_image_url,
+        default_voice_id: selectedAvatar.default_voice_id,
+        type: selectedAvatar.kind,
+      };
+
+      await avatarService.saveUserAvatar(heygenData, authFetch);
+
+      setSaveMessage({
+        type: 'success',
+        text: 'Avatar saved successfully! You can now access it anytime.'
+      });
+
+      // Refresh saved avatars list
+      loadSavedAvatars();
+    } catch (error) {
+      console.error('Error saving avatar:', error);
+      setSaveMessage({
+        type: 'error',
+        text: error instanceof Error ? error.message : 'Failed to save avatar'
+      });
+    } finally {
+      setIsSaving(false);
+    }
+  };
+
+  // Clear save message after 5 seconds
+  useEffect(() => {
+    if (saveMessage) {
+      const timer = setTimeout(() => {
+        setSaveMessage(null);
+      }, 5000);
+      return () => clearTimeout(timer);
+    }
+  }, [saveMessage]);
+
+  // Load saved avatars when user is authenticated
+  const loadSavedAvatars = async () => {
+    if (authStatus !== 'authenticated') {
+      setSavedAvatars([]);
+      return;
+    }
+
+    setLoadingSavedAvatars(true);
+    try {
+      const userAvatars = await avatarService.getUserAvatars(authFetch);
+      setSavedAvatars(userAvatars);
+    } catch (error) {
+      console.error('Error loading saved avatars:', error);
+      setSavedAvatars([]);
+    } finally {
+      setLoadingSavedAvatars(false);
+    }
+  };
+
+  useEffect(() => {
+    loadSavedAvatars();
+  }, [authStatus]);
+
   const renderTabContent = () => {
     switch (currentTab) {
       case "Avatar":
@@ -224,6 +314,79 @@ const AvatarCreation = () => {
           />
         );
 
+      case "MyAvatars":
+        return (
+          <div className={styles.tabContent}>
+            <div className={styles.section}>
+              <h4>My Saved Avatars</h4>
+
+              {authStatus !== 'authenticated' ? (
+                <p style={{ color: "#6B7FA8", textAlign: "center", padding: "20px" }}>
+                  Please log in to view your saved avatars.
+                </p>
+              ) : loadingSavedAvatars ? (
+                <p style={{ color: "#6B7FA8", textAlign: "center", padding: "20px" }}>
+                  Loading your saved avatars...
+                </p>
+              ) : savedAvatars.length === 0 ? (
+                <div style={{ textAlign: "center", padding: "40px 20px" }}>
+                  <p style={{ color: "#6B7FA8", marginBottom: "12px" }}>
+                    You haven&apos;t saved any avatars yet.
+                  </p>
+                  <p style={{ color: "#6B7FA8", fontSize: "0.9rem" }}>
+                    Go to the <strong>Avatar</strong> tab to select and save your first avatar!
+                  </p>
+                </div>
+              ) : (
+                <div className={styles.imageOptions}>
+                  {savedAvatars.map((savedAvatar) => (
+                    <button
+                      key={savedAvatar.avatar_id}
+                      type="button"
+                      onClick={() => {
+                        if (savedAvatar.heygen_data) {
+                          // Set the selected avatar based on saved data
+                          setSelectedAvatarId(savedAvatar.heygen_data.avatar_id);
+                          if (savedAvatar.heygen_data.default_voice_id) {
+                            setSelectedVoiceId(savedAvatar.heygen_data.default_voice_id);
+                          }
+                        }
+                      }}
+                      className={`${styles.imageOption} ${
+                        selectedAvatarId === savedAvatar.heygen_data?.avatar_id ? styles.selected : ""
+                      }`}
+                      title={`${savedAvatar.name || 'Saved Avatar'} (Saved)`}
+                    >
+                      {savedAvatar.heygen_data?.preview_image_url ? (
+                        <img
+                          src={savedAvatar.heygen_data.preview_image_url}
+                          alt={savedAvatar.name || 'Saved avatar'}
+                          className={styles.optionImage}
+                        />
+                      ) : (
+                        <div className={styles.optionImage} style={{
+                          backgroundColor: "#f0f0f0",
+                          display: "flex",
+                          alignItems: "center",
+                          justifyContent: "center"
+                        }}>
+                          <span style={{ color: "#999", fontSize: "0.8rem" }}>No Image</span>
+                        </div>
+                      )}
+                      <span className={styles.optionLabel}>
+                        {savedAvatar.name || savedAvatar.heygen_data?.avatar_name || 'Saved Avatar'}
+                      </span>
+                      <span className={styles.optionKindBadge} style={{ backgroundColor: "#28a745" }}>
+                        Saved
+                      </span>
+                    </button>
+                  ))}
+                </div>
+              )}
+            </div>
+          </div>
+        );
+
       default:
         return null;
     }
@@ -261,17 +424,71 @@ const AvatarCreation = () => {
                 )}
               </div>
               {selectedAvatar ? (
-                <p
-                  style={{
-                    marginTop: "12px",
-                    fontSize: "0.9rem",
-                    color: "#3B4F8E",
-                    textAlign: "center",
-                  }}
-                >
-                  {selectedAvatar.name}
-                  {selectedAvatar.kind === "talking_photo" ? " · Photo avatar" : ""}
-                </p>
+                <>
+                  <p
+                    style={{
+                      marginTop: "12px",
+                      fontSize: "0.9rem",
+                      color: "#3B4F8E",
+                      textAlign: "center",
+                    }}
+                  >
+                    {selectedAvatar.name}
+                    {selectedAvatar.kind === "talking_photo" ? " · Photo avatar" : ""}
+                  </p>
+
+                  {/* Save Avatar Button */}
+                  <div style={{ marginTop: "16px", textAlign: "center" }}>
+                    <button
+                      onClick={handleSaveAvatar}
+                      disabled={isSaving || authStatus !== 'authenticated'}
+                      style={{
+                        backgroundColor: authStatus === 'authenticated' ? "#3B4F8E" : "#ccc",
+                        color: "white",
+                        border: "none",
+                        borderRadius: "6px",
+                        padding: "10px 20px",
+                        fontSize: "0.9rem",
+                        fontWeight: "600",
+                        cursor: authStatus === 'authenticated' ? (isSaving ? "not-allowed" : "pointer") : "not-allowed",
+                        opacity: isSaving ? 0.7 : 1,
+                        width: "100%",
+                      }}
+                    >
+                      {isSaving ? "Saving..." : "Save Avatar"}
+                    </button>
+
+                    {/* Feedback Messages */}
+                    {saveMessage && (
+                      <div
+                        style={{
+                          marginTop: "12px",
+                          padding: "8px 12px",
+                          borderRadius: "6px",
+                          fontSize: "0.85rem",
+                          backgroundColor: saveMessage.type === 'success' ? "#d4edda" : "#f8d7da",
+                          color: saveMessage.type === 'success' ? "#155724" : "#721c24",
+                          border: `1px solid ${saveMessage.type === 'success' ? "#c3e6cb" : "#f5c6cb"}`,
+                        }}
+                      >
+                        {saveMessage.text}
+                      </div>
+                    )}
+
+                    {authStatus !== 'authenticated' && (
+                      <p
+                        style={{
+                          marginTop: "8px",
+                          fontSize: "0.8rem",
+                          color: "#6B7FA8",
+                          textAlign: "center",
+                        }}
+                      >
+                        Log in to save your avatar choices
+                      </p>
+                    )}
+                  </div>
+                </>
               ) : null}
             </div>
 
