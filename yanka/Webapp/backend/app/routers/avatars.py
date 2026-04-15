@@ -1,6 +1,7 @@
 from fastapi import APIRouter, HTTPException, Depends
 from sqlalchemy.orm import Session
 from typing import List
+import json
 
 from ..database import get_db
 from ..models import AIAvatar
@@ -13,8 +14,9 @@ router = APIRouter(prefix="/avatars", tags=["avatars"])
 def create_avatar(avatar: AvatarCreate, db: Session = Depends(get_db)):
     new_avatar = AIAvatar(
         name=avatar.name,
-        heygen_avatar_id=avatar.heygen_avatar_id,
         voice_id=avatar.voice_id,
+        type=avatar.type,
+        configuration=json.dumps(avatar.heygen_data.dict()) if avatar.heygen_data else None,
     )
     db.add(new_avatar)
     db.commit()

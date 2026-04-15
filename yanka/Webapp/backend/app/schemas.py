@@ -1,5 +1,5 @@
-from pydantic import BaseModel, EmailStr
-from typing import Optional
+from pydantic import BaseModel, EmailStr, HttpUrl
+from typing import Optional, Dict, Any, List
 from datetime import datetime
 
 
@@ -31,17 +31,50 @@ class UserResponse(BaseModel):
 
 # --- AIAvatar Table Schemas ---
 
+class HeyGenAvatarData(BaseModel):
+    """Schema for HeyGen avatar JSON data."""
+    avatar_id: str
+    avatar_name: str
+    gender: Optional[str] = None
+    preview_image_url: Optional[str] = None
+    preview_video_url: Optional[str] = None
+    premium: Optional[bool] = None
+    type: Optional[str] = None
+    tags: Optional[str] = None
+    default_voice_id: Optional[str] = None
+
+
 class AvatarCreate(BaseModel):
     name: Optional[str] = None
-    heygen_avatar_id: Optional[str] = None
     voice_id: str
+    type: Optional[str] = None
+    heygen_data: Optional[HeyGenAvatarData] = None  # Store full HeyGen response
 
 
 class AvatarResponse(BaseModel):
     avatar_id: int
     name: Optional[str]
-    heygen_avatar_id: Optional[str]
     voice_id: Optional[str]
+    type: Optional[str]
+    owner_id: Optional[int]
+    configuration: Optional[Dict[str, Any]]  # HeyGen data stored as JSON
+
+    class Config:
+        from_attributes = True
+
+
+class UserAvatarCreate(BaseModel):
+    """Schema for saving a user's selected HeyGen avatar."""
+    heygen_data: HeyGenAvatarData
+
+
+class UserAvatarResponse(BaseModel):
+    """Schema for returning user's saved avatars."""
+    avatar_id: int
+    name: Optional[str]
+    voice_id: Optional[str]
+    heygen_data: Optional[HeyGenAvatarData]
+    created_at: datetime
 
     class Config:
         from_attributes = True
@@ -93,3 +126,124 @@ class LearningProgressResponse(BaseModel):
 
     class Config:
         from_attributes = True
+
+
+# --- SourceContent Table Schemas ---
+
+class SourceContentCreate(BaseModel):
+    title: str
+    source_type: Optional[str] = None
+    source_data: Optional[str] = None
+
+
+class SourceContentResponse(BaseModel):
+    content_id: int
+    creator_id: int
+    title: str
+    source_type: Optional[str]
+    source_data: Optional[str]
+    updated_at: Optional[datetime]
+
+    class Config:
+        from_attributes = True
+
+
+# --- GeneratedVideos Table Schemas ---
+
+class VideoGenerateRequest(BaseModel):
+    """Request schema for generating a new video."""
+    source_content_id: int
+    avatar_id: int
+    script: Optional[str] = None
+
+
+class GeneratedVideoCreate(BaseModel):
+    source_content_id: int
+    creator_id: int
+    avatar_id: int
+    video_url: Optional[str] = None
+    scorm_package_url: Optional[str] = None
+    generation_status: Optional[str] = "pending"
+    version: Optional[int] = 1
+
+
+class GeneratedVideoResponse(BaseModel):
+    video_id: int
+    source_content_id: int
+    creator_id: int
+    avatar_id: int
+    video_url: Optional[str]
+    scorm_package_url: Optional[str]
+    generation_status: Optional[str]
+    generated_at: Optional[datetime]
+    version: Optional[int]
+
+    class Config:
+        from_attributes = True
+
+
+class GeneratedVideoWithDetails(BaseModel):
+    """Detailed response including related data."""
+    video_id: int
+    source_content_id: int
+    creator_id: int
+    avatar_id: int
+    video_url: Optional[str]
+    presigned_url: Optional[str]  # Pre-signed S3 URL for secure access
+    scorm_package_url: Optional[str]
+    generation_status: Optional[str]
+    generated_at: Optional[datetime]
+    version: Optional[int]
+
+    # Related data
+    source_content: Optional[SourceContentResponse] = None
+    avatar: Optional[AvatarResponse] = None
+
+    class Config:
+        from_attributes = True
+
+
+# --- Organization Table Schemas ---
+
+class OrganizationCreate(BaseModel):
+    name: str
+    type: Optional[str] = None
+    branding_details: Optional[Dict[str, Any]] = None
+
+
+class OrganizationResponse(BaseModel):
+    organization_id: int
+    name: str
+    type: Optional[str]
+    branding_details: Optional[Dict[str, Any]]
+    admin_id: Optional[int]
+
+    class Config:
+        from_attributes = True
+
+
+# --- VideoInteraction Table Schemas ---
+
+class VideoInteractionCreate(BaseModel):
+    video_id: int
+    timestamp_in_video: float
+    data: Dict[str, Any]
+
+
+class VideoInteractionResponse(BaseModel):
+    interaction_id: int
+    video_id: int
+    timestamp_in_video: float
+    data: Dict[str, Any]
+
+    class Config:
+        from_attributes = True
+
+
+# --- File Upload Schemas ---
+
+class FileUploadResponse(BaseModel):
+    """Response for file uploads to S3."""
+    file_url: str
+    content_id: Optional[int] = None  # If saved to SourceContent
+    message: str
