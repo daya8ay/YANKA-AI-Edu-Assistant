@@ -24,14 +24,24 @@ def create_avatar(avatar: AvatarCreate, db: Session = Depends(get_db)):
     return new_avatar
 
 
+def _parse_configuration(avatar: AIAvatar) -> AIAvatar:
+    """Deserialize configuration if stored as a JSON string."""
+    if isinstance(avatar.configuration, str):
+        try:
+            avatar.configuration = json.loads(avatar.configuration)
+        except (json.JSONDecodeError, TypeError):
+            pass
+    return avatar
+
+
 @router.get("/{avatar_id}", response_model=AvatarResponse)
 def get_avatar(avatar_id: int, db: Session = Depends(get_db)):
     avatar = db.query(AIAvatar).filter(AIAvatar.avatar_id == avatar_id).first()
     if not avatar:
         raise HTTPException(status_code=404, detail="Avatar not found")
-    return avatar
+    return _parse_configuration(avatar)
 
 
 @router.get("", response_model=List[AvatarResponse])
 def get_all_avatars(db: Session = Depends(get_db)):
-    return db.query(AIAvatar).all()
+    return [_parse_configuration(a) for a in db.query(AIAvatar).all()]
