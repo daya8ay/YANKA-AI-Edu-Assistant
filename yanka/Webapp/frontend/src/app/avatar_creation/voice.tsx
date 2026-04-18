@@ -2,6 +2,11 @@
 
 import React, { useEffect, useMemo, useRef, useState } from "react";
 import styles from "./avatar.module.css";
+import {
+    VIDEO_VOICE_LANGUAGE_OPTIONS,
+    type VideoVoiceLanguage,
+    normalizeVoiceLanguageToVideoKey,
+} from "./voiceLanguageOptions";
 
 type HeygenVoice = {
     voice_id: string;
@@ -13,27 +18,6 @@ type HeygenVoice = {
     emotion_support?: boolean;
 };
 
-/** Canonical tab keys for voice language (HeyGen labels are inconsistent). */
-type VoiceLanguageTab = "English" | "French";
-
-function normalizeVoiceLanguage(raw: string | null | undefined): VoiceLanguageTab | null {
-    if (raw == null) return null;
-    const t = String(raw).trim();
-    if (t === "") return null;
-    const lower = t.toLowerCase();
-    if (lower === "unknown") return null;
-
-    if (lower === "multilingual") return "English";
-
-    if (lower === "en" || lower === "english") return "English";
-    if (lower === "fr" || lower === "french") return "French";
-
-    if (/^english$/i.test(t)) return "English";
-    if (/^french$/i.test(t)) return "French";
-
-    return null;
-}
-
 const Voice: React.FC<{
     voices: HeygenVoice[];
     selectedVoiceId: string | null;
@@ -43,9 +27,9 @@ const Voice: React.FC<{
 }> = ({ voices, selectedVoiceId, onSelectVoiceId, loading, error }) => {
     const audioRef = useRef<HTMLAudioElement | null>(null);
 
-    const VOICES_PER_PAGE = 18;
+    const VOICES_PER_PAGE = 20;
     const [page, setPage] = useState(1);
-    const [languageTab, setLanguageTab] = useState<VoiceLanguageTab>("English");
+    const [voiceLanguage, setVoiceLanguage] = useState<VideoVoiceLanguage>("english");
 
     const voicesWithPreview = useMemo(() => {
         const hasPreview = (v: HeygenVoice) =>
@@ -60,36 +44,47 @@ const Voice: React.FC<{
         });
     }, [voices]);
 
-    /** Preview + single-word names + English or French only (incl. Multilingual → English). */
+    /** Preview + single-word names + language matches a video-page language. */
     const eligibleVoices = useMemo(() => {
-        return voicesWithPreview.filter((v) => normalizeVoiceLanguage(v.language) != null);
+        return voicesWithPreview.filter((v) => normalizeVoiceLanguageToVideoKey(v.language) != null);
     }, [voicesWithPreview]);
+
+    const countsByLanguage = useMemo(() => {
+        const m = new Map<VideoVoiceLanguage, number>();
+        for (const o of VIDEO_VOICE_LANGUAGE_OPTIONS) {
+            m.set(o.value, 0);
+        }
+        for (const v of eligibleVoices) {
+            const k = normalizeVoiceLanguageToVideoKey(v.language);
+            if (k) m.set(k, (m.get(k) ?? 0) + 1);
+        }
+        return m;
+    }, [eligibleVoices]);
 
     const selectedVoice = useMemo(() => {
         if (!selectedVoiceId) return null;
         return eligibleVoices.find((v) => v.voice_id === selectedVoiceId) ?? null;
     }, [selectedVoiceId, eligibleVoices]);
 
-    // Drop invalid selection when the eligible list changes; align tab to that pick.
+    // Drop invalid selection when the eligible list changes; align language to that pick.
     useEffect(() => {
         if (eligibleVoices.length === 0) return;
         if (!selectedVoiceId || !eligibleVoices.some((v) => v.voice_id === selectedVoiceId)) {
             const pick = eligibleVoices[0];
             onSelectVoiceId(pick.voice_id);
-            const n = normalizeVoiceLanguage(pick.language);
-            if (n) setLanguageTab(n);
+            const n = normalizeVoiceLanguageToVideoKey(pick.language);
+            if (n) setVoiceLanguage(n);
         }
     }, [eligibleVoices, selectedVoiceId, onSelectVoiceId]);
 
-    // When data loads or parent changes selection, align tab to the selected voice (no fight with tab clicks:
-    // tab buttons also set selection in the same handler.)
+    // When data loads or parent changes selection, align dropdown to the selected voice.
     useEffect(() => {
         if (eligibleVoices.length === 0 || !selectedVoiceId) return;
         const v = eligibleVoices.find((x) => x.voice_id === selectedVoiceId);
         if (!v) return;
-        const n = normalizeVoiceLanguage(v.language);
+        const n = normalizeVoiceLanguageToVideoKey(v.language);
         if (!n) return;
-        setLanguageTab((tab) => (tab === n ? tab : n));
+        setVoiceLanguage((tab) => (tab === n ? tab : n));
     }, [eligibleVoices, selectedVoiceId]);
 
     // Autoplay preview whenever the selected voice changes.
@@ -98,7 +93,6 @@ const Voice: React.FC<{
         if (!audioRef.current) return;
 
         try {
-            // Reset so the preview always starts from the beginning.
             audioRef.current.pause();
             audioRef.current.currentTime = 0;
         } catch {
@@ -111,24 +105,13 @@ const Voice: React.FC<{
     }, [selectedVoice?.voice_id, selectedVoice?.preview_audio]);
 
     const sortedVoices = useMemo(() => {
-        const inTab = eligibleVoices.filter(
-            (v) => normalizeVoiceLanguage(v.language) === languageTab,
+        const inLang = eligibleVoices.filter(
+            (v) => normalizeVoiceLanguageToVideoKey(v.language) === voiceLanguage,
         );
-        return [...inTab].sort((a, b) =>
+        return [...inLang].sort((a, b) =>
             (a.name || "").localeCompare(b.name || "", undefined, { sensitivity: "base" }),
         );
-    }, [eligibleVoices, languageTab]);
-
-    const englishCount = useMemo(
-        () =>
-            eligibleVoices.filter((v) => normalizeVoiceLanguage(v.language) === "English").length,
-        [eligibleVoices],
-    );
-    const frenchCount = useMemo(
-        () =>
-            eligibleVoices.filter((v) => normalizeVoiceLanguage(v.language) === "French").length,
-        [eligibleVoices],
-    );
+    }, [eligibleVoices, voiceLanguage]);
 
     const voiceLanguageSelectStyle: React.CSSProperties = {
         width: "100%",
@@ -138,11 +121,11 @@ const Voice: React.FC<{
         border: "1px solid #ccc",
     };
 
-    const goToLanguageTab = (tab: VoiceLanguageTab) => {
-        setLanguageTab(tab);
+    const goToVoiceLanguage = (lang: VideoVoiceLanguage) => {
+        setVoiceLanguage(lang);
         setPage(1);
         const list = eligibleVoices
-            .filter((v) => normalizeVoiceLanguage(v.language) === tab)
+            .filter((v) => normalizeVoiceLanguageToVideoKey(v.language) === lang)
             .sort((a, b) =>
                 (a.name || "").localeCompare(b.name || "", undefined, { sensitivity: "base" }),
             );
@@ -197,8 +180,9 @@ const Voice: React.FC<{
                             </p>
                         ) : eligibleVoices.length === 0 ? (
                             <p style={{ color: "#6B7FA8", marginTop: "12px" }}>
-                                No English or French voices match the current filters (preview + single-word
-                                names). Other languages are hidden for now.
+                                No voices match the current filters (preview + single-word names) for any
+                                language in the list below. HeyGen may use different language labels for
+                                some locales.
                             </p>
                         ) : (
                             <>
@@ -217,20 +201,21 @@ const Voice: React.FC<{
                                 </label>
                                 <select
                                     id="avatar-voice-language"
-                                    value={languageTab === "English" ? "english" : "french"}
-                                    onChange={(e) => {
-                                        const v = e.target.value;
-                                        if (v === "english") goToLanguageTab("English");
-                                        else goToLanguageTab("French");
-                                    }}
+                                    value={voiceLanguage}
+                                    onChange={(e) =>
+                                        goToVoiceLanguage(e.target.value as VideoVoiceLanguage)
+                                    }
                                     style={voiceLanguageSelectStyle}
                                 >
-                                    <option value="english" disabled={englishCount === 0}>
-                                        English
-                                    </option>
-                                    <option value="french" disabled={frenchCount === 0}>
-                                        French
-                                    </option>
+                                    {VIDEO_VOICE_LANGUAGE_OPTIONS.map((opt) => (
+                                        <option
+                                            key={opt.value}
+                                            value={opt.value}
+                                            disabled={(countsByLanguage.get(opt.value) ?? 0) === 0}
+                                        >
+                                            {opt.label}
+                                        </option>
+                                    ))}
                                 </select>
 
                                 {selectedVoice?.preview_audio ? (
@@ -257,7 +242,7 @@ const Voice: React.FC<{
 
                                 {sortedVoices.length === 0 ? (
                                     <p style={{ color: "#6B7FA8", marginTop: "8px" }}>
-                                        No voices in this language tab.
+                                        No voices for this language with the current filters.
                                     </p>
                                 ) : (
                                     <div className={styles.styleOptions} style={{ marginTop: "12px" }}>
@@ -321,4 +306,3 @@ const Voice: React.FC<{
 };
 
 export default Voice;
-
