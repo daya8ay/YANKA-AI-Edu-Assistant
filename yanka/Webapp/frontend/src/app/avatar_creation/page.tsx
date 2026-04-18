@@ -2,15 +2,11 @@
 
 import React, { useEffect, useMemo, useState } from "react";
 import DashboardNavBar from "@/components/DashboardNavBar";
-import Footer from "@/components/Footer"; // ✅ Import Footer component
+import Footer from "@/components/Footer";
 import styles from "./avatar.module.css";
-// import Face from "./face";
-// import Hair from "./hair";
 import Clothing from "./clothing";
-// import Accessories from "./accessories";
 import Voice from "./voice";
 import StudioAvatar, { type PresenterGender } from "./studioAvatar";
-import AvatarChat from "./AvatarChat";
 import { useAuth } from "@/hooks/useAuth";
 import { avatarService, type HeyGenAvatarData, type SavedAvatar } from "@/services/avatarService";
 
@@ -189,6 +185,14 @@ const AvatarCreation = () => {
     return filteredAvatars.filter((a) => getPersonKey(a) === selectedPersonKey);
   }, [filteredAvatars, selectedPersonKey]);
 
+  const voiceNameById = useMemo(() => {
+    const m = new Map<string, string>();
+    for (const v of voices) {
+      if (v.voice_id) m.set(v.voice_id, v.name);
+    }
+    return m;
+  }, [voices]);
+
   // Save avatar function
   const handleSaveAvatar = async () => {
     if (!selectedAvatar || authStatus !== 'authenticated') {
@@ -208,7 +212,8 @@ const AvatarCreation = () => {
         avatar_name: selectedAvatar.name,
         gender: selectedAvatar.gender,
         preview_image_url: selectedAvatar.preview_image_url,
-        default_voice_id: selectedAvatar.default_voice_id,
+        // Save the voice the user actually selected in the Voice tab.
+        default_voice_id: selectedVoiceId ?? selectedAvatar.default_voice_id,
         type: selectedAvatar.kind,
       };
 
@@ -319,68 +324,93 @@ const AvatarCreation = () => {
           <div className={styles.tabContent}>
             <div className={styles.section}>
               <h4>My Saved Avatars</h4>
+              {authStatus === "authenticated" &&
+              !loadingSavedAvatars &&
+              savedAvatars.length > 0 ? (
+                <p className={styles.savedSectionIntro}>
+                  Tap a card to load that avatar and voice into the editor.
+                </p>
+              ) : null}
 
               {authStatus !== 'authenticated' ? (
-                <p style={{ color: "#6B7FA8", textAlign: "center", padding: "20px" }}>
+                <p className={styles.savedLoginHint}>
                   Please log in to view your saved avatars.
                 </p>
               ) : loadingSavedAvatars ? (
-                <p style={{ color: "#6B7FA8", textAlign: "center", padding: "20px" }}>
+                <p className={styles.savedLoading}>
                   Loading your saved avatars...
                 </p>
               ) : savedAvatars.length === 0 ? (
-                <div style={{ textAlign: "center", padding: "40px 20px" }}>
-                  <p style={{ color: "#6B7FA8", marginBottom: "12px" }}>
+                <div className={styles.savedEmpty}>
+                  <p>
                     You haven&apos;t saved any avatars yet.
                   </p>
-                  <p style={{ color: "#6B7FA8", fontSize: "0.9rem" }}>
+                  <p>
                     Go to the <strong>Avatar</strong> tab to select and save your first avatar!
                   </p>
                 </div>
               ) : (
                 <div className={styles.imageOptions}>
-                  {savedAvatars.map((savedAvatar) => (
+                  {savedAvatars.map((savedAvatar) => {
+                    const savedVoiceId =
+                      savedAvatar.heygen_data?.default_voice_id ?? savedAvatar.voice_id ?? null;
+                    const voiceLabel =
+                      savedVoiceId != null && savedVoiceId !== ""
+                        ? voiceNameById.get(savedVoiceId) ?? "Unknown voice"
+                        : "Not set";
+
+                    return (
                     <button
                       key={savedAvatar.avatar_id}
                       type="button"
                       onClick={() => {
                         if (savedAvatar.heygen_data) {
-                          // Set the selected avatar based on saved data
                           setSelectedAvatarId(savedAvatar.heygen_data.avatar_id);
-                          if (savedAvatar.heygen_data.default_voice_id) {
-                            setSelectedVoiceId(savedAvatar.heygen_data.default_voice_id);
-                          }
+                          const vid =
+                            savedAvatar.heygen_data.default_voice_id ??
+                            savedAvatar.voice_id ??
+                            null;
+                          if (vid) setSelectedVoiceId(vid);
                         }
                       }}
-                      className={`${styles.imageOption} ${
+                      className={`${styles.imageOption} ${styles.savedAvatarCard} ${
                         selectedAvatarId === savedAvatar.heygen_data?.avatar_id ? styles.selected : ""
                       }`}
-                      title={`${savedAvatar.name || 'Saved Avatar'} (Saved)`}
+                      title={`${savedAvatar.name || 'Saved Avatar'} · Saved`}
                     >
-                      {savedAvatar.heygen_data?.preview_image_url ? (
-                        <img
-                          src={savedAvatar.heygen_data.preview_image_url}
-                          alt={savedAvatar.name || 'Saved avatar'}
-                          className={styles.optionImage}
-                        />
-                      ) : (
-                        <div className={styles.optionImage} style={{
-                          backgroundColor: "#f0f0f0",
-                          display: "flex",
-                          alignItems: "center",
-                          justifyContent: "center"
-                        }}>
-                          <span style={{ color: "#999", fontSize: "0.8rem" }}>No Image</span>
-                        </div>
-                      )}
+                      <div className={styles.savedAvatarMedia}>
+                        {savedAvatar.heygen_data?.preview_image_url ? (
+                          <img
+                            src={savedAvatar.heygen_data.preview_image_url}
+                            alt={savedAvatar.name || 'Saved avatar'}
+                            className={styles.optionImage}
+                          />
+                        ) : (
+                          <div
+                            className={styles.optionImage}
+                            style={{
+                              display: "flex",
+                              alignItems: "center",
+                              justifyContent: "center",
+                              background: "rgba(255,255,255,0.5)",
+                            }}
+                          >
+                            <span style={{ color: "#8a9bb8", fontSize: "0.78rem" }}>
+                              No preview
+                            </span>
+                          </div>
+                        )}
+                      </div>
                       <span className={styles.optionLabel}>
                         {savedAvatar.name || savedAvatar.heygen_data?.avatar_name || 'Saved Avatar'}
                       </span>
-                      <span className={styles.optionKindBadge} style={{ backgroundColor: "#28a745" }}>
-                        Saved
+                      <span className={styles.savedVoiceLine}>
+                        Voice: <strong>{voiceLabel}</strong>
                       </span>
+                      <span className={styles.savedBadge}>Saved</span>
                     </button>
-                  ))}
+                    );
+                  })}
                 </div>
               )}
             </div>
@@ -513,7 +543,6 @@ const AvatarCreation = () => {
         </main>
       </div>
 
-      <AvatarChat />
       <Footer />
     </>
   );
