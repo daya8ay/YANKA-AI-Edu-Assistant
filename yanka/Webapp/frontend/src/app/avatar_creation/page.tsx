@@ -2,15 +2,13 @@
 
 import React, { useEffect, useMemo, useState } from "react";
 import DashboardNavBar from "@/components/DashboardNavBar";
-import Footer from "@/components/Footer"; // ✅ Import Footer component
+import Footer from "@/components/Footer";
 import styles from "./avatar.module.css";
-// import Face from "./face";
-// import Hair from "./hair";
 import Clothing from "./clothing";
-// import Accessories from "./accessories";
 import Voice from "./voice";
 import StudioAvatar, { type PresenterGender } from "./studioAvatar";
-import AvatarChat from "./AvatarChat";
+import { useAuth } from "@/hooks/useAuth";
+import { avatarService, type HeyGenAvatarData, type SavedAvatar } from "@/services/avatarService";
 
 type HeygenAvatar = {
   id: string;
@@ -72,10 +70,23 @@ const AvatarCreation = () => {
     useState<PresenterGender>(DEFAULT_PRESENTER_GENDER);
   const [selectedPersonKey, setSelectedPersonKey] = useState<string | null>(null);
 
+  // Avatar saving state
+  const [isSaving, setIsSaving] = useState(false);
+  const [saveMessage, setSaveMessage] = useState<{ type: 'success' | 'error'; text: string } | null>(null);
+
+  // Saved avatars state
+  const [savedAvatars, setSavedAvatars] = useState<SavedAvatar[]>([]);
+  const [loadingSavedAvatars, setLoadingSavedAvatars] = useState(false);
+  const [deletingAvatarId, setDeletingAvatarId] = useState<number | null>(null);
+
+  // Auth hook
+  const { authStatus, authFetch } = useAuth();
+
   const tabs = [
     { id: "Avatar", label: "Avatar" },
     { id: "Clothing", label: "Clothing" },
     { id: "Voice", label: "Voice" },
+    { id: "MyAvatars", label: "My Avatars" },
   ];
 
   const selectedAvatar =
@@ -175,6 +186,115 @@ const AvatarCreation = () => {
     return filteredAvatars.filter((a) => getPersonKey(a) === selectedPersonKey);
   }, [filteredAvatars, selectedPersonKey]);
 
+  const voiceNameById = useMemo(() => {
+    const m = new Map<string, string>();
+    for (const v of voices) {
+      if (v.voice_id) m.set(v.voice_id, v.name);
+    }
+    return m;
+  }, [voices]);
+
+  // Save avatar function
+  const handleSaveAvatar = async () => {
+    if (!selectedAvatar || authStatus !== 'authenticated') {
+      setSaveMessage({
+        type: 'error',
+        text: authStatus !== 'authenticated' ? 'Please log in to save avatars' : 'Please select an avatar first'
+      });
+      return;
+    }
+
+    setIsSaving(true);
+    setSaveMessage(null);
+
+    try {
+      const heygenData: HeyGenAvatarData = {
+        avatar_id: selectedAvatar.id,
+        avatar_name: selectedAvatar.name,
+        gender: selectedAvatar.gender,
+        preview_image_url: selectedAvatar.preview_image_url,
+        // Save the voice the user actually selected in the Voice tab.
+        default_voice_id: selectedVoiceId ?? selectedAvatar.default_voice_id,
+        type: selectedAvatar.kind,
+      };
+
+      await avatarService.saveUserAvatar(heygenData, authFetch);
+
+      setSaveMessage({
+        type: 'success',
+        text: 'Avatar saved successfully! You can now access it anytime.'
+      });
+
+      // Refresh saved avatars list
+      loadSavedAvatars();
+    } catch (error) {
+      console.error('Error saving avatar:', error);
+      setSaveMessage({
+        type: 'error',
+        text: error instanceof Error ? error.message : 'Failed to save avatar'
+      });
+    } finally {
+      setIsSaving(false);
+    }
+  };
+
+  // Clear save message after 5 seconds
+  useEffect(() => {
+    if (saveMessage) {
+      const timer = setTimeout(() => {
+        setSaveMessage(null);
+      }, 5000);
+      return () => clearTimeout(timer);
+    }
+  }, [saveMessage]);
+
+  // Load saved avatars when user is authenticated
+  const loadSavedAvatars = async () => {
+    if (authStatus !== 'authenticated') {
+      setSavedAvatars([]);
+      return;
+    }
+
+    setLoadingSavedAvatars(true);
+    try {
+      const userAvatars = await avatarService.getUserAvatars(authFetch);
+      setSavedAvatars(userAvatars);
+    } catch (error) {
+      console.error('Error loading saved avatars:', error);
+      setSavedAvatars([]);
+    } finally {
+      setLoadingSavedAvatars(false);
+    }
+  };
+
+  useEffect(() => {
+    loadSavedAvatars();
+  }, [authStatus]);
+
+  const handleDeleteSavedAvatar = async (
+    e: React.MouseEvent<HTMLButtonElement>,
+    savedAvatar: SavedAvatar,
+  ) => {
+    e.preventDefault();
+    e.stopPropagation();
+
+    const confirmed = window.confirm(
+      "Remove this avatar from your saved list? Existing generated videos will not be deleted.",
+    );
+    if (!confirmed) return;
+
+    setDeletingAvatarId(savedAvatar.avatar_id);
+    try {
+      await avatarService.deleteUserAvatar(savedAvatar.avatar_id, authFetch);
+      await loadSavedAvatars();
+    } catch (error) {
+      console.error("Error deleting saved avatar:", error);
+      window.alert(error instanceof Error ? error.message : "Failed to delete avatar");
+    } finally {
+      setDeletingAvatarId(null);
+    }
+  };
+
   const renderTabContent = () => {
     switch (currentTab) {
       case "Avatar":
@@ -224,6 +344,118 @@ const AvatarCreation = () => {
           />
         );
 
+      case "MyAvatars":
+        return (
+          <div className={styles.tabContent}>
+            <div className={styles.section}>
+              <h4>My Saved Avatars</h4>
+              {authStatus === "authenticated" &&
+              !loadingSavedAvatars &&
+              savedAvatars.length > 0 ? (
+                <p className={styles.savedSectionIntro}>
+                  Tap a card to load that avatar and voice into the editor.
+                </p>
+              ) : null}
+
+              {authStatus !== 'authenticated' ? (
+                <p className={styles.savedLoginHint}>
+                  Please log in to view your saved avatars.
+                </p>
+              ) : loadingSavedAvatars ? (
+                <p className={styles.savedLoading}>
+                  Loading your saved avatars...
+                </p>
+              ) : savedAvatars.length === 0 ? (
+                <div className={styles.savedEmpty}>
+                  <p>
+                    You haven&apos;t saved any avatars yet.
+                  </p>
+                  <p>
+                    Go to the <strong>Avatar</strong> tab to select and save your first avatar!
+                  </p>
+                </div>
+              ) : (
+                <div className={styles.imageOptions}>
+                  {savedAvatars.map((savedAvatar) => {
+                    const savedVoiceId =
+                      savedAvatar.heygen_data?.default_voice_id ?? savedAvatar.voice_id ?? null;
+                    const voiceLabel =
+                      savedVoiceId != null && savedVoiceId !== ""
+                        ? voiceNameById.get(savedVoiceId) ?? "Unknown voice"
+                        : "Not set";
+
+                    return (
+                      <div
+                        key={savedAvatar.avatar_id}
+                        className={`${styles.imageOption} ${styles.savedAvatarCard} ${
+                          selectedAvatarId === savedAvatar.heygen_data?.avatar_id ? styles.selected : ""
+                        }`}
+                      >
+                        <button
+                          type="button"
+                          className={styles.savedAvatarSelectBtn}
+                          onClick={() => {
+                            if (savedAvatar.heygen_data) {
+                              setSelectedAvatarId(savedAvatar.heygen_data.avatar_id);
+                              const vid =
+                                savedAvatar.heygen_data.default_voice_id ??
+                                savedAvatar.voice_id ??
+                                null;
+                              if (vid) setSelectedVoiceId(vid);
+                            }
+                          }}
+                          title={`${savedAvatar.name || "Saved Avatar"} · Saved`}
+                        >
+                          <div className={styles.savedAvatarMedia}>
+                            {savedAvatar.heygen_data?.preview_image_url ? (
+                              <img
+                                src={savedAvatar.heygen_data.preview_image_url}
+                                alt={savedAvatar.name || "Saved avatar"}
+                                className={styles.optionImage}
+                              />
+                            ) : (
+                              <div
+                                className={styles.optionImage}
+                                style={{
+                                  display: "flex",
+                                  alignItems: "center",
+                                  justifyContent: "center",
+                                  background: "rgba(255,255,255,0.5)",
+                                }}
+                              >
+                                <span style={{ color: "#8a9bb8", fontSize: "0.78rem" }}>
+                                  No preview
+                                </span>
+                              </div>
+                            )}
+                          </div>
+                          <span className={styles.optionLabel}>
+                            {savedAvatar.name || savedAvatar.heygen_data?.avatar_name || "Saved Avatar"}
+                          </span>
+                          <span className={styles.savedVoiceLine}>
+                            Voice: <strong>{voiceLabel}</strong>
+                          </span>
+                          <span className={styles.savedBadge}>Saved</span>
+                        </button>
+
+                        <button
+                          type="button"
+                          className={styles.savedAvatarDeleteBtn}
+                          disabled={deletingAvatarId === savedAvatar.avatar_id}
+                          onClick={(e) => handleDeleteSavedAvatar(e, savedAvatar)}
+                          aria-label={`Remove ${savedAvatar.name || savedAvatar.heygen_data?.avatar_name || "saved avatar"} from saved list`}
+                        >
+                          {deletingAvatarId === savedAvatar.avatar_id ? "Removing..." : "Remove"}
+                        </button>
+                      </div>
+                    );
+                  })}
+                </div>
+              )}
+            </div>
+          </div>
+        );
+
       default:
         return null;
     }
@@ -261,17 +493,71 @@ const AvatarCreation = () => {
                 )}
               </div>
               {selectedAvatar ? (
-                <p
-                  style={{
-                    marginTop: "12px",
-                    fontSize: "0.9rem",
-                    color: "#3B4F8E",
-                    textAlign: "center",
-                  }}
-                >
-                  {selectedAvatar.name}
-                  {selectedAvatar.kind === "talking_photo" ? " · Photo avatar" : ""}
-                </p>
+                <>
+                  <p
+                    style={{
+                      marginTop: "12px",
+                      fontSize: "0.9rem",
+                      color: "#3B4F8E",
+                      textAlign: "center",
+                    }}
+                  >
+                    {selectedAvatar.name}
+                    {selectedAvatar.kind === "talking_photo" ? " · Photo avatar" : ""}
+                  </p>
+
+                  {/* Save Avatar Button */}
+                  <div style={{ marginTop: "16px", textAlign: "center" }}>
+                    <button
+                      onClick={handleSaveAvatar}
+                      disabled={isSaving || authStatus !== 'authenticated'}
+                      style={{
+                        backgroundColor: authStatus === 'authenticated' ? "#3B4F8E" : "#ccc",
+                        color: "white",
+                        border: "none",
+                        borderRadius: "6px",
+                        padding: "10px 20px",
+                        fontSize: "0.9rem",
+                        fontWeight: "600",
+                        cursor: authStatus === 'authenticated' ? (isSaving ? "not-allowed" : "pointer") : "not-allowed",
+                        opacity: isSaving ? 0.7 : 1,
+                        width: "100%",
+                      }}
+                    >
+                      {isSaving ? "Saving..." : "Save Avatar"}
+                    </button>
+
+                    {/* Feedback Messages */}
+                    {saveMessage && (
+                      <div
+                        style={{
+                          marginTop: "12px",
+                          padding: "8px 12px",
+                          borderRadius: "6px",
+                          fontSize: "0.85rem",
+                          backgroundColor: saveMessage.type === 'success' ? "#d4edda" : "#f8d7da",
+                          color: saveMessage.type === 'success' ? "#155724" : "#721c24",
+                          border: `1px solid ${saveMessage.type === 'success' ? "#c3e6cb" : "#f5c6cb"}`,
+                        }}
+                      >
+                        {saveMessage.text}
+                      </div>
+                    )}
+
+                    {authStatus !== 'authenticated' && (
+                      <p
+                        style={{
+                          marginTop: "8px",
+                          fontSize: "0.8rem",
+                          color: "#6B7FA8",
+                          textAlign: "center",
+                        }}
+                      >
+                        Log in to save your avatar choices
+                      </p>
+                    )}
+                  </div>
+                </>
               ) : null}
             </div>
 
@@ -296,7 +582,6 @@ const AvatarCreation = () => {
         </main>
       </div>
 
-      <AvatarChat />
       <Footer />
     </>
   );

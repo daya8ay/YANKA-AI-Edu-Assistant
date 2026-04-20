@@ -3,7 +3,7 @@
 import React, { useEffect, useMemo, useState, type CSSProperties } from "react";
 import styles from "./avatar.module.css";
 
-const AVATARS_PER_PAGE = 21;
+const AVATARS_PER_PAGE = 12;
 
 export type PresenterGender = "male" | "female";
 
