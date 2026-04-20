@@ -28,6 +28,11 @@ export interface SaveAvatarResponse {
   avatar_id: number;
 }
 
+export interface DeleteAvatarResponse {
+  success: boolean;
+  message: string;
+}
+
 /**
  * Avatar persistence service for saving and retrieving user avatars
  */
@@ -75,6 +80,25 @@ export class AvatarService {
     if (!response.ok) {
       const errorText = await response.text();
       throw new Error(`Failed to get user avatars: ${response.status} - ${errorText}`);
+    }
+
+    return await response.json();
+  }
+
+  /**
+   * Delete a saved avatar from the current user's collection
+   */
+  async deleteUserAvatar(
+    avatarId: number,
+    authFetch: (url: string, options?: RequestInit) => Promise<Response>
+  ): Promise<DeleteAvatarResponse> {
+    const response = await authFetch(`${this.baseUrl}/users/me/avatars/${avatarId}`, {
+      method: 'DELETE',
+    });
+
+    if (!response.ok) {
+      const errorText = await response.text();
+      throw new Error(`Failed to delete avatar: ${response.status} - ${errorText}`);
     }
 
     return await response.json();

@@ -131,6 +131,54 @@
     0 0 0 1px rgba(255, 255, 255, 0.22) inset;
 }
 
+.savedAvatarSelectBtn {
+  width: 100%;
+  margin: 0;
+  padding: 0;
+  border: none;
+  background: transparent;
+  cursor: pointer;
+  font: inherit;
+  color: inherit;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 10px;
+  border-radius: 8px;
+  text-align: center;
+}
+
+.savedAvatarSelectBtn:focus-visible {
+  outline: 2px solid #2e5aa8;
+  outline-offset: 2px;
+}
+
+.savedAvatarDeleteBtn {
+  margin-top: 2px;
+  padding: 6px 14px;
+  font-size: 0.78rem;
+  font-weight: 600;
+  color: #b03a2e;
+  background: rgba(176, 58, 46, 0.08);
+  border: 1px solid rgba(176, 58, 46, 0.35);
+  border-radius: 8px;
+  cursor: pointer;
+  transition:
+    background 0.2s,
+    border-color 0.2s;
+  align-self: stretch;
+}
+
+.savedAvatarDeleteBtn:hover:not(:disabled) {
+  background: rgba(176, 58, 46, 0.14);
+  border-color: rgba(176, 58, 46, 0.5);
+}
+
+.savedAvatarDeleteBtn:disabled {
+  opacity: 0.55;
+  cursor: not-allowed;
+}
+
 .savedVoiceLine {
   font-size: 0.78rem;
   color: #6b7fa8;
