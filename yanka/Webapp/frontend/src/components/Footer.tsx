@@ -3,9 +3,113 @@
 import React from "react";
 import Link from "next/link";
 import Image from "next/image";
+import { useLanguage } from "@/context/LanguageContext";
 import styles from "./Footer.module.css";
 
+const translations = {
+  en: {
+    tagline:
+      "AI that transforms how you learn—faster, smarter, limitless. Unlock your full potential with Yanka AI",
+
+    features: "Features",
+    featureLinks: {
+      video: "AI Video Generation",
+      avatar: "Real-Time AI Avatars",
+      training: "AI Training Programs",
+      courses: "Wide Range of Courses",
+      data: "AI Data Analysis & Visualization",
+      thesis: "Thesis & Dissertation Builder",
+    },
+
+    serve: "Who We Serve",
+    serveLinks: {
+      students: "Students",
+      researchers: "Researchers",
+      teachers: "Teachers & Institutions",
+      creators: "Course Creators",
+      universities: "Universities",
+    },
+
+    resources: "Resources",
+    resourceLinks: {
+      pricing: "Pricing",
+      integration: "Integration",
+      community: "Community & Blog",
+      integrity: "Academic Integrity",
+      support: "Support Center",
+    },
+
+    company: "Company",
+    companyLinks: {
+      about: "About",
+      vision: "Vision & Ethics",
+      partnerships: "Partnerships",
+      affiliates: "Affiliates",
+      careers: "Careers",
+    },
+
+    copyright:
+      "© 2025 Yanka — An Academic AI Platform by Kimuntu Power Inc.",
+
+    privacy: "Privacy Policy",
+    terms: "Terms and Conditions",
+    licensing: "Licensing",
+  },
+
+  fr: {
+    tagline:
+      "Une IA qui transforme votre façon d’apprendre — plus rapide, plus intelligente, sans limites. Libérez votre plein potentiel avec Yanka AI",
+
+    features: "Fonctionnalités",
+    featureLinks: {
+      video: "Génération vidéo par IA",
+      avatar: "Avatars IA en temps réel",
+      training: "Programmes de formation IA",
+      courses: "Large gamme de cours",
+      data: "Analyse et visualisation de données IA",
+      thesis: "Créateur de thèse et dissertation",
+    },
+
+    serve: "Qui nous servons",
+    serveLinks: {
+      students: "Étudiants",
+      researchers: "Chercheurs",
+      teachers: "Enseignants et institutions",
+      creators: "Créateurs de cours",
+      universities: "Universités",
+    },
+
+    resources: "Ressources",
+    resourceLinks: {
+      pricing: "Tarifs",
+      integration: "Intégration",
+      community: "Communauté et blog",
+      integrity: "Intégrité académique",
+      support: "Centre de support",
+    },
+
+    company: "Entreprise",
+    companyLinks: {
+      about: "À propos",
+      vision: "Vision et éthique",
+      partnerships: "Partenariats",
+      affiliates: "Affiliés",
+      careers: "Carrières",
+    },
+
+    copyright:
+      "© 2025 Yanka — Une plateforme académique IA par Kimuntu Power Inc.",
+
+    privacy: "Politique de confidentialité",
+    terms: "Conditions générales",
+    licensing: "Licence",
+  },
+};
+
 const Footer: React.FC = () => {
+  const { language } = useLanguage();
+  const t = translations[language];
+
   return (
     <footer className={styles.footer}>
       {/* Top Section */}
@@ -20,10 +124,7 @@ const Footer: React.FC = () => {
             className={styles.logo}
           />
 
-          <p className={styles.tagline}>
-            AI that transforms how you learn—faster, smarter, limitless. Unlock
-            your full potential with Yanka AI
-          </p>
+          <p className={styles.tagline}>{t.tagline}</p>
 
           {/* Social Icons */}
           <div className={styles.socialLinks}>
@@ -62,53 +163,53 @@ const Footer: React.FC = () => {
           {/* Features */}
           <div className={styles.column}>
             <Link href="/features" className={styles.columnTitleLink}>
-              <h4>Features</h4>
+              <h4>{t.features}</h4>
             </Link>
             <ul>
-              <li><Link href="/features#video">AI Video Generation</Link></li>
-              <li><Link href="/features#avatar">Real-Time AI Avatars</Link></li>
-              <li><Link href="/features#training">AI Training Programs</Link></li>
-              <li><Link href="/features#courses">Wide Range of Courses</Link></li>
-              <li><Link href="/features#data">AI Data Analysis & Visualization</Link></li>
-              <li><Link href="/features#thesis">Thesis & Dissertation Builder</Link></li>
+              <li><Link href="/features#video">{t.featureLinks.video}</Link></li>
+              <li><Link href="/features#avatar">{t.featureLinks.avatar}</Link></li>
+              <li><Link href="/features#training">{t.featureLinks.training}</Link></li>
+              <li><Link href="/features#courses">{t.featureLinks.courses}</Link></li>
+              <li><Link href="/features#data">{t.featureLinks.data}</Link></li>
+              <li><Link href="/features#thesis">{t.featureLinks.thesis}</Link></li>
             </ul>
           </div>
 
           {/* Who We Serve */}
           <div className={styles.column}>
             <Link href="/solutions" className={styles.columnTitleLink}>
-              <h4>Who We Serve</h4>
+              <h4>{t.serve}</h4>
             </Link>
             <ul>
-              <li><Link href="/solutions#students">Students</Link></li>
-              <li><Link href="/solutions#researchers">Researchers</Link></li>
-              <li><Link href="/solutions#teachers">Teachers & Institutions</Link></li>
-              <li><Link href="/solutions#creators">Course Creators</Link></li>
-              <li><Link href="/solutions#universities">Universities</Link></li>
+              <li><Link href="/solutions#students">{t.serveLinks.students}</Link></li>
+              <li><Link href="/solutions#researchers">{t.serveLinks.researchers}</Link></li>
+              <li><Link href="/solutions#teachers">{t.serveLinks.teachers}</Link></li>
+              <li><Link href="/solutions#creators">{t.serveLinks.creators}</Link></li>
+              <li><Link href="/solutions#universities">{t.serveLinks.universities}</Link></li>
             </ul>
           </div>
 
           {/* Resources */}
           <div className={styles.column}>
-            <h4>Resources</h4>
+            <h4>{t.resources}</h4>
             <ul>
-              <li><Link href="/#pricing">Pricing</Link></li>
-              <li><Link href="#">Integration</Link></li>
-              <li><Link href="#">Community & Blog</Link></li>
-              <li><Link href="#">Academic Integrity</Link></li>
-              <li><Link href="/support">Support Center</Link></li>
+              <li><Link href="/#pricing">{t.resourceLinks.pricing}</Link></li>
+              <li><Link href="#">{t.resourceLinks.integration}</Link></li>
+              <li><Link href="#">{t.resourceLinks.community}</Link></li>
+              <li><Link href="#">{t.resourceLinks.integrity}</Link></li>
+              <li><Link href="/support">{t.resourceLinks.support}</Link></li>
             </ul>
           </div>
 
           {/* Company */}
           <div className={styles.column}>
-            <h4>Company</h4>
+            <h4>{t.company}</h4>
             <ul>
-              <li><Link href="/about">About</Link></li>
-              <li><Link href="/about#vision">Vision & Ethics</Link></li>
-              <li><Link href="#">Partnerships</Link></li>
-              <li><Link href="#">Affiliates</Link></li>
-              <li><Link href="#">Careers</Link></li>
+              <li><Link href="/about">{t.companyLinks.about}</Link></li>
+              <li><Link href="/about#vision">{t.companyLinks.vision}</Link></li>
+              <li><Link href="#">{t.companyLinks.partnerships}</Link></li>
+              <li><Link href="#">{t.companyLinks.affiliates}</Link></li>
+              <li><Link href="#">{t.companyLinks.careers}</Link></li>
             </ul>
           </div>
         </div>
@@ -116,11 +217,11 @@ const Footer: React.FC = () => {
 
       {/* Bottom Section */}
       <div className={styles.footerBottom}>
-        <p>© 2025 Yanka — An Academic AI Platform by Kimuntu Power Inc.</p>
+        <p>{t.copyright}</p>
         <div className={styles.bottomLinks}>
-          <Link href="/privacy">Privacy Policy</Link>
-          <Link href="/terms">Terms and Conditions</Link>
-          <Link href="#">Licensing</Link>
+          <Link href="/privacy">{t.privacy}</Link>
+          <Link href="/terms">{t.terms}</Link>
+          <Link href="#">{t.licensing}</Link>
         </div>
       </div>
     </footer>

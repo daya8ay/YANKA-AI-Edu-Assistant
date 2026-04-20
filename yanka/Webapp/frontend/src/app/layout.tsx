@@ -1,8 +1,9 @@
 import type { Metadata } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
-import './aws-auth-config';
+import "./aws-auth-config";
 import "./globals.css";
-import AuthWrapper from '@/components/AuthWrapper';
+import AuthWrapper from "@/components/AuthWrapper";
+import { LanguageProvider } from "@/context/LanguageContext";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -27,10 +28,9 @@ export default function RootLayout({
   return (
     <html lang="en">
       <body className={`${geistSans.variable} ${geistMono.variable}`}>
-        {/* Wrap children so Auth state is available globally */}
-        <AuthWrapper>
-          {children}
-        </AuthWrapper>
+        <LanguageProvider>
+          <AuthWrapper>{children}</AuthWrapper>
+        </LanguageProvider>
       </body>
     </html>
   );

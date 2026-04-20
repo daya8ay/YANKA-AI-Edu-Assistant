@@ -7,8 +7,77 @@ import { useRouter } from "next/navigation";
 import { signUp } from "aws-amplify/auth";
 import { v4 as uuidv4 } from "uuid";
 import styles from "./signup.module.css";
+import { useLanguage } from "@/context/LanguageContext";
 
 export default function SignUp() {
+  const { language } = useLanguage();
+
+  const translations = {
+    en: {
+      subtitle: "Empower your academic journey with AI",
+      fullName: "Full Name",
+      namePlaceholder: "Enter your full name",
+      email: "Email Address",
+      emailPlaceholder: "Enter your email",
+      password: "Password",
+      passwordPlaceholder: "Create a password",
+
+      agreeTerms: "I agree with the",
+      terms: "Terms and Conditions",
+      agreePrivacy: "I agree with the",
+      privacy: "Privacy Policy",
+
+      createAccount: "Create Account",
+      creating: "Creating account…",
+
+      social: "Or sign up with",
+
+      loginText: "Already have an account?",
+      login: "Log in",
+
+      back: "← Back to Home",
+
+      errorTerms:
+        "Please agree to the Terms and Conditions before creating your account.",
+      errorPrivacy:
+        "Please agree to the Privacy Policy before creating your account.",
+      errorGeneric: "Sign up failed. Please try again.",
+    },
+
+    fr: {
+      subtitle: "Boostez votre parcours académique avec l’IA",
+      fullName: "Nom complet",
+      namePlaceholder: "Entrez votre nom complet",
+      email: "Adresse e-mail",
+      emailPlaceholder: "Entrez votre e-mail",
+      password: "Mot de passe",
+      passwordPlaceholder: "Créer un mot de passe",
+
+      agreeTerms: "J’accepte les",
+      terms: "Conditions générales",
+      agreePrivacy: "J’accepte la",
+      privacy: "Politique de confidentialité",
+
+      createAccount: "Créer un compte",
+      creating: "Création du compte…",
+
+      social: "Ou inscrivez-vous avec",
+
+      loginText: "Vous avez déjà un compte ?",
+      login: "Se connecter",
+
+      back: "← Retour à l’accueil",
+
+      errorTerms:
+        "Veuillez accepter les conditions générales avant de créer votre compte.",
+      errorPrivacy:
+        "Veuillez accepter la politique de confidentialité avant de créer votre compte.",
+      errorGeneric: "Échec de l'inscription. Veuillez réessayer.",
+    },
+  };
+
+  const t = translations[language];
+
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
@@ -16,6 +85,7 @@ export default function SignUp() {
   const [agreedToPrivacy, setAgreedToPrivacy] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
+
   const router = useRouter();
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -23,12 +93,12 @@ export default function SignUp() {
     setError(null);
 
     if (!agreedToTerms) {
-      setError("Please agree to the Terms and Conditions before creating your account.");
+      setError(t.errorTerms);
       return;
     }
 
     if (!agreedToPrivacy) {
-      setError("Please agree to the Privacy Policy before creating your account.");
+      setError(t.errorPrivacy);
       return;
     }
 
@@ -36,6 +106,7 @@ export default function SignUp() {
 
     try {
       const username = uuidv4();
+
       await signUp({
         username,
         password,
@@ -54,7 +125,7 @@ export default function SignUp() {
       if (err instanceof Error) {
         setError(err.message);
       } else {
-        setError("Sign up failed. Please try again.");
+        setError(t.errorGeneric);
       }
     } finally {
       setLoading(false);
@@ -72,41 +143,44 @@ export default function SignUp() {
           className={styles.logo}
         />
 
-        <p className={styles.subtitle}>Empower your academic journey with AI</p>
+        <p className={styles.subtitle}>{t.subtitle}</p>
 
         {error && <p className={styles.errorText}>{error}</p>}
 
         <form className={styles.signupForm} onSubmit={handleSubmit}>
+          {/* Name */}
           <div className={styles.formGroup}>
-            <label htmlFor="name">Full Name</label>
+            <label htmlFor="name">{t.fullName}</label>
             <input
               type="text"
               id="name"
-              placeholder="Enter your full name"
+              placeholder={t.namePlaceholder}
               value={name}
               onChange={(e) => setName(e.target.value)}
             />
           </div>
 
+          {/* Email */}
           <div className={styles.formGroup}>
-            <label htmlFor="email">Email Address</label>
+            <label htmlFor="email">{t.email}</label>
             <input
               type="email"
               id="email"
-              placeholder="Enter your email"
+              placeholder={t.emailPlaceholder}
               value={email}
               onChange={(e) => setEmail(e.target.value)}
               required
             />
           </div>
 
+          {/* Password */}
           <div className={`${styles.formGroup} ${styles.passwordGroup}`}>
-            <label htmlFor="password">Password</label>
+            <label htmlFor="password">{t.password}</label>
             <div className={styles.passwordWrapper}>
               <input
                 type="password"
                 id="password"
-                placeholder="Create a password"
+                placeholder={t.passwordPlaceholder}
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
                 required
@@ -114,6 +188,7 @@ export default function SignUp() {
             </div>
           </div>
 
+          {/* Terms */}
           <div className={styles.termsWrapper}>
             <label className={styles.termsLabel}>
               <input
@@ -123,14 +198,15 @@ export default function SignUp() {
                 className={styles.termsCheckbox}
               />
               <span>
-                I agree with the{" "}
+                {t.agreeTerms}{" "}
                 <Link href="/terms" className={styles.termsLink}>
-                  Terms and Conditions
+                  {t.terms}
                 </Link>
               </span>
             </label>
           </div>
 
+          {/* Privacy */}
           <div className={styles.termsWrapper}>
             <label className={styles.termsLabel}>
               <input
@@ -140,21 +216,23 @@ export default function SignUp() {
                 className={styles.termsCheckbox}
               />
               <span>
-                I agree with the{" "}
+                {t.agreePrivacy}{" "}
                 <Link href="/privacy" className={styles.termsLink}>
-                  Privacy Policy
+                  {t.privacy}
                 </Link>
               </span>
             </label>
           </div>
 
+          {/* Submit */}
           <button type="submit" className={styles.signupBtn} disabled={loading}>
-            {loading ? "Creating account…" : "Create Account"}
+            {loading ? t.creating : t.createAccount}
           </button>
         </form>
 
+        {/* Social */}
         <div className={styles.socialSignup}>
-          <p>Or sign up with</p>
+          <p>{t.social}</p>
           <div className={styles.socialIcons}>
             <a href="#">
               <Image src="/pics/gmail.jpeg" alt="Gmail" width={38} height={38} />
@@ -168,12 +246,14 @@ export default function SignUp() {
           </div>
         </div>
 
+        {/* Login */}
         <p className={styles.loginLink}>
-          Already have an account? <Link href="/login">Log in</Link>
+          {t.loginText} <Link href="/login">{t.login}</Link>
         </p>
 
+        {/* Back */}
         <p className={styles.homeLink}>
-          <Link href="/">← Back to Home</Link>
+          <Link href="/">{t.back}</Link>
         </p>
       </div>
     </div>
