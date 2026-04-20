@@ -77,6 +77,7 @@ const AvatarCreation = () => {
   // Saved avatars state
   const [savedAvatars, setSavedAvatars] = useState<SavedAvatar[]>([]);
   const [loadingSavedAvatars, setLoadingSavedAvatars] = useState(false);
+  const [deletingAvatarId, setDeletingAvatarId] = useState<number | null>(null);
 
   // Auth hook
   const { authStatus, authFetch } = useAuth();
@@ -270,6 +271,30 @@ const AvatarCreation = () => {
     loadSavedAvatars();
   }, [authStatus]);
 
+  const handleDeleteSavedAvatar = async (
+    e: React.MouseEvent<HTMLButtonElement>,
+    savedAvatar: SavedAvatar,
+  ) => {
+    e.preventDefault();
+    e.stopPropagation();
+
+    const confirmed = window.confirm(
+      "Remove this avatar from your saved list? Existing generated videos will not be deleted.",
+    );
+    if (!confirmed) return;
+
+    setDeletingAvatarId(savedAvatar.avatar_id);
+    try {
+      await avatarService.deleteUserAvatar(savedAvatar.avatar_id, authFetch);
+      await loadSavedAvatars();
+    } catch (error) {
+      console.error("Error deleting saved avatar:", error);
+      window.alert(error instanceof Error ? error.message : "Failed to delete avatar");
+    } finally {
+      setDeletingAvatarId(null);
+    }
+  };
+
   const renderTabContent = () => {
     switch (currentTab) {
       case "Avatar":
@@ -360,55 +385,69 @@ const AvatarCreation = () => {
                         : "Not set";
 
                     return (
-                    <button
-                      key={savedAvatar.avatar_id}
-                      type="button"
-                      onClick={() => {
-                        if (savedAvatar.heygen_data) {
-                          setSelectedAvatarId(savedAvatar.heygen_data.avatar_id);
-                          const vid =
-                            savedAvatar.heygen_data.default_voice_id ??
-                            savedAvatar.voice_id ??
-                            null;
-                          if (vid) setSelectedVoiceId(vid);
-                        }
-                      }}
-                      className={`${styles.imageOption} ${styles.savedAvatarCard} ${
-                        selectedAvatarId === savedAvatar.heygen_data?.avatar_id ? styles.selected : ""
-                      }`}
-                      title={`${savedAvatar.name || 'Saved Avatar'} · Saved`}
-                    >
-                      <div className={styles.savedAvatarMedia}>
-                        {savedAvatar.heygen_data?.preview_image_url ? (
-                          <img
-                            src={savedAvatar.heygen_data.preview_image_url}
-                            alt={savedAvatar.name || 'Saved avatar'}
-                            className={styles.optionImage}
-                          />
-                        ) : (
-                          <div
-                            className={styles.optionImage}
-                            style={{
-                              display: "flex",
-                              alignItems: "center",
-                              justifyContent: "center",
-                              background: "rgba(255,255,255,0.5)",
-                            }}
-                          >
-                            <span style={{ color: "#8a9bb8", fontSize: "0.78rem" }}>
-                              No preview
-                            </span>
+                      <div
+                        key={savedAvatar.avatar_id}
+                        className={`${styles.imageOption} ${styles.savedAvatarCard} ${
+                          selectedAvatarId === savedAvatar.heygen_data?.avatar_id ? styles.selected : ""
+                        }`}
+                      >
+                        <button
+                          type="button"
+                          className={styles.savedAvatarSelectBtn}
+                          onClick={() => {
+                            if (savedAvatar.heygen_data) {
+                              setSelectedAvatarId(savedAvatar.heygen_data.avatar_id);
+                              const vid =
+                                savedAvatar.heygen_data.default_voice_id ??
+                                savedAvatar.voice_id ??
+                                null;
+                              if (vid) setSelectedVoiceId(vid);
+                            }
+                          }}
+                          title={`${savedAvatar.name || "Saved Avatar"} · Saved`}
+                        >
+                          <div className={styles.savedAvatarMedia}>
+                            {savedAvatar.heygen_data?.preview_image_url ? (
+                              <img
+                                src={savedAvatar.heygen_data.preview_image_url}
+                                alt={savedAvatar.name || "Saved avatar"}
+                                className={styles.optionImage}
+                              />
+                            ) : (
+                              <div
+                                className={styles.optionImage}
+                                style={{
+                                  display: "flex",
+                                  alignItems: "center",
+                                  justifyContent: "center",
+                                  background: "rgba(255,255,255,0.5)",
+                                }}
+                              >
+                                <span style={{ color: "#8a9bb8", fontSize: "0.78rem" }}>
+                                  No preview
+                                </span>
+                              </div>
+                            )}
                           </div>
-                        )}
+                          <span className={styles.optionLabel}>
+                            {savedAvatar.name || savedAvatar.heygen_data?.avatar_name || "Saved Avatar"}
+                          </span>
+                          <span className={styles.savedVoiceLine}>
+                            Voice: <strong>{voiceLabel}</strong>
+                          </span>
+                          <span className={styles.savedBadge}>Saved</span>
+                        </button>
+
+                        <button
+                          type="button"
+                          className={styles.savedAvatarDeleteBtn}
+                          disabled={deletingAvatarId === savedAvatar.avatar_id}
+                          onClick={(e) => handleDeleteSavedAvatar(e, savedAvatar)}
+                          aria-label={`Remove ${savedAvatar.name || savedAvatar.heygen_data?.avatar_name || "saved avatar"} from saved list`}
+                        >
+                          {deletingAvatarId === savedAvatar.avatar_id ? "Removing..." : "Remove"}
+                        </button>
                       </div>
-                      <span className={styles.optionLabel}>
-                        {savedAvatar.name || savedAvatar.heygen_data?.avatar_name || 'Saved Avatar'}
-                      </span>
-                      <span className={styles.savedVoiceLine}>
-                        Voice: <strong>{voiceLabel}</strong>
-                      </span>
-                      <span className={styles.savedBadge}>Saved</span>
-                    </button>
                     );
                   })}
                 </div>

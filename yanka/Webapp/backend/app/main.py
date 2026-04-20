@@ -1013,6 +1013,31 @@ async def get_user_avatars(
     return result
 
 
+@app.delete("/users/me/avatars/{avatar_id}", response_model=dict)
+async def delete_user_avatar(
+    avatar_id: int,
+    current_user: User = Depends(get_current_user),
+    db: Session = Depends(get_db),
+):
+    """Delete a saved avatar owned by the current user."""
+    db.rollback()
+
+    avatar = db.query(AIAvatar).filter(AIAvatar.avatar_id == avatar_id).first()
+    if not avatar:
+        raise HTTPException(status_code=404, detail="Avatar not found")
+    if avatar.owner_id != current_user.user_id:
+        raise HTTPException(status_code=403, detail="Not allowed to delete this avatar")
+
+    # Preserve generated videos by unlinking avatar_id before avatar delete.
+    db.query(GeneratedVideo).filter(GeneratedVideo.avatar_id == avatar_id).update(
+        {GeneratedVideo.avatar_id: None},
+        synchronize_session=False,
+    )
+    db.delete(avatar)
+    db.commit()
+    return {"success": True, "message": "Avatar removed"}
+
+
 @app.post("/users/me/content", response_model=SourceContentResponse)
 async def upload_user_content(
     title: str = Form(...),
