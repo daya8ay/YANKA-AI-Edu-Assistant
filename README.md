@@ -35,3 +35,28 @@ Access to quality education remains a global challenge till date. This is especi
 - **Taiga Board:** https://tree.taiga.io/project/aayush-bharti-capstone-project-yanka/timeline 
 - **Reports:** `/docs/`
 - **Drive:** https://drive.google.com/drive/folders/1j4YZulil_YO-BAOFBNGmrlFO-g6PdmaX?usp=sharing 
+
+## Tech Stack
+- Frontend: Next.js (React)  
+- Backend: FastAPI (Python)  
+- Database: PostgreSQL (AWS RDS)  
+- APIs: OpenAI (script generation, chatbot), HeyGen (video/avatar generation)  
+- Deployment: Docker, AWS EC2  
+
+## Installation & Running the Project
+
+```bash
+1. Clone the repository
+git clone https://github.com/daya8ay/YANKA-AI-Edu-Assistant
+cd YANKA-AI-Edu-Assistant/
+
+2. Create a .env file and add:
+OPENAI_API_KEY=your_key_here
+HEYGEN_API_KEY=your_key_here
+
+3. Run the application
+docker-compose up --build
+
+4. Access the application
+Frontend: http://localhost:3000
+Backend API Docs: http://localhost:8000/docs
