@@ -45,18 +45,21 @@ Access to quality education remains a global challenge till date. This is especi
 
 ## Installation & Running the Project
 
-```bash
 1. Clone the repository
+```bash
 git clone https://github.com/daya8ay/YANKA-AI-Edu-Assistant
 cd YANKA-AI-Edu-Assistant/
-
+```
 2. Create a .env file and add:
+```bash
 OPENAI_API_KEY=your_key_here
 HEYGEN_API_KEY=your_key_here
+```
 
-3. Run the application
+4. Run the application
+```bash
 docker-compose up --build
-
-4. Access the application
+```
+6. Access the application 
 Frontend: http://localhost:3000
 Backend API Docs: http://localhost:8000/docs
