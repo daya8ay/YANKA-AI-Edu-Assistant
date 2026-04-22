@@ -1,7 +1,9 @@
 import asyncio
+from contextlib import asynccontextmanager
 import os
 import re
 from typing import Any, Dict, List, Optional
+from pathlib import Path
 
 import httpx
 from dotenv import load_dotenv
@@ -30,10 +32,46 @@ from model.model import predict as model_predict
 
 load_dotenv()
 
+BACKEND_DIR = Path(__file__).resolve().parent.parent
+default_video = BACKEND_DIR.parent / "frontend" / "public" / "video" / "test.mp4"
+VIDEO_PATH = Path(os.getenv("VIDEO_PATH_OVERRIDE", str(default_video)))
+TRANSCRIPT_PATH = BACKEND_DIR / "app" / "transcript.json"
+
+
+def build_transcript() -> None:
+    """Transcribe test.mp4 with Whisper and save timestamped segments to transcript.json."""
+    if not VIDEO_PATH.exists():
+        print(f"[YANKA] Video not found at {VIDEO_PATH} — skipping transcription.")
+        return
+    print("[YANKA] Transcribing video with Whisper (this runs once)…")
+    client = OpenAI(api_key=os.getenv("OPENAI_API_KEY"))
+    with open(VIDEO_PATH, "rb") as f:
+        response = client.audio.transcriptions.create(
+            model="whisper-1",
+            file=f,
+            response_format="verbose_json",
+            timestamp_granularities=["segment"],
+        )
+    segments = [
+        {"start": s.start, "end": s.end, "text": s.text}
+        for s in response.segments
+    ]
+    with open(TRANSCRIPT_PATH, "w") as f:
+        json.dump(segments, f, indent=2)
+    print(f"[YANKA] Transcript saved ({len(segments)} segments).")
+
+
+@asynccontextmanager
+async def lifespan(app: FastAPI):
+    if not TRANSCRIPT_PATH.exists():
+        build_transcript()
+    yield
+
 app = FastAPI(
     title="YANKA API",
     description="Backend API for YANKA",
     version="0.1.0",
+    lifespan=lifespan,
 )
 
 _frontend_origin = os.getenv("FRONTEND_URL", "http://localhost:3000").rstrip("/")
@@ -140,6 +178,228 @@ def chat(
     )
 
     return {"response": completion.choices[0].message.content}
+
+
+LIVEAVATAR_API = "https://api.liveavatar.com"
+LIVEAVATAR_KEY = os.getenv("LIVEAVATAR_API_KEY", "")
+LIVEAVATAR_VOICE_ID = os.getenv("LIVEAVATAR_VOICE_ID", "")
+
+
+@app.post("/api/avatar/session")
+async def create_avatar_session():
+    """
+    Creates a LiveAvatar FULL-mode session and returns LiveKit credentials.
+    If concurrency limit is hit, wait and retry once.
+    """
+    if not LIVEAVATAR_KEY:
+        raise HTTPException(status_code=500, detail="LIVEAVATAR_API_KEY not configured")
+
+    async with httpx.AsyncClient(timeout=20) as client:
+        start_data, session_token, session_id = await _start_session(client)
+
+        if start_data is None:
+            print("[YANKA] Concurrency limit hit; waiting 8 s for previous session to close…")
+            await asyncio.sleep(8)
+            start_data, session_token, session_id = await _start_session(client)
+
+        if start_data is None:
+            raise HTTPException(
+                status_code=429,
+                detail="An avatar session is still closing. Please wait a moment and try again.",
+            )
+
+    livekit_url = start_data.get("livekit_url") or start_data.get("livekitUrl")
+    livekit_token = (
+        start_data.get("livekit_client_token")
+        or start_data.get("livekit_token")
+        or start_data.get("livekitToken")
+    )
+
+    print(f"[YANKA] Session started: {session_id}")
+    return {
+        "session_id": session_id,
+        "session_token": session_token,
+        "livekit_url": livekit_url,
+        "livekit_token": livekit_token,
+    }
+
+
+async def _start_session(client: httpx.AsyncClient) -> tuple[dict | None, str | None, str | None]:
+    """
+    Creates a LiveAvatar token then starts the session.
+    Returns (start_data, session_token, session_id) on success, or (None, None, None)
+    if concurrency limit (code 4032) is hit.
+    """
+    persona: dict = {"language": "en"}
+    if LIVEAVATAR_VOICE_ID:
+        persona["voice_id"] = LIVEAVATAR_VOICE_ID
+
+    token_resp = await client.post(
+        f"{LIVEAVATAR_API}/v1/sessions/token",
+        headers={"X-API-KEY": LIVEAVATAR_KEY, "content-type": "application/json"},
+        json={
+            "mode": "FULL",
+            "is_sandbox": True,
+            "avatar_id": "dd73ea75-1218-4ef3-92ce-606d5f7fbc0a",
+            "avatar_persona": persona,
+        },
+    )
+    if token_resp.status_code != 200:
+        raise HTTPException(status_code=502, detail=f"LiveAvatar token error: {token_resp.text}")
+
+    inner = token_resp.json().get("data", token_resp.json())
+    session_token = inner.get("session_token") or inner.get("sessionToken")
+    session_id = inner.get("session_id") or inner.get("sessionId")
+
+    if not session_token or not session_id:
+        raise HTTPException(status_code=502, detail=f"Unexpected token response: {token_resp.json()}")
+
+    start_resp = await client.post(
+        f"{LIVEAVATAR_API}/v1/sessions/start",
+        headers={"authorization": f"Bearer {session_token}", "accept": "application/json"},
+    )
+
+    if start_resp.status_code == 403 and start_resp.json().get("code") == 4032:
+        return None, None, None
+
+    if start_resp.status_code not in (200, 201):
+        raise HTTPException(status_code=502, detail=f"LiveAvatar start error: {start_resp.text}")
+
+    return start_resp.json().get("data", start_resp.json()), session_token, session_id
+
+
+@app.delete("/api/avatar/session/{session_id}")
+async def stop_avatar_session(session_id: str):
+    """Acknowledge session stop request; session ends when LiveKit participant disconnects."""
+    print(f"[YANKA] Session stop acknowledged (client disconnects LiveKit): {session_id}")
+    return {"ok": True}
+
+
+class VideoHelpRequest(BaseModel):
+    timestamp: float
+    lookback: float | None = None
+
+
+def load_transcript_context(timestamp: float, lookback: float = 180.0) -> str:
+    """Return transcript text from lookback window up to current timestamp."""
+    if not TRANSCRIPT_PATH.exists():
+        return ""
+    with open(TRANSCRIPT_PATH) as f:
+        segments = json.load(f)
+    lo = max(0.0, timestamp - lookback)
+    relevant = [s["text"].strip() for s in segments if s["start"] <= timestamp and s["end"] >= lo]
+    return " ".join(relevant).strip()
+
+
+@app.post("/api/video-help")
+def video_help(request: VideoHelpRequest):
+    """
+    Returns AI-generated summary, key points, and suggested questions
+    for transcript context around the provided timestamp.
+    """
+    lookback = request.lookback if request.lookback is not None else 180.0
+    context = load_transcript_context(request.timestamp, lookback=lookback)
+
+    if not context:
+        return {
+            "summary": "No transcript is available for this video yet.",
+            "keyPoints": [],
+            "suggestedQuestions": [],
+        }
+
+    client = OpenAI(api_key=os.getenv("OPENAI_API_KEY"))
+
+    system = (
+        "You are an educational assistant. The student is watching a video lesson "
+        "and has asked for help understanding the section they just watched. "
+        "Based on the transcript excerpt provided, respond with JSON in exactly this shape:\n"
+        '{ "summary": "...", "keyPoints": [{ "point": "...", "explanation": "..." }], "suggestedQuestions": [{ "question": "...", "answer": "..." }] }\n'
+        "summary: 2-3 sentences explaining the section in plain language.\n"
+        "keyPoints: 3-5 objects, each with a short 'point' label and a detailed 'explanation' of that concept.\n"
+        "suggestedQuestions: 3 objects, each with a 'question' and a full 'answer'.\n"
+        "Return only valid JSON, no markdown fences."
+        
+        "You are an educational assistant. The student is watching a video lesson "
+        "and has asked for help understanding the section they just watched. "
+        "Based on the transcript excerpt provided, respond with JSON in exactly this shape:\n"
+        '{ "summary": "...", "keyPoints": [{ "point": "...", "explanation": "..." }], "suggestedQuestions": [{ "question": "...", "answer": "..." }] }\n'
+        "summary: 2-3 sentences explaining the section in plain language.\n"
+        "keyPoints: 3-5 objects, each with a short 'point' label and a detailed 'explanation' of that concept.\n"
+        "suggestedQuestions: 3 objects, each with a 'question' and a full 'answer'.\n"
+        "Return only valid JSON, no markdown fences."
+    )
+
+    user_msg = (
+        f"The student is at {int(request.timestamp // 60)}m {int(request.timestamp % 60)}s "
+        f"in the video. Here is the relevant transcript:\n\n{context}"
+    )
+
+    completion = client.chat.completions.create(
+        model="gpt-4o-mini",
+        messages=[
+            {"role": "system", "content": system},
+            {"role": "user", "content": user_msg},
+        ],
+        response_format={"type": "json_object"},
+    )
+
+    raw = completion.choices[0].message.content or "{}"
+    data = json.loads(raw)
+
+    return {
+        "summary": data.get("summary", ""),
+        "keyPoints": [
+            {"point": k.get("point", ""), "explanation": k.get("explanation", "")}
+            for k in data.get("keyPoints", [])
+        ],
+        "suggestedQuestions": [
+            {"question": q.get("question", ""), "answer": q.get("answer", "")}
+            for q in data.get("suggestedQuestions", [])
+        ],
+    }
+
+
+class VideoHelpChatRequest(BaseModel):
+    message: str
+    timestamp: float
+
+
+@app.post("/api/video-help/chat")
+def video_help_chat(request: VideoHelpChatRequest):
+    """Answers a student's follow-up question using local transcript context."""
+    context = load_transcript_context(request.timestamp)
+    client = OpenAI(api_key=os.getenv("OPENAI_API_KEY"))
+
+    system = (
+        "You are a helpful educational assistant. A student is watching a video lesson "
+        "and has a follow-up question about the content. "
+        "Use the provided transcript excerpt as context to give a clear, concise answer. "
+        "Speak directly to the student in plain, friendly language. "
+        "Keep your response focused and to the point — 2-4 sentences unless more detail is needed."
+    )
+
+    messages = [{"role": "system", "content": system}]
+    if context:
+        messages.append(
+            {
+                "role": "user",
+                "content": (
+                    f"Here is the relevant part of the video transcript "
+                    f"(around {int(request.timestamp // 60)}m {int(request.timestamp % 60)}s):\n\n"
+                    f"{context}\n\n"
+                    f"Student's question: {request.message}"
+                ),
+            }
+        )
+    else:
+        messages.append({"role": "user", "content": request.message})
+
+    completion = client.chat.completions.create(
+        model="gpt-4o-mini",
+        messages=messages,
+    )
+
+    return {"response": completion.choices[0].message.content or ""}
 
 
 HEYGEN_BASE_URL = "https://api.heygen.com"

@@ -137,9 +137,6 @@ const DashboardNavBar: React.FC = () => {
               <Link href="/video_simulator">{t.videoSimulator}</Link>
             </li>
             <li>
-              <Link href="/video_analytics">{t.videoAnalytics}</Link>
-            </li>
-            <li>
               <Link href="/support">{t.support}</Link>
             </li>
             <li>
