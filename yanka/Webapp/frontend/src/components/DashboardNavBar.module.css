@@ -69,14 +69,20 @@
 }
 
 .userAvatar {
+  width: 42px;           /* ⬅️ slightly bigger */
+  height: 42px;
   border-radius: 50%;
+  padding: 3px;          /* ⬅️ THIS is the key (adds breathing space) */
+  background: #ffffff;   /* inner spacing effect */
   border: 2px solid #1E4386;
+  object-fit: cover;     /* prevents squishing */
   cursor: pointer;
-  transition: transform 0.2s ease;
+  transition: all 0.25s ease;
 }
 
 .userAvatar:hover {
-  transform: scale(1.1);
+  transform: scale(1.12);
+  box-shadow: 0 4px 12px rgba(30, 67, 134, 0.25); /* subtle lift */
 }
 
 /* Globe Icon */
@@ -197,4 +203,9 @@
   .languageGrid {
     grid-template-columns: repeat(2, 1fr);
   }
+}
+
+.avatarLink {
+  display: flex;
+  align-items: center;
 }

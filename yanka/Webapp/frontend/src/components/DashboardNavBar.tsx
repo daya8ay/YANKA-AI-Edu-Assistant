@@ -152,13 +152,15 @@ const DashboardNavBar: React.FC = () => {
               />
             </li>
             <li>
-              <Image
-                src="/pics/user_avatar.jpeg"
-                alt={t.userAvatar}
-                width={36}
-                height={36}
-                className={styles.userAvatar}
-              />
+              <Link href="/profile" className={styles.avatarLink}>
+                <Image
+                  src="/pics/user_avatar.jpeg"
+                  alt={t.userAvatar}
+                  width={36}
+                  height={36}
+                  className={styles.userAvatar}
+                />
+              </Link>
             </li>
           </ul>
         </nav>
