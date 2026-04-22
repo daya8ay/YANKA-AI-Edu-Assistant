@@ -42,6 +42,8 @@ const VideoSimulator = () => {
   const [seekCount, setSeekCount] = useState(0);
   const [totalWatchTime, setTotalWatchTime] = useState(0);
   const watchStartVideoTimeRef = useRef<number | null>(null);
+  const pauseCountBaselineRef = useRef(0);
+  const seekCountBaselineRef = useRef(0);
 
   // ── ML prediction ──
   const [predictionLoading, setPredictionLoading] = useState(false);
@@ -135,17 +137,14 @@ const VideoSimulator = () => {
       const metrics = {
         video_duration: Number((duration / 60).toFixed(2)) || 0,
         time_watched: metricOverrides?.time_watched ?? (Number((totalWatchTime / 60).toFixed(2)) || 0),
-        skip_count: seekCount,
-        pause_count: pauseCount,
+        skip_count: Math.max(0, seekCount - seekCountBaselineRef.current),
+        pause_count: Math.max(0, pauseCount - pauseCountBaselineRef.current),
       };
       const result = await api.getVideoPrediction(metrics);
       const p = (result.prediction as string).trim().toLowerCase();
 
       const qualifies = p === "high" || (p === "medium" && trigger === "end");
-      const blockedByAcceptedHelp =
-        helpDecision.current === "accepted_help" && (trigger === "mid" || trigger === "late");
-      const canShowPopup =
-        helpDecision.current !== "dismissed" && qualifies && !blockedByAcceptedHelp;
+      const canShowPopup = helpDecision.current !== "dismissed" && qualifies;
 
       if (canShowPopup) {
         if (videoRef.current && !videoRef.current.paused) {
@@ -304,6 +303,8 @@ const VideoSimulator = () => {
     setPauseCount(0);
     setSeekCount(0);
     setTotalWatchTime(0);
+    pauseCountBaselineRef.current = 0;
+    seekCountBaselineRef.current = 0;
     watchStartVideoTimeRef.current = null;
     setShowConfusionModal(false);
     setConfusionModalFromEnd(false);
@@ -466,8 +467,10 @@ const VideoSimulator = () => {
 
   const handleModalResponse = (response: string) => {
     if (response === "Maybe later") {
-      helpDecision.current = helpDecision.current === "snoozed" ? "dismissed" : "snoozed";
+      helpDecision.current = "snoozed";
     } else if (response === "Yes, help me") {
+      pauseCountBaselineRef.current = pauseCount;
+      seekCountBaselineRef.current = seekCount;
       helpDecision.current = isCompleted ? "dismissed" : "accepted_help";
     } else {
       helpDecision.current = "dismissed";

@@ -28,6 +28,8 @@ const VideoAnalytics = () => {
   const [pauseCount, setPauseCount] = useState(0);
   const [seekCount, setSeekCount] = useState(0);
   const [speedChangeCount, setSpeedChangeCount] = useState(0);
+  const pauseCountBaselineRef = useRef(0);
+  const seekCountBaselineRef = useRef(0);
   const [isCompleted, setIsCompleted] = useState(false);
   const [completionTime, setCompletionTime] = useState<number | null>(null);
   const [replayCount, setReplayCount] = useState(0);
@@ -47,7 +49,7 @@ const VideoAnalytics = () => {
   const lateCheckSent = useRef(false);
   const endCheckSent  = useRef(false);
 
-  // "none" | "snoozed" (maybe later once) | "accepted_help" (yes mid-video — allow end popup again) | "dismissed"
+  // "none" | "snoozed" (maybe later — defer, may show again) | "accepted_help" | "dismissed"
   const helpDecision = useRef<"none" | "snoozed" | "dismissed" | "accepted_help">("none");
 
   // Track analytics event
@@ -146,8 +148,8 @@ const VideoAnalytics = () => {
       video_topic: "Yanka platform overview",
       video_duration: Number((duration / 60).toFixed(2)) || 0,
       time_watched: metricOverrides?.time_watched ?? (Number((totalWatchTime / 60).toFixed(2)) || 0),
-      skip_count: seekCount,
-      pause_count: pauseCount,
+      skip_count: Math.max(0, seekCount - seekCountBaselineRef.current),
+      pause_count: Math.max(0, pauseCount - pauseCountBaselineRef.current),
     };
     setLastSentMetrics(metrics);
     try {
@@ -157,10 +159,7 @@ const VideoAnalytics = () => {
       setPrediction(p);
 
       const qualifies = p === "high" || (p === "medium" && trigger === "end");
-      const blockedByAcceptedHelp =
-        helpDecision.current === "accepted_help" && (trigger === "mid" || trigger === "late");
-      const canShowPopup =
-        helpDecision.current !== "dismissed" && qualifies && !blockedByAcceptedHelp;
+      const canShowPopup = helpDecision.current !== "dismissed" && qualifies;
 
       if (canShowPopup) {
         // Pause directly on the element so pauseCount isn't incremented.
@@ -237,6 +236,8 @@ const VideoAnalytics = () => {
       lateCheckSent.current = false;
       endCheckSent.current  = false;
       helpDecision.current  = "none";
+      pauseCountBaselineRef.current = 0;
+      seekCountBaselineRef.current = 0;
     }
 
     // Flush the current watch segment before jumping, so rewatched sections count
@@ -330,6 +331,8 @@ const VideoAnalytics = () => {
       lateCheckSent.current = false;
       endCheckSent.current  = false;
       helpDecision.current  = "none";
+      pauseCountBaselineRef.current = 0;
+      seekCountBaselineRef.current = 0;
     }
   };
 
@@ -366,10 +369,10 @@ const VideoAnalytics = () => {
 
   const handleModalResponse = (response: string) => {
     if (response === "Maybe later") {
-      // First snooze → allow one more popup at the next qualifying trigger.
-      // Second snooze → stop asking for the rest of the session.
-      helpDecision.current = helpDecision.current === "snoozed" ? "dismissed" : "snoozed";
+      helpDecision.current = "snoozed";
     } else if (response === "Yes, help me") {
+      pauseCountBaselineRef.current = pauseCount;
+      seekCountBaselineRef.current = seekCount;
       // Mid-session help: suppress further 50%/75% popups but allow one more at video end if model qualifies.
       helpDecision.current = isCompleted ? "dismissed" : "accepted_help";
     } else {
