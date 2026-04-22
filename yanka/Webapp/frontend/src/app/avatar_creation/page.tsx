@@ -85,11 +85,14 @@ const AvatarCreation = () => {
   // Avatar saving state
   const [isSaving, setIsSaving] = useState(false);
   const [saveMessage, setSaveMessage] = useState<{ type: 'success' | 'error'; text: string } | null>(null);
+  const [customAvatarName, setCustomAvatarName] = useState<string>("");
 
   // Saved avatars state
   const [savedAvatars, setSavedAvatars] = useState<SavedAvatar[]>([]);
   const [loadingSavedAvatars, setLoadingSavedAvatars] = useState(false);
   const [deletingAvatarId, setDeletingAvatarId] = useState<number | null>(null);
+  const [renamingAvatarId, setRenamingAvatarId] = useState<number | null>(null);
+  const [renameValue, setRenameValue] = useState<string>("");
 
   // Auth hook
   const { authStatus, authFetch } = useAuth();
@@ -194,6 +197,7 @@ const AvatarCreation = () => {
     // Keep selected person in sync with selected variant.
     if (!selectedAvatar) return;
     setSelectedPersonKey(getPersonKey(selectedAvatar));
+    setCustomAvatarName(selectedAvatar.name ?? "");
   }, [selectedAvatar?.id]);
 
   useEffect(() => {
@@ -258,7 +262,7 @@ const AvatarCreation = () => {
         type: selectedAvatar.kind,
       };
 
-      await avatarService.saveUserAvatar(heygenData, authFetch);
+      await avatarService.saveUserAvatar(heygenData, authFetch, customAvatarName.trim() || undefined);
 
       setSaveMessage({
         type: 'success',
@@ -332,6 +336,27 @@ const AvatarCreation = () => {
       window.alert(error instanceof Error ? error.message : "Failed to delete avatar");
     } finally {
       setDeletingAvatarId(null);
+    }
+  };
+
+  const handleRenameStart = (savedAvatar: SavedAvatar) => {
+    setRenamingAvatarId(savedAvatar.avatar_id);
+    setRenameValue(savedAvatar.name || savedAvatar.heygen_data?.avatar_name || "");
+  };
+
+  const handleRenameConfirm = async (avatarId: number) => {
+    const trimmed = renameValue.trim();
+    if (!trimmed) return;
+    try {
+      await avatarService.renameUserAvatar(avatarId, trimmed, authFetch);
+      setSavedAvatars((prev) =>
+        prev.map((a) => (a.avatar_id === avatarId ? { ...a, name: trimmed } : a))
+      );
+    } catch (error) {
+      window.alert(error instanceof Error ? error.message : "Failed to rename avatar");
+    } finally {
+      setRenamingAvatarId(null);
+      setRenameValue("");
     }
   };
 
@@ -487,6 +512,51 @@ const AvatarCreation = () => {
                         >
                           {deletingAvatarId === savedAvatar.avatar_id ? "Removing..." : "Remove"}
                         </button>
+
+                        {renamingAvatarId === savedAvatar.avatar_id ? (
+                          <div style={{ display: "flex", gap: "4px", marginTop: "6px" }}>
+                            <input
+                              type="text"
+                              value={renameValue}
+                              onChange={(e) => setRenameValue(e.target.value)}
+                              onKeyDown={(e) => {
+                                if (e.key === "Enter") handleRenameConfirm(savedAvatar.avatar_id);
+                                if (e.key === "Escape") setRenamingAvatarId(null);
+                              }}
+                              maxLength={100}
+                              autoFocus
+                              style={{
+                                flex: 1,
+                                padding: "4px 8px",
+                                borderRadius: "4px",
+                                border: "1px solid #c0cbe0",
+                                fontSize: "0.78rem",
+                              }}
+                            />
+                            <button
+                              type="button"
+                              onClick={() => handleRenameConfirm(savedAvatar.avatar_id)}
+                              style={{ fontSize: "0.78rem", padding: "4px 8px", borderRadius: "4px", border: "none", background: "#3B4F8E", color: "white", cursor: "pointer" }}
+                            >
+                              Save
+                            </button>
+                            <button
+                              type="button"
+                              onClick={() => setRenamingAvatarId(null)}
+                              style={{ fontSize: "0.78rem", padding: "4px 8px", borderRadius: "4px", border: "1px solid #c0cbe0", background: "white", cursor: "pointer" }}
+                            >
+                              Cancel
+                            </button>
+                          </div>
+                        ) : (
+                          <button
+                            type="button"
+                            onClick={() => handleRenameStart(savedAvatar)}
+                            style={{ fontSize: "0.75rem", marginTop: "4px", background: "none", border: "none", color: "#3B4F8E", cursor: "pointer", textDecoration: "underline" }}
+                          >
+                            Rename
+                          </button>
+                        )}
                       </div>
                     );
                   })}
@@ -550,8 +620,28 @@ const AvatarCreation = () => {
                         : ""}
                   </p>
 
+                  {/* Custom name input */}
+                  <div style={{ marginTop: "12px" }}>
+                    <input
+                      type="text"
+                      value={customAvatarName}
+                      onChange={(e) => setCustomAvatarName(e.target.value)}
+                      placeholder="Name your avatar"
+                      maxLength={100}
+                      style={{
+                        width: "100%",
+                        padding: "8px 10px",
+                        borderRadius: "6px",
+                        border: "1px solid #c0cbe0",
+                        fontSize: "0.85rem",
+                        color: "#2d3a5a",
+                        boxSizing: "border-box",
+                      }}
+                    />
+                  </div>
+
                   {/* Save Avatar Button */}
-                  <div style={{ marginTop: "16px", textAlign: "center" }}>
+                  <div style={{ marginTop: "10px", textAlign: "center" }}>
                     <button
                       onClick={handleSaveAvatar}
                       disabled={isSaving || authStatus !== 'authenticated'}
