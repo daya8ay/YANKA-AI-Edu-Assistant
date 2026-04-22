@@ -142,14 +142,20 @@ const DashboardNavBar: React.FC = () => {
               </button>
             </li>
             <li>
-              <Image
-                src="/pics/globe.jpeg"
-                alt={t.languageSelector}
-                width={28}
-                height={28}
-                className={styles.globeIcon}
+              <button
+                type="button"
+                className={styles.languageButton}
                 onClick={() => setIsLanguageModalOpen(true)}
-              />
+                aria-label={t.languageSelector}
+              >
+                <span className={language === "en" ? styles.activeLang : ""}>
+                  EN
+                </span>
+                <span className={styles.divider}>|</span>
+                <span className={language === "fr" ? styles.activeLang : ""}>
+                  FR
+                </span>
+              </button>
             </li>
             <li>
               <Link href="/profile" className={styles.avatarLink}>

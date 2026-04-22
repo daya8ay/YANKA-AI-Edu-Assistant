@@ -39,6 +39,8 @@
   display: flex;
   gap: 24px;
   align-items: center;
+  margin: 0;
+  padding: 0;
 }
 
 .navbar a {
@@ -53,7 +55,7 @@
 }
 
 .logoutBtn {
-  border: 1px solid #1E4386;
+  border: 1px solid #1e4386;
   color: #0041ad;
   background: transparent;
   padding: 8px 16px;
@@ -68,33 +70,64 @@
   color: white;
 }
 
+.languageButton {
+  background: transparent;
+  border: 1px solid #d6deeb;
+  color: #0041ad;
+  padding: 7px 14px;
+  border-radius: 999px;
+  font-size: 0.9rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.25s ease;
+  font-family: inherit;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  line-height: 1;
+}
+
+.languageButton:hover {
+  background-color: #f5f8fd;
+  border-color: #0041ad;
+  color: #0041ad;
+}
+
+.languageButton:focus {
+  outline: none;
+  box-shadow: 0 0 0 3px rgba(0, 65, 173, 0.12);
+}
+
+.activeLang {
+  color: #0041ad;
+  font-weight: 700;
+  opacity: 1;
+}
+
+.divider {
+  color: #9aa8c4;
+  font-weight: 400;
+}
+
+.languageButton span:not(.activeLang):not(.divider) {
+  opacity: 0.6;
+}
+
 .userAvatar {
-  width: 42px;           /* ⬅️ slightly bigger */
+  width: 42px;
   height: 42px;
   border-radius: 50%;
-  padding: 3px;          /* ⬅️ THIS is the key (adds breathing space) */
-  background: #ffffff;   /* inner spacing effect */
-  border: 2px solid #1E4386;
-  object-fit: cover;     /* prevents squishing */
+  padding: 3px;
+  background: #ffffff;
+  border: 2px solid #1e4386;
+  object-fit: cover;
   cursor: pointer;
   transition: all 0.25s ease;
 }
 
 .userAvatar:hover {
   transform: scale(1.12);
-  box-shadow: 0 4px 12px rgba(30, 67, 134, 0.25); /* subtle lift */
-}
-
-/* Globe Icon */
-.globeIcon {
-  width: 28px;
-  height: 28px;
-  cursor: pointer;
-  transition: transform 0.2s;
-}
-
-.globeIcon:hover {
-  transform: scale(1.1);
+  box-shadow: 0 4px 12px rgba(30, 67, 134, 0.25);
 }
 
 /* Modal Background */
@@ -156,14 +189,16 @@
 
 .languageGrid span {
   cursor: pointer;
-  padding: 6px 8px;
-  border-radius: 8px;
+  padding: 10px 12px;
+  border-radius: 10px;
   transition: all 0.3s;
+  border: 1px solid transparent;
 }
 
 .languageGrid span:hover {
   background-color: #f5f8fd;
   color: #2e5aa8;
+  border-color: #dbe4f2;
 }
 
 @keyframes fadeInUp {
@@ -175,6 +210,11 @@
     opacity: 1;
     transform: translateY(0);
   }
+}
+
+.avatarLink {
+  display: flex;
+  align-items: center;
 }
 
 @media (max-width: 768px) {
@@ -203,9 +243,9 @@
   .languageGrid {
     grid-template-columns: repeat(2, 1fr);
   }
-}
 
-.avatarLink {
-  display: flex;
-  align-items: center;
+  .languageButton {
+    padding: 6px 12px;
+    font-size: 0.85rem;
+  }
 }

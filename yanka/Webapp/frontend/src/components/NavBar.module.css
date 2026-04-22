@@ -2,12 +2,13 @@
     display: flex;
     justify-content: space-between;
     align-items: center;
-    padding: 5px 40px;   /* remove vertical padding completely */
+    padding: 5px 40px;
     background-color: #ffffff;
     position: sticky;
     top: 0;
     z-index: 1000;
     box-shadow: 0 2px 12px rgba(30, 67, 134, 0.08);
+    transition: transform 0.3s ease;
 }
 
 .navbar.scrollDown {
@@ -15,10 +16,10 @@
 }
 
 .logoImg {
-  width: auto;
-  height: 72px;          /* increased from 60px */
-  max-height: 72px;
-  object-fit: contain;
+    width: auto;
+    height: 72px;
+    max-height: 72px;
+    object-fit: contain;
 }
 
 /* Navbar links */
@@ -27,6 +28,8 @@
     display: flex;
     gap: 24px;
     align-items: center;
+    margin: 0;
+    padding: 0;
 }
 
 .navbar a {
@@ -65,16 +68,36 @@
     background-color: #0c2d62;
 }
 
-/* Globe Icon */
-.globeIcon {
-    width: 28px;
-    height: 28px;
+.languageButton {
+    background: transparent;
+    border: 1px solid #d6deeb;
+    color: #0041ad;
+    padding: 7px 14px;
+    border-radius: 999px;
+    font-size: 0.9rem;
+    font-weight: 600;
     cursor: pointer;
-    transition: transform 0.2s;
+    transition: all 0.25s ease;
+    font-family: inherit;
+    display: flex;
+    align-items: center;
+    gap: 6px;
 }
 
-.globeIcon:hover {
-    transform: scale(1.1);
+.languageButton:hover {
+    background-color: #f5f8fd;
+    border-color: #0041ad;
+    color: #0041ad;
+}
+
+.languageButton:focus {
+    outline: none;
+    box-shadow: 0 0 0 3px rgba(0, 65, 173, 0.12);
+}
+
+.divider {
+    color: #9aa8c4;
+    font-weight: 400;
 }
 
 /* Modal Background */
@@ -136,19 +159,100 @@
 
 .languageGrid span {
     cursor: pointer;
-    padding: 6px 8px;
-    border-radius: 8px;
+    padding: 10px 12px;
+    border-radius: 10px;
     transition: all 0.3s;
+    border: 1px solid transparent;
 }
 
 .languageGrid span:hover {
     background-color: #F5F8FD;
     color: #2E5AA8;
+    border-color: #dbe4f2;
 }
 
 @keyframes fadeInUp {
-    from { opacity: 0; transform: translateY(20px); }
-    to { opacity: 1; transform: translateY(0); }
+    from {
+        opacity: 0;
+        transform: translateY(20px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+/* ---------- Dropdown ---------- */
+
+.dropdown {
+    position: relative;
+    cursor: pointer;
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+}
+
+/* Main navbar title */
+.dropdownTitle {
+    color: #0041ad;
+    font-weight: 500;
+    transition: color 0.3s;
+}
+
+.dropdownTitle:hover {
+    color: #e9df13;
+}
+
+/* Dropdown menu hidden by default */
+.dropdownMenu {
+    position: absolute;
+    top: 38px;
+    left: 0;
+    background: rgba(255, 255, 255, 0.99);
+    padding: 8px 0;
+    margin: 0;
+    border-radius: 10px;
+    box-shadow: 0 8px 24px rgba(30, 67, 134, 0.15);
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    min-width: 240px;
+    opacity: 0;
+    visibility: hidden;
+    transform: translateY(10px);
+    transition: all 0.25s ease;
+    z-index: 1000;
+}
+
+/* Show dropdown on hover */
+.dropdown:hover .dropdownMenu {
+    opacity: 1;
+    visibility: visible;
+    transform: translateY(0);
+}
+
+/* List items */
+.dropdownMenu li {
+    width: 100%;
+    padding: 8px 20px;
+    list-style: none;
+}
+
+/* Dropdown links */
+.dropdownMenu li a {
+    color: #0041ad;
+    font-weight: 500;
+    display: block;
+    width: 100%;
+    text-align: left;
+    transition: all 0.2s ease;
+}
+
+/* Hover effect */
+.dropdownMenu li a:hover {
+    background: #F5F8FD;
+    border-radius: 6px;
+    color: #2E5AA8;
 }
 
 /* Responsive */
@@ -181,81 +285,9 @@
     .languageGrid {
         grid-template-columns: repeat(2, 1fr);
     }
-}
 
-/* ---------- Dropdown ---------- */
-
-.dropdown {
-  position: relative;
-  cursor: pointer;
-  display: flex;
-  flex-direction: column;
-  align-items: flex-start;   /* ensures left alignment */
-}
-
-/* Main navbar title */
-.dropdownTitle {
-  color: #0041ad;
-  font-weight: 500;
-  transition: color 0.3s;
-}
-
-.dropdownTitle:hover {
-  color: #e9df13;
-}
-
-/* Dropdown menu hidden by default */
-.dropdownMenu {
-  position: absolute;
-  top: 38px;
-  left: 0;                  /* keeps dropdown aligned to left of title */
-  background: rgba(255, 255, 255, 0.99);
-  padding: 8px 0;
-  margin: 0;
-  border-radius: 10px;
-  box-shadow: 0 8px 24px rgba(30, 67, 134, 0.15);
-
-  display: flex;
-  flex-direction: column;
-  align-items: flex-start;  /* LEFT ALIGN ITEMS */
-
-  min-width: 240px;
-
-  opacity: 0;
-  visibility: hidden;
-  transform: translateY(10px);
-  transition: all 0.25s ease;
-
-  z-index: 1000;
-}
-
-/* Show dropdown on hover */
-.dropdown:hover .dropdownMenu {
-  opacity: 1;
-  visibility: visible;
-  transform: translateY(0);
-}
-
-/* List items */
-.dropdownMenu li {
-  width: 100%;
-  padding: 8px 20px;
-  list-style: none;
-}
-
-/* Dropdown links */
-.dropdownMenu li a {
-  color: #0041ad;
-  font-weight: 500;
-  display: block;
-  width: 100%;
-  text-align: left;     /* ensure text is left aligned */
-  transition: all 0.2s ease;
-}
-
-/* Hover effect */
-.dropdownMenu li a:hover {
-  background: #F5F8FD;
-  border-radius: 6px;
-  color: #2E5AA8;
+    .languageButton {
+        padding: 6px 12px;
+        font-size: 0.85rem;
+    }
 }

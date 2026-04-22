@@ -79,56 +79,56 @@ const translations = {
 
     pricingTitle: "Choose Your Plan",
     pricingSub:
-      "Flexible plans designed for every learner, from students to institutions.",
+      "Flexible plans designed for every learner, from students to professionals.",
     plans: {
       learn: {
         title: "Learn",
         price: "Free",
         features: [
-          "AI chatbot access",
-          "Unlimited AI video creation",
-          "Study planner & progress tracker",
+          "1 trial AI video",
+          "Basic course browsing",
+          "Limited avatar access",
+          "Community support",
           "Limited daily questions",
-          "Access to community Q&A",
         ],
-        cta: "Start Free",
+        cta: "Get Started",
       },
       plus: {
         title: "Plus",
-        price: "$9.99/mo",
+        price: "$9.99/month",
         features: [
-          "Unlimited AI tutor sessions",
-          "AI essay & assignment assistant",
-          "Research & Thesis Builder (standard mode)",
-          "AI avatars & video creation",
-          "Advanced study analytics",
+          "10 AI videos per month",
+          "Enhanced avatar creation",
+          "Access to training workshops",
+          "AI study assistant",
+          "Priority email support",
         ],
-        cta: "Upgrade to Plus",
+        cta: "Start Plus",
       },
       scholar: {
         title: "Scholar",
-        price: "$24.99/mo",
-        badge: "Recommended",
+        price: "$19.99/month",
+        badge: "Most Popular",
         features: [
-          "All Plus features",
-          "Full Academic & Research Suite",
-          "Collaboration tools",
+          "Unlimited AI videos",
+          "Full avatar and video tools",
+          "Advanced academic features",
+          "Research and thesis support",
           "Priority support",
-          "Document cloud backup",
         ],
-        cta: "Upgrade to Scholar",
+        cta: "Go Scholar",
       },
-      institution: {
-        title: "Institution",
-        price: "Starting at $2,499/mo",
+      professional: {
+        title: "Professional",
+        price: "$49.99/month",
         features: [
-          "Full academic + learning ecosystem",
-          "Custom branding",
-          "API & LMS integration",
-          "Institutional analytics",
-          "Admin control & compliance",
+          "Everything in Scholar",
+          "Team collaboration tools",
+          "Advanced analytics",
+          "Professional content creation",
+          "Dedicated support",
         ],
-        cta: "Request Institutional Demo",
+        cta: "Get Professional",
       },
     },
 
@@ -329,56 +329,56 @@ const translations = {
 
     pricingTitle: "Choisissez votre plan",
     pricingSub:
-      "Des plans flexibles conçus pour chaque apprenant, des étudiants aux institutions.",
+      "Des plans flexibles conçus pour chaque apprenant, des étudiants aux professionnels.",
     plans: {
       learn: {
-        title: "Apprendre",
+        title: "Learn",
         price: "Gratuit",
         features: [
-          "Accès au chatbot IA",
-          "Création illimitée de vidéos IA",
-          "Planificateur d’études et suivi de progression",
+          "1 vidéo IA d’essai",
+          "Navigation de cours de base",
+          "Accès limité aux avatars",
+          "Support communautaire",
           "Nombre limité de questions par jour",
-          "Accès à la communauté Q&R",
         ],
-        cta: "Commencer gratuitement",
+        cta: "Commencer",
       },
       plus: {
         title: "Plus",
-        price: "$9.99/mo",
+        price: "9,99 $/mois",
         features: [
-          "Sessions illimitées avec tuteur IA",
-          "Assistant IA pour essais et devoirs",
-          "Recherche et créateur de thèse (mode standard)",
-          "Avatars IA et création vidéo",
-          "Analyses d’étude avancées",
+          "10 vidéos IA par mois",
+          "Création d’avatar améliorée",
+          "Accès aux ateliers de formation",
+          "Assistant d’étude IA",
+          "Support prioritaire par e-mail",
         ],
-        cta: "Passer à Plus",
+        cta: "Choisir Plus",
       },
       scholar: {
         title: "Scholar",
-        price: "$24.99/mo",
-        badge: "Recommandé",
+        price: "19,99 $/mois",
+        badge: "Le plus populaire",
         features: [
-          "Toutes les fonctionnalités Plus",
-          "Suite académique et de recherche complète",
-          "Outils de collaboration",
+          "Vidéos IA illimitées",
+          "Outils complets d’avatar et de vidéo",
+          "Fonctionnalités académiques avancées",
+          "Support pour la recherche et la thèse",
           "Support prioritaire",
-          "Sauvegarde cloud des documents",
         ],
-        cta: "Passer à Scholar",
+        cta: "Choisir Scholar",
       },
-      institution: {
-        title: "Institution",
-        price: "À partir de $2,499/mo",
+      professional: {
+        title: "Professional",
+        price: "29,99 $/mois",
         features: [
-          "Écosystème complet d’apprentissage et académique",
-          "Personnalisation de marque",
-          "Intégration API et LMS",
-          "Analyses institutionnelles",
-          "Contrôle administrateur et conformité",
+          "Tout ce qui est inclus dans Scholar",
+          "Outils de collaboration en équipe",
+          "Analyses avancées",
+          "Création de contenu professionnelle",
+          "Support dédié",
         ],
-        cta: "Demander une démo institutionnelle",
+        cta: "Choisir Professional",
       },
     },
 
@@ -642,7 +642,10 @@ export default function Home() {
                 <li key={index}>{item}</li>
               ))}
             </ul>
-            <Link href="/signup" className={`${styles.btnPrimary} ${styles.small}`}>
+            <Link
+              href="/signup"
+              className={`${styles.btnPrimary} ${styles.small}`}
+            >
               {t.plans.learn.cta}
             </Link>
           </div>
@@ -683,7 +686,10 @@ export default function Home() {
                 <li key={index}>{item}</li>
               ))}
             </ul>
-            <Link href="/signup" className={`${styles.btnPurple} ${styles.small}`}>
+            <Link
+              href="/signup"
+              className={`${styles.btnPurple} ${styles.small}`}
+            >
               {t.plans.scholar.cta}
             </Link>
           </div>
@@ -691,23 +697,23 @@ export default function Home() {
           <div className={styles.planCard}>
             <Image
               src="/pics/pic4.jpeg"
-              alt={t.plans.institution.title}
+              alt={t.plans.professional.title}
               width={70}
               height={70}
               className={styles.planIcon}
             />
-            <h3>{t.plans.institution.title}</h3>
-            <p className={styles.price}>{t.plans.institution.price}</p>
+            <h3>{t.plans.professional.title}</h3>
+            <p className={styles.price}>{t.plans.professional.price}</p>
             <ul>
-              {t.plans.institution.features.map((item, index) => (
+              {t.plans.professional.features.map((item, index) => (
                 <li key={index}>{item}</li>
               ))}
             </ul>
             <Link
-              href="#contact"
-              className={`${styles.btnSecondary} ${styles.small} ${styles.institution}`}
+              href="/signup"
+              className={`${styles.btnSecondary} ${styles.small}`}
             >
-              {t.plans.institution.cta}
+              {t.plans.professional.cta}
             </Link>
           </div>
         </div>
