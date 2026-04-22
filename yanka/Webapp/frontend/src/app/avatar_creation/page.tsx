@@ -16,8 +16,20 @@ type HeygenAvatar = {
   gender?: string | null;
   preview_image_url: string;
   default_voice_id: string | null;
-  kind: "avatar" | "talking_photo";
+  kind: "avatar" | "talking_photo" | "avatar_group";
 };
+
+function mergeAvatarsByKindId(base: HeygenAvatar[], extra: HeygenAvatar[]): HeygenAvatar[] {
+  const seen = new Set(base.map((a) => `${a.kind}:${a.id}`));
+  const out = [...base];
+  for (const a of extra) {
+    const key = `${a.kind}:${a.id}`;
+    if (seen.has(key)) continue;
+    seen.add(key);
+    out.push(a);
+  }
+  return out;
+}
 
 function getPersonKey(a: Pick<HeygenAvatar, "id" | "name">): string {
   // Prefer the name prefix before " in " (e.g. "Aditya in Blue shirt" => "Aditya")
@@ -84,7 +96,7 @@ const AvatarCreation = () => {
 
   const tabs = [
     { id: "Avatar", label: "Avatar" },
-    { id: "Clothing", label: "Clothing" },
+    { id: "Looks", label: "Looks" },
     { id: "Voice", label: "Voice" },
     { id: "MyAvatars", label: "My Avatars" },
   ];
@@ -100,6 +112,8 @@ const AvatarCreation = () => {
   const API_URL = process.env.NEXT_PUBLIC_API_URL ?? "http://localhost:8000";
 
   useEffect(() => {
+    let cancelled = false;
+
     async function loadHeygenLists() {
       setHeygenLoading(true);
       setHeygenError(null);
@@ -119,6 +133,8 @@ const AvatarCreation = () => {
         const loadedAvatars: HeygenAvatar[] = avatarsJson.avatars ?? [];
         const loadedVoices: HeygenVoice[] = voicesJson.voices ?? [];
 
+        if (cancelled) return;
+
         setAvatars(loadedAvatars);
         setVoices(loadedVoices);
 
@@ -136,15 +152,33 @@ const AvatarCreation = () => {
 
         setSelectedAvatarId(firstMatch?.id ?? null);
         setSelectedVoiceId(initialVoiceId);
+
+        // Group looks are a separate slow endpoint so /heygen/avatars matches HeyGen /v2/avatars
+        // (same as heygen_avatars_dump.json) and the grid fills in when this returns.
+        void (async () => {
+          try {
+            const gr = await fetch(`${API_URL}/heygen/avatar-group-looks`);
+            if (!gr.ok || cancelled) return;
+            const gj = await gr.json();
+            const extra: HeygenAvatar[] = gj.avatars ?? [];
+            if (cancelled || extra.length === 0) return;
+            setAvatars((prev) => mergeAvatarsByKindId(prev, extra));
+          } catch {
+            /* keep v2-only list */
+          }
+        })();
       } catch (e) {
         const message = e instanceof Error ? e.message : "Unknown error";
         setHeygenError(message);
       } finally {
-        setHeygenLoading(false);
+        if (!cancelled) setHeygenLoading(false);
       }
     }
 
     loadHeygenLists();
+    return () => {
+      cancelled = true;
+    };
   }, [API_URL]);
 
   useEffect(() => {
@@ -185,6 +219,12 @@ const AvatarCreation = () => {
     if (!selectedPersonKey) return [];
     return filteredAvatars.filter((a) => getPersonKey(a) === selectedPersonKey);
   }, [filteredAvatars, selectedPersonKey]);
+
+  /** Looks tab: studio rigged avatars only (outfit / "in …" variants), not photo or group looks. */
+  const looksTabVariants = useMemo(
+    () => selectedPersonVariants.filter((a) => a.kind === "avatar"),
+    [selectedPersonVariants],
+  );
 
   const voiceNameById = useMemo(() => {
     const m = new Map<string, string>();
@@ -320,12 +360,12 @@ const AvatarCreation = () => {
       // case "Hair":
       //   return <Hair />;
 
-      case "Clothing":
+      case "Looks":
         return (
           <Clothing
             personKey={selectedPersonKey}
             selectedAvatarId={selectedAvatarId}
-            variants={selectedPersonVariants}
+            variants={looksTabVariants}
             onSelectAvatarId={setSelectedAvatarId}
           />
         );
@@ -503,7 +543,11 @@ const AvatarCreation = () => {
                     }}
                   >
                     {selectedAvatar.name}
-                    {selectedAvatar.kind === "talking_photo" ? " · Photo avatar" : ""}
+                    {selectedAvatar.kind === "talking_photo"
+                      ? " · Photo avatar"
+                      : selectedAvatar.kind === "avatar_group"
+                        ? " · Group look"
+                        : ""}
                   </p>
 
                   {/* Save Avatar Button */}

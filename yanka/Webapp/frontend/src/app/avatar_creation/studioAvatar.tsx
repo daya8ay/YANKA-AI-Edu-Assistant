@@ -13,7 +13,7 @@ export type HeygenAvatarRow = {
   gender?: string | null;
   preview_image_url: string;
   default_voice_id: string | null;
-  kind: "avatar" | "talking_photo";
+  kind: "avatar" | "talking_photo" | "avatar_group";
 };
 
 function getPersonKey(a: Pick<HeygenAvatarRow, "id" | "name">): string {
@@ -43,7 +43,6 @@ function isLikelyTeacherPose(a: Pick<HeygenAvatarRow, "id" | "name">): boolean {
 }
 
 function pickRepresentative(variants: HeygenAvatarRow[]): HeygenAvatarRow {
-  // Prefer teacher-ish framing, then stable ordering by name/id.
   const teacher = variants.find(isLikelyTeacherPose);
   if (teacher) return teacher;
   return (
@@ -74,14 +73,7 @@ const StudioAvatar: React.FC<{
 }) => {
   const [page, setPage] = useState(1);
 
-  const presenterGenderSelectStyle: CSSProperties = {
-    width: "100%",
-    padding: "10px",
-    marginBottom: "12px",
-    borderRadius: "6px",
-    border: "1px solid #ccc",
-  };
-
+  /** One card per presenter */
   const peopleCards = useMemo(() => {
     const groups = new Map<string, HeygenAvatarRow[]>();
     for (const v of avatars) {
@@ -93,7 +85,8 @@ const StudioAvatar: React.FC<{
 
     const cards = Array.from(groups.entries()).map(([personKey, variants]) => {
       const rep = pickRepresentative(variants);
-      return { personKey, rep, variantsCount: variants.length };
+      const variantIds = new Set(variants.map((x) => x.id));
+      return { personKey, rep, variantsCount: variants.length, variantIds };
     });
 
     cards.sort((a, b) =>
@@ -101,6 +94,14 @@ const StudioAvatar: React.FC<{
     );
     return cards;
   }, [avatars]);
+
+  const presenterGenderSelectStyle: CSSProperties = {
+    width: "100%",
+    padding: "10px",
+    marginBottom: "12px",
+    borderRadius: "6px",
+    border: "1px solid #ccc",
+  };
 
   const totalPages = Math.max(1, Math.ceil(peopleCards.length / AVATARS_PER_PAGE));
   const safePage = Math.min(page, totalPages);
@@ -112,14 +113,13 @@ const StudioAvatar: React.FC<{
     setPage((p) => Math.min(Math.max(1, p), totalPages));
   }, [totalPages]);
 
-  /** Jump to the page that contains the current selection when the list or selection changes (not when only `page` changes). */
   useEffect(() => {
     if (peopleCards.length === 0) {
       setPage(1);
       return;
     }
     if (selectedAvatarId) {
-      const idx = peopleCards.findIndex((c) => c.rep.id === selectedAvatarId);
+      const idx = peopleCards.findIndex((c) => c.variantIds.has(selectedAvatarId));
       if (idx !== -1) {
         setPage(Math.floor(idx / AVATARS_PER_PAGE) + 1);
         return;
@@ -176,27 +176,47 @@ const StudioAvatar: React.FC<{
         {!loading && !error && peopleCards.length > 0 ? (
           <>
             <div className={styles.imageOptions}>
-              {pagePeople.map(({ personKey, rep, variantsCount }) => (
-                <button
-                  key={personKey}
-                  type="button"
-                  onClick={() => onSelectAvatarId(rep.id)}
-                  className={`${styles.imageOption} ${
-                    selectedAvatarId === rep.id ? styles.selected : ""
-                  }`}
-                  title={`${personKey}${variantsCount > 1 ? ` (${variantsCount} outfits)` : ""}`}
-                >
-                  <img
-                    src={rep.preview_image_url}
-                    alt={personKey}
-                    className={styles.optionImage}
-                  />
-                  <span className={styles.optionLabel}>{personKey}</span>
-                  {rep.kind === "talking_photo" ? (
-                    <span className={styles.optionKindBadge}>Photo</span>
-                  ) : null}
-                </button>
-              ))}
+              {pagePeople.map(({ personKey, rep, variantsCount, variantIds }) => {
+                const isSelected =
+                  selectedAvatarId != null && variantIds.has(selectedAvatarId);
+                return (
+                  <button
+                    key={`${rep.kind}-${personKey}`}
+                    type="button"
+                    onClick={() => {
+                      if (
+                        selectedAvatarId != null &&
+                        variantIds.has(selectedAvatarId)
+                      ) {
+                        onSelectAvatarId(selectedAvatarId);
+                      } else {
+                        onSelectAvatarId(rep.id);
+                      }
+                    }}
+                    className={`${styles.imageOption} ${isSelected ? styles.selected : ""}`}
+                    title={
+                      variantsCount > 1
+                        ? `${personKey} (${variantsCount} looks — use Looks tab)`
+                        : personKey
+                    }
+                  >
+                    <img
+                      src={rep.preview_image_url}
+                      alt={personKey}
+                      className={styles.optionImage}
+                    />
+                    <span className={styles.optionLabel}>{personKey}</span>
+                    {rep.kind === "talking_photo" ? (
+                      <span className={styles.optionKindBadge}>Photo</span>
+                    ) : rep.kind === "avatar_group" ? (
+                      <span className={styles.optionKindBadge}>Group</span>
+                    ) : null}
+                    {variantsCount > 1 && rep.kind === "avatar" ? (
+                      <span className={styles.optionKindBadge}>{variantsCount} looks</span>
+                    ) : null}
+                  </button>
+                );
+              })}
             </div>
 
             {totalPages > 1 ? (

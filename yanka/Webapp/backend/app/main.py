@@ -1,6 +1,7 @@
+import asyncio
 import os
 import re
-from typing import Any, Dict, List, Optional, Tuple
+from typing import Any, Dict, List, Optional
 
 import httpx
 from dotenv import load_dotenv
@@ -11,12 +12,6 @@ from pydantic import BaseModel
 from io import BytesIO
 from pypdf import PdfReader
 from docx import Document
-
-from dotenv import load_dotenv
-from fastapi import FastAPI, Depends
-from fastapi.middleware.cors import CORSMiddleware
-from openai import OpenAI
-from pydantic import BaseModel
 
 from .auth import verify_cognito_token, get_current_user
 from .routers import users, progress, avatars, videos
@@ -122,330 +117,6 @@ def chat(
 
 HEYGEN_BASE_URL = "https://api.heygen.com"
 
-# Substrings that usually indicate stylized / game / lifestyle / cartoon avatars.
-# HeyGen does not expose a "professional only" API filter; this is a best-effort server-side filter.
-_CASUAL_AVATAR_SUBSTRINGS: Tuple[str, ...] = (
-    "anime",
-    "avatar_iv_stylized",
-    "bikini",
-    "cartoon",
-    "caricature",
-    "casual",
-    "chibi",
-    "clubbing",
-    "comic",
-    "cosplay",
-    "costume",
-    "creature",
-    "cyborg",
-    "dj ",
-    " dj",
-    "dragon",
-    "festival",
-    "fortnite",
-    "furry",
-    "gaming",
-    "halloween",
-    "illustrated",
-    "illustration",
-    "kawaii",
-    "manga",
-    "mascot",
-    "meme",
-    "metaverse",
-    "minecraft",
-    "monster",
-    "nightclub",
-    "parkour",
-    "party",
-    "pixel",
-    "playful",
-    "pirate",
-    "pool",
-    "quirky",
-    "rave",
-    "roblox",
-    "robot",
-    " rollers",
-    "skate",
-    "ski ",
-    " snowboard",
-    "streetwear",
-    "summer",
-    "superhero",
-    "surf ",
-    "swimsuit",
-    "tiktok",
-    "toon",
-    "toy ",
-    "villain",
-    "voxel",
-    "wizard",
-    "witch",
-    "zombie",
-    "alien",
-    "ninja",
-    "samurai",
-    "warcraft",
-    "battle",
-    "arena",
-    "fantasy",
-    " scifi",
-    "sci-fi",
-    "steampunk",
-    " sports",
-    "sportswear",
-    "athlete",
-    " jersey",
-    "basketball",
-    "football",
-    "soccer",
-    "hockey",
-    "yoga",
-    "gym",
-    "workout",
-    "mermaid",
-    "fairy",
-    "vampire",
-    "werewolf",
-    "circus",
-    "clown",
-    "rockstar",
-    "rapper",
-    "hiphop",
-    "hip-hop",
-    "santa",
-)
-
-# Short tokens matched as whole words to reduce false positives (e.g. "orc" inside "Orchestra").
-_CASUAL_AVATAR_WORD_PATTERNS: Tuple[re.Pattern[str], ...] = tuple(
-    re.compile(rf"\b{re.escape(w)}\b", re.IGNORECASE)
-    for w in (
-        "beach",
-        "cute",
-        "dj",
-        "elf",
-        "elves",
-        "emoji",
-        "game",
-        "gamer",
-        "knight",
-        "meme",
-        "orc",
-        "party",
-        "park",
-        "santa",
-        "plush",
-        "streamer",
-        "warrior",
-        "zombie",
-    )
-)
-
-
-# For rigged "studio" avatars: keep rows that look like workplace / presenter contexts.
-# Many casual avatars still have innocent display names; id + this gate cuts most junk.
-_PROFESSIONAL_STUDIO_HINTS: Tuple[str, ...] = (
-    "office",
-    "studio",
-    "corporate",
-    "business",
-    "formal",
-    "professional",
-    "executive",
-    "workplace",
-    "meeting",
-    "conference",
-    "presentation",
-    "webinar",
-    "interview",
-    "broadcast",
-    "news",
-    "anchor",
-    "reporter",
-    "presenter",
-    "lecture",
-    "classroom",
-    "education",
-    "teacher",
-    "professor",
-    "training",
-    "sales",
-    "desk",
-    "laptop",
-    "whiteboard",
-    "zoom",
-    "medical",
-    "doctor",
-    "nurse",
-    "hospital",
-    "clinic",
-    "labcoat",
-    "lawyer",
-    "court",
-    "expressive",
-    "upper_body",
-    "upper body",
-    "half_body",
-    "half body",
-    "blazer",
-    "suit",
-    "podcast",
-)
-
-
-def _avatar_blob(
-    name: Any = None,
-    id_value: Any = None,
-    tags: Any = None,
-    typ: Any = None,
-) -> str:
-    parts: List[str] = []
-    if name:
-        parts.append(str(name))
-    if id_value:
-        parts.append(str(id_value))
-    if isinstance(tags, list):
-        parts.extend(str(t) for t in tags)
-    if typ:
-        parts.append(str(typ))
-    return " ".join(parts).lower()
-
-
-def _casual_avatar_blob(avatar: Dict[str, Any]) -> str:
-    return _avatar_blob(
-        avatar.get("avatar_name"),
-        avatar.get("avatar_id"),
-        avatar.get("tags"),
-        avatar.get("type"),
-    )
-
-
-def _casual_talking_photo_blob(tp: Dict[str, Any]) -> str:
-    return _avatar_blob(
-        tp.get("talking_photo_name"),
-        tp.get("talking_photo_id"),
-        tp.get("tags"),
-        tp.get("type"),
-    )
-
-
-def _is_likely_casual(blob: str) -> bool:
-    if any(s in blob for s in _CASUAL_AVATAR_SUBSTRINGS):
-        return True
-    if any(p.search(blob) for p in _CASUAL_AVATAR_WORD_PATTERNS):
-        return True
-    return False
-
-
-def _is_likely_casual_studio_avatar(avatar: Dict[str, Any]) -> bool:
-    return _is_likely_casual(_casual_avatar_blob(avatar))
-
-
-def _looks_professional_studio_avatar(avatar: Dict[str, Any]) -> bool:
-    blob = _casual_avatar_blob(avatar)
-    return any(h in blob for h in _PROFESSIONAL_STUDIO_HINTS)
-
-
-# --- "Teacher / headshot" mode (default): bust-up office or presenter looks, not lifestyle wide shots ---
-
-_TEACHER_STUDIO_EXCLUDE_RE = re.compile(
-    r"gym|sofa|outdoor|beach|pool|bed(room)?|kitchen|\bparty\b|halloween|christmas|santa|"
-    r"bikini|swimsuit|\bsport|parkour|\bskate|picnic|camping|full_body|full body|"
-    r"outdoorchair|outdoorcasual|living_?room|nightclub|festival|\brave\b|\bdj\b|"
-    r"rollerskate|\broller\b|snowboard|surf\b|yoga\b|workout\b|clubbing",
-    re.IGNORECASE,
-)
-
-# Studio avatars must match at least one of these (headshot framing or teacher/w workplace).
-_TEACHER_STUDIO_KEEP_HINTS: Tuple[str, ...] = (
-    "upper_body",
-    "upper body",
-    "half_body",
-    "half body",
-    "close_up",
-    "close up",
-    "closeup",
-    "expressive",
-    "office",
-    "biztalk",
-    "business",
-    "teacher",
-    "lecture",
-    "classroom",
-    "presenter",
-    "professor",
-    "news",
-    "anchor",
-    "reporter",
-    "professional",
-    "formal",
-    "executive",
-    "corporate",
-    "workplace",
-    "meeting",
-    "conference",
-    "webinar",
-    "interview",
-    "presentation",
-    "desk",
-    "blazer",
-    "suit",
-    "medical",
-    "doctor",
-    "nurse",
-    "hospital",
-    "clinic",
-    "labcoat",
-    "lawyer",
-    "court",
-    "podcast",
-    "training",
-    "education",
-    "standing_studio",
-    "sitting_studio",
-)
-
-_IN_SHIRT_ID_RE = re.compile(r"in_[a-z]+_shirt", re.IGNORECASE)
-
-
-def _teacher_studio_excluded(avatar: Dict[str, Any]) -> bool:
-    s = (avatar.get("avatar_id") or "") + " " + (avatar.get("avatar_name") or "")
-    return bool(_TEACHER_STUDIO_EXCLUDE_RE.search(s))
-
-
-def _teacher_studio_keeps(avatar: Dict[str, Any]) -> bool:
-    blob = _casual_avatar_blob(avatar)
-    if any(h in blob for h in _TEACHER_STUDIO_KEEP_HINTS):
-        return True
-    aid = avatar.get("avatar_id") or ""
-    alower = aid.lower()
-    if "public" in alower:
-        return True
-    if _IN_SHIRT_ID_RE.search(aid):
-        return True
-    aname = avatar.get("avatar_name") or ""
-    if re.search(r"in [a-z]+ shirt", aname, re.IGNORECASE):
-        return True
-    if re.search(r"\bblazer\b", aname, re.IGNORECASE):
-        return True
-    if re.search(r"\bbusiness\b", aname, re.IGNORECASE):
-        return True
-    return False
-
-
-_ILLUSTRATED_TALKING_PHOTO_RE = re.compile(
-    r"illustrat|cartoon|comic|anime|manga|pixar|\b3d\b|stylized|chibi|"
-    r"draw(n|ing)?|furry|mascot|emoji|figurine|clay\b|low-?poly|"
-    r"fantasy|wizard|dragon|zombie|robot\b|superhero|sprite\b|videogame|video game",
-    re.IGNORECASE,
-)
-
-
-def _is_illustrated_talking_photo(tp: Dict[str, Any]) -> bool:
-    s = (tp.get("talking_photo_name") or "") + " " + (tp.get("talking_photo_id") or "")
-    return bool(_ILLUSTRATED_TALKING_PHOTO_RE.search(s))
-
 
 def _get_heygen_api_key() -> str:
     key = os.getenv("HEYGEN_API_KEY")
@@ -457,12 +128,12 @@ def _get_heygen_api_key() -> str:
     return key
 
 
-def _heygen_get_json(path: str) -> Dict[str, Any]:
+def _heygen_get_json(path: str, params: Optional[Dict[str, Any]] = None) -> Dict[str, Any]:
     api_key = _get_heygen_api_key()
     url = f"{HEYGEN_BASE_URL}{path}"
     try:
         with httpx.Client(timeout=30) as client:
-            resp = client.get(url, headers={"x-api-key": api_key})
+            resp = client.get(url, headers={"x-api-key": api_key}, params=params)
             resp.raise_for_status()
             return resp.json()
     except httpx.HTTPStatusError as e:
@@ -470,59 +141,161 @@ def _heygen_get_json(path: str) -> Dict[str, Any]:
         raise HTTPException(status_code=502, detail=f"HeyGen request failed: {e.response.status_code}")
 
 
-@app.get("/heygen/avatars")
-def heygen_avatars(response: Response) -> Dict[str, List[Dict[str, Any]]]:
+def _ingest_v2_avatars_page(
+    data: Dict[str, Any],
+    avatars_by_id: Dict[str, Any],
+    tp_by_id: Dict[str, Any],
+) -> int:
+    """Merge one /v2/avatars response page into maps. Returns count of newly seen ids."""
+    before = len(avatars_by_id) + len(tp_by_id)
+    for a in data.get("avatars") or []:
+        aid = a.get("avatar_id")
+        if aid:
+            avatars_by_id[aid] = a
+    for tp in data.get("talking_photos") or []:
+        tid = tp.get("talking_photo_id")
+        if tid:
+            tp_by_id[tid] = tp
+    return len(avatars_by_id) + len(tp_by_id) - before
+
+
+async def _heygen_fetch_v2_avatars_all_pages(client: httpx.AsyncClient) -> tuple[List[Dict[str, Any]], List[Dict[str, Any]]]:
     """
-    Fetch Public avatars and Talking Photos from HeyGen (v2).
-
-    Returned format is normalized for the frontend selector:
-    [{ id, name, gender?, preview_image_url, default_voice_id?, kind }]
-    (gender from HeyGen is typically "female" / "male" for studio avatars; may be null.)
-
-    Filtering modes (HEYGEN_AVATAR_LIST_FILTER):
-    - teacher (default): headshot / teacher-style presenters using HeyGen studio avatars only
-      (bust-up or office/classroom contexts; excludes gym, sofa, outdoor lifestyle, etc.).
-      Talking photos are omitted — they appear after studio avatars in HeyGen’s API and are a
-      mixed bag visually. Set HEYGEN_AVATAR_TEACHER_INCLUDE_TALKING_PHOTOS=1 to include them.
-    - professional: prior behavior — casual denylist + workplace/presenter hint gate on studio;
-      talking photos: casual denylist only.
-    - loose: casual denylist for both studio avatars and talking photos (no hint gate).
-    - all: no filtering.
+    Pull studio avatars + talking photos. First request is unpaginated (HeyGen default).
+    If the API honors offset/limit, follow pages until no new ids appear.
     """
-    list_filter = (os.getenv("HEYGEN_AVATAR_LIST_FILTER") or "teacher").strip().lower()
-    no_filter = list_filter == "all"
-    loose_only = list_filter == "loose"
-    teacher_mode = list_filter == "teacher"
-    teacher_include_photos = (
-        os.getenv("HEYGEN_AVATAR_TEACHER_INCLUDE_TALKING_PHOTOS", "").strip().lower()
-        in ("1", "true", "yes")
-    )
+    avatars_by_id: Dict[str, Any] = {}
+    tp_by_id: Dict[str, Any] = {}
 
-    response.headers["Cache-Control"] = "no-store"
+    main = await client.get("/v2/avatars")
+    main.raise_for_status()
+    _ingest_v2_avatars_page(main.json().get("data") or {}, avatars_by_id, tp_by_id)
 
-    payload = _heygen_get_json("/v2/avatars")
-    data = payload.get("data") or {}
+    limit = 500
+    offset = limit
+    for _ in range(400):
+        try:
+            r = await client.get("/v2/avatars", params={"offset": offset, "limit": limit})
+            if r.status_code >= 400:
+                break
+            r.raise_for_status()
+        except (httpx.HTTPStatusError, httpx.RequestError):
+            break
+        new = _ingest_v2_avatars_page(r.json().get("data") or {}, avatars_by_id, tp_by_id)
+        if new == 0:
+            break
+        batch = (r.json().get("data") or {}).get("avatars") or []
+        batch_tp = (r.json().get("data") or {}).get("talking_photos") or []
+        if len(batch) + len(batch_tp) < limit:
+            break
+        offset += limit
 
-    avatars = data.get("avatars") or []
-    talking_photos = data.get("talking_photos") or []
+    return list(avatars_by_id.values()), list(tp_by_id.values())
 
+
+def _avatar_group_looks_to_rows(
+    looks_by_id: Dict[str, Any],
+    group_id: str,
+    group_name: str,
+) -> List[Dict[str, Any]]:
+    out: List[Dict[str, Any]] = []
+    for lid, look in looks_by_id.items():
+        preview = look.get("image_url") or look.get("motion_preview_url") or ""
+        look_name = (look.get("name") or str(lid)).strip()
+        gname = (group_name or "").strip()
+        display_name = f"{gname} · {look_name}" if gname else look_name
+        out.append(
+            {
+                "id": lid,
+                "name": display_name,
+                "gender": look.get("gender"),
+                "preview_image_url": preview,
+                "default_voice_id": look.get("default_voice_id"),
+                "kind": "avatar_group",
+                "group_id": group_id,
+                "look_status": look.get("status"),
+            }
+        )
+    return out
+
+
+async def _heygen_fetch_group_looks(
+    client: httpx.AsyncClient,
+    sem: asyncio.Semaphore,
+    group_id: str,
+    group_name: str,
+) -> List[Dict[str, Any]]:
+    """All looks in one avatar group (every status). Paginates when HeyGen honors offset/limit."""
+    looks_by_id: Dict[str, Any] = {}
+    limit = 200
+    offset = 0
+
+    while offset < 100_000:
+        async with sem:
+            try:
+                resp = await client.get(
+                    f"/v2/avatar_group/{group_id}/avatars",
+                    params={"offset": offset, "limit": limit},
+                )
+                if offset == 0 and resp.status_code >= 400:
+                    resp = await client.get(f"/v2/avatar_group/{group_id}/avatars")
+                resp.raise_for_status()
+            except (httpx.HTTPStatusError, httpx.RequestError):
+                if offset == 0:
+                    try:
+                        resp = await client.get(f"/v2/avatar_group/{group_id}/avatars")
+                        resp.raise_for_status()
+                    except (httpx.HTTPStatusError, httpx.RequestError):
+                        return []
+                else:
+                    break
+
+        page = (resp.json().get("data") or {}).get("avatar_list") or []
+        before = len(looks_by_id)
+        for look in page:
+            lid = look.get("id")
+            if lid:
+                looks_by_id[str(lid)] = look
+        if not page:
+            break
+        if len(looks_by_id) == before and offset > 0:
+            break
+        if len(page) < limit:
+            break
+        offset += limit
+
+    return _avatar_group_looks_to_rows(looks_by_id, group_id, group_name)
+
+
+async def _heygen_merge_avatar_group_lists(client: httpx.AsyncClient) -> List[Dict[str, Any]]:
+    """Union of account groups and public groups (deduped by group id)."""
+    merged: Dict[str, Dict[str, Any]] = {}
+    for params in ({}, {"include_public": "true"}):
+        try:
+            r = await client.get("/v2/avatar_group.list", params=params)
+            r.raise_for_status()
+        except (httpx.HTTPStatusError, httpx.RequestError):
+            continue
+        for g in (r.json().get("data") or {}).get("avatar_group_list") or []:
+            gid = g.get("id")
+            if gid and str(gid) not in merged:
+                merged[str(gid)] = g
+    return list(merged.values())
+
+
+def _normalize_v2_avatar_rows(
+    studio_list: List[Dict[str, Any]],
+    tp_list: List[Dict[str, Any]],
+) -> List[Dict[str, Any]]:
+    """Turn HeyGen /v2/avatars studio + talking_photo payloads into UI rows."""
     normalized: List[Dict[str, Any]] = []
-
-    for a in avatars:
-        if not no_filter:
-            if _is_likely_casual_studio_avatar(a):
-                continue
-            if teacher_mode:
-                if _teacher_studio_excluded(a):
-                    continue
-                if not _teacher_studio_keeps(a):
-                    continue
-            elif not loose_only:
-                if not _looks_professional_studio_avatar(a):
-                    continue
+    for a in studio_list:
+        aid = a.get("avatar_id")
+        if not aid:
+            continue
         normalized.append(
             {
-                "id": a.get("avatar_id"),
+                "id": aid,
                 "name": a.get("avatar_name"),
                 "gender": a.get("gender"),
                 "preview_image_url": a.get("preview_image_url"),
@@ -530,19 +303,13 @@ def heygen_avatars(response: Response) -> Dict[str, List[Dict[str, Any]]]:
                 "kind": "avatar",
             }
         )
-
-    for tp in talking_photos:
-        if teacher_mode and not teacher_include_photos:
+    for tp in tp_list:
+        tid = tp.get("talking_photo_id")
+        if not tid:
             continue
-        if not no_filter:
-            if _is_likely_casual(_casual_talking_photo_blob(tp)):
-                continue
-            # With talking photos re-enabled in teacher mode, drop illustrated / character looks.
-            if teacher_mode and _is_illustrated_talking_photo(tp):
-                continue
         normalized.append(
             {
-                "id": tp.get("talking_photo_id"),
+                "id": tid,
                 "name": tp.get("talking_photo_name"),
                 "gender": tp.get("gender"),
                 "preview_image_url": tp.get("preview_image_url"),
@@ -550,11 +317,117 @@ def heygen_avatars(response: Response) -> Dict[str, List[Dict[str, Any]]]:
                 "kind": "talking_photo",
             }
         )
+    return normalized
 
-    if teacher_mode:
-        normalized.sort(key=lambda x: (x.get("name") or "").lower())
 
-    return {"avatars": normalized}
+async def _heygen_fetch_avatar_group_look_rows(
+    client: httpx.AsyncClient,
+) -> tuple[List[Dict[str, Any]], Dict[str, Any]]:
+    """Photo-avatar group looks only (slow; many HeyGen calls)."""
+    meta: Dict[str, Any] = {
+        "avatar_group_look_rows": 0,
+        "group_list_merged_count": 0,
+        "group_fetch_exceptions": 0,
+    }
+    rows: List[Dict[str, Any]] = []
+    raw_groups = await _heygen_merge_avatar_group_lists(client)
+    meta["group_list_merged_count"] = len(raw_groups)
+
+    sem = asyncio.Semaphore(24)
+    tasks = [
+        _heygen_fetch_group_looks(
+            client,
+            sem,
+            str(g.get("id")),
+            str(g.get("name") or ""),
+        )
+        for g in raw_groups
+        if g.get("id")
+    ]
+    if tasks:
+        chunks = await asyncio.gather(*tasks, return_exceptions=True)
+        for ch in chunks:
+            if isinstance(ch, Exception):
+                meta["group_fetch_exceptions"] += 1
+                continue
+            rows.extend(ch)
+        meta["avatar_group_look_rows"] = sum(
+            len(x) for x in chunks if isinstance(x, list)
+        )
+    return rows, meta
+
+
+@app.get("/heygen/avatars")
+async def heygen_avatars(response: Response) -> Dict[str, Any]:
+    """
+    Same catalog as ``GET https://api.heygen.com/v2/avatars`` (studio + talking photos only).
+
+    Kept separate from photo-avatar **group** looks so this response stays small and reliable
+    (matches what you get from ``heygen_avatars_dump.json``). Extra pages use offset/limit when
+    HeyGen supports them.
+
+    Response: ``{ "avatars": [...], "meta": { studio_avatar_rows, talking_photo_rows, v2_row_total } }``.
+    """
+    response.headers["Cache-Control"] = "no-store"
+    api_key = _get_heygen_api_key()
+    headers = {"x-api-key": api_key}
+    timeout = httpx.Timeout(120.0, connect=20.0)
+    limits = httpx.Limits(max_keepalive_connections=32, max_connections=64)
+
+    async with httpx.AsyncClient(
+        base_url=HEYGEN_BASE_URL,
+        headers=headers,
+        timeout=timeout,
+        limits=limits,
+    ) as client:
+        try:
+            studio_list, tp_list = await _heygen_fetch_v2_avatars_all_pages(client)
+        except httpx.HTTPStatusError as e:
+            raise HTTPException(
+                status_code=502,
+                detail=f"HeyGen request failed: {e.response.status_code}",
+            ) from e
+        except httpx.RequestError as e:
+            raise HTTPException(status_code=502, detail="HeyGen request failed") from e
+
+    normalized = _normalize_v2_avatar_rows(studio_list, tp_list)
+    meta = {
+        "studio_avatar_rows": len(studio_list),
+        "talking_photo_rows": len(tp_list),
+        "v2_row_total": len(normalized),
+    }
+    return {"avatars": normalized, "meta": meta}
+
+
+@app.get("/heygen/avatar-group-looks")
+async def heygen_avatar_group_looks(response: Response) -> Dict[str, Any]:
+    """
+    All looks from ``/v2/avatar_group.list`` (account + public) and each
+    ``/v2/avatar_group/{id}/avatars``. Slow; call after ``/heygen/avatars`` has loaded.
+
+    Disable with ``HEYGEN_FETCH_AVATAR_GROUPS=0``.
+    """
+    response.headers["Cache-Control"] = "no-store"
+    if os.getenv("HEYGEN_FETCH_AVATAR_GROUPS", "1").strip().lower() in ("0", "false", "no"):
+        return {"avatars": [], "meta": {"skipped": True}}
+
+    api_key = _get_heygen_api_key()
+    headers = {"x-api-key": api_key}
+    timeout = httpx.Timeout(300.0, connect=20.0)
+    limits = httpx.Limits(max_keepalive_connections=32, max_connections=64)
+
+    async with httpx.AsyncClient(
+        base_url=HEYGEN_BASE_URL,
+        headers=headers,
+        timeout=timeout,
+        limits=limits,
+    ) as client:
+        try:
+            rows, meta = await _heygen_fetch_avatar_group_look_rows(client)
+        except (httpx.HTTPStatusError, httpx.RequestError):
+            return {"avatars": [], "meta": {"error": True}}
+
+    return {"avatars": rows, "meta": meta}
 
 
 @app.get("/heygen/voices")
