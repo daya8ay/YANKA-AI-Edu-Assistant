@@ -4,6 +4,7 @@ from fastapi import HTTPException, Depends
 from fastapi.security import HTTPBearer, HTTPAuthorizationCredentials
 from jwt import PyJWKClient
 from sqlalchemy.orm import Session
+from sqlalchemy import text
 from dotenv import load_dotenv
 from typing import Optional
 
@@ -63,8 +64,6 @@ def get_or_create_user(cognito_payload: dict, db: Session) -> User:
     Returns:
         User object from database
     """
-    # Clear any failed transactions to start with clean session
-    db.rollback()
 
     print(f"DEBUG: === get_or_create_user CALLED ===")
     print(f"DEBUG: Function entry - cognito_payload type: {type(cognito_payload)}")
@@ -87,21 +86,44 @@ def get_or_create_user(cognito_payload: dict, db: Session) -> User:
             print(f"DEBUG: ERROR - Missing cognito_sub in token payload")
             raise HTTPException(status_code=401, detail="Invalid token: missing sub")
 
-        print(f"DEBUG: Step 2 - Querying for existing user by cognito_sub")
+        print(f"DEBUG: Step 2 - Checking if cognito_sub column exists")
         user = None
+        cognito_sub_exists = False
 
-        # Try to find existing user by Cognito sub ID first
+        # Check if cognito_sub column exists by inspecting the table
         try:
-            query_result = db.query(User).filter(User.cognito_sub == cognito_sub).first()
-            print(f"DEBUG: Step 2 - Query by cognito_sub completed")
-            if query_result:
-                print(f"DEBUG: Step 2 - FOUND user by cognito_sub: user_id={query_result.user_id}, email={query_result.email}")
-                user = query_result
-            else:
-                print(f"DEBUG: Step 2 - NO user found by cognito_sub")
+            # Try a simple query that would fail if cognito_sub doesn't exist
+            db.execute(text("SELECT cognito_sub FROM users LIMIT 1"))
+            cognito_sub_exists = True
+            print(f"DEBUG: Step 2 - cognito_sub column exists")
         except Exception as e:
-            print(f"DEBUG: Step 2 - ERROR querying by cognito_sub: {type(e).__name__}: {e}")
-            user = None
+            print(f"DEBUG: Step 2 - cognito_sub column does not exist: {e}")
+            try:
+                db.rollback()
+                print(f"DEBUG: Step 2 - Rolled back after column check")
+            except:
+                pass
+
+        # Only try to query by cognito_sub if the column exists
+        if cognito_sub_exists:
+            try:
+                query_result = db.query(User).filter(User.cognito_sub == cognito_sub).first()
+                print(f"DEBUG: Step 2 - Query by cognito_sub completed")
+                if query_result:
+                    print(f"DEBUG: Step 2 - FOUND user by cognito_sub: user_id={query_result.user_id}, email={query_result.email}")
+                    user = query_result
+                else:
+                    print(f"DEBUG: Step 2 - NO user found by cognito_sub")
+            except Exception as e:
+                print(f"DEBUG: Step 2 - ERROR querying by cognito_sub: {type(e).__name__}: {e}")
+                try:
+                    db.rollback()
+                    print(f"DEBUG: Step 2 - Rolled back failed transaction")
+                except:
+                    pass
+                user = None
+        else:
+            print(f"DEBUG: Step 2 - Skipping cognito_sub query - column doesn't exist")
 
         if not user and email:
             print(f"DEBUG: Step 3 - Querying for existing user by email")
@@ -111,34 +133,51 @@ def get_or_create_user(cognito_payload: dict, db: Session) -> User:
                 if query_result:
                     print(f"DEBUG: Step 3 - FOUND user by email: user_id={query_result.user_id}")
                     user = query_result
-                    # Try to update cognito_sub
-                    try:
-                        print(f"DEBUG: Step 3 - Updating cognito_sub for existing user")
-                        user.cognito_sub = cognito_sub
-                        db.commit()
-                        db.refresh(user)
-                        print(f"DEBUG: Step 3 - Successfully updated cognito_sub")
-                    except Exception as e:
-                        print(f"DEBUG: Step 3 - ERROR updating cognito_sub: {type(e).__name__}: {e}")
-                        db.rollback()
+                    # Try to update cognito_sub only if column exists
+                    if cognito_sub_exists:
+                        try:
+                            print(f"DEBUG: Step 3 - Updating cognito_sub for existing user")
+                            user.cognito_sub = cognito_sub
+                            db.commit()
+                            db.refresh(user)
+                            print(f"DEBUG: Step 3 - Successfully updated cognito_sub")
+                        except Exception as e:
+                            print(f"DEBUG: Step 3 - ERROR updating cognito_sub: {type(e).__name__}: {e}")
+                            db.rollback()
+                    else:
+                        print(f"DEBUG: Step 3 - Skipping cognito_sub update - column doesn't exist")
                 else:
                     print(f"DEBUG: Step 3 - NO user found by email")
             except Exception as e:
                 print(f"DEBUG: Step 3 - ERROR querying by email: {type(e).__name__}: {e}")
+                # Rollback failed transaction before raising error
+                try:
+                    db.rollback()
+                    print(f"DEBUG: Step 3 - Rolled back failed transaction")
+                except Exception as rollback_error:
+                    print(f"DEBUG: Step 3 - Error during rollback: {rollback_error}")
                 raise HTTPException(status_code=500, detail=f"Database error: {e}")
 
         if not user:
             print(f"DEBUG: Step 4 - Creating new user")
             try:
                 print(f"DEBUG: Step 4 - Constructing User object")
-                user = User(
-                    cognito_sub=cognito_sub,
-                    email=email,
-                    first_name=given_name,
-                    last_name=family_name,
-                    role="student",
-                    account_status="active"
-                )
+                user_data = {
+                    "email": email,
+                    "first_name": given_name,
+                    "last_name": family_name,
+                    "role": "student",
+                    "account_status": "active"
+                }
+
+                # Only add cognito_sub if the column exists
+                if cognito_sub_exists:
+                    user_data["cognito_sub"] = cognito_sub
+                    print(f"DEBUG: Step 4 - Including cognito_sub in user creation")
+                else:
+                    print(f"DEBUG: Step 4 - Skipping cognito_sub - column doesn't exist")
+
+                user = User(**user_data)
                 print(f"DEBUG: Step 4 - User object created, adding to db")
                 db.add(user)
                 print(f"DEBUG: Step 4 - Committing to database")
