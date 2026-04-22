@@ -66,6 +66,11 @@ class AvatarResponse(BaseModel):
 class UserAvatarCreate(BaseModel):
     """Schema for saving a user's selected HeyGen avatar."""
     heygen_data: HeyGenAvatarData
+    custom_name: Optional[str] = None
+
+
+class AvatarNameUpdate(BaseModel):
+    name: str
 
 
 class UserAvatarResponse(BaseModel):
