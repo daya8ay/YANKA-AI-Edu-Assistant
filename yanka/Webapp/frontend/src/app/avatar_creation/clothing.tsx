@@ -7,7 +7,7 @@ type Variant = {
   id: string;
   name: string;
   preview_image_url: string;
-  kind: "avatar" | "talking_photo";
+  kind: "avatar" | "talking_photo" | "avatar_group";
 };
 
 /** e.g. "Aditya in Blue shirt" → "Blue shirt" */
@@ -20,6 +20,25 @@ function outfitLabelFromName(name: string): string | null {
   const color = colorRaw.charAt(0).toUpperCase() + colorRaw.slice(1).toLowerCase();
   const garment = garmentRaw.toLowerCase();
   return `${color} ${garment}`;
+}
+
+/**
+ * Labels for studio looks that are not "in Color garment" outfits — e.g. office front/side,
+ * upper body, etc. Strips the presenter prefix when the name starts with it.
+ */
+function poseOrLookLabel(personKey: string, name: string): string {
+  const pk = (personKey || "").trim();
+  const raw = (name || "").trim();
+  if (!raw) return "Look";
+
+  const lower = raw.toLowerCase();
+  const pkLower = pk.toLowerCase();
+  if (pk && lower.startsWith(pkLower)) {
+    let rest = raw.slice(pk.length).trim();
+    rest = rest.replace(/^[-–—:]\s*/u, "").trim();
+    if (rest) return rest;
+  }
+  return raw;
 }
 
 function poseHint(a: Pick<Variant, "id" | "name">): string {
@@ -58,6 +77,19 @@ const Clothing: React.FC<{
       .filter(Boolean) as { v: Variant; label: string }[];
   }, [variants]);
 
+  const poseLookVariants = useMemo(() => {
+    if (!personKey) return [];
+    return variants
+      .filter((v) => outfitLabelFromName(v.name) == null)
+      .map((v) => ({
+        v,
+        label: poseOrLookLabel(personKey, v.name),
+      }))
+      .sort((a, b) =>
+        a.label.localeCompare(b.label, undefined, { sensitivity: "base" }),
+      );
+  }, [variants, personKey]);
+
   const labels = useMemo(() => {
     const set = new Set<string>();
     for (const row of rowsWithOutfit) set.add(row.label);
@@ -74,39 +106,38 @@ const Clothing: React.FC<{
     return m;
   }, [rowsWithOutfit]);
 
+  const hasAnyOptions = labels.length > 0 || poseLookVariants.length > 0;
+
   return (
     <div className={styles.tabContent}>
       <div className={styles.section}>
-        <h4>Outfit</h4>
+        <h4>Looks</h4>
         {!personKey ? (
           <p style={{ color: "#6B7FA8" }}>
             Select an avatar in the <strong>Avatar</strong> tab first.
           </p>
         ) : (
           <p style={{ color: "#6B7FA8" }}>
-            Outfit options for <strong>{personKey}</strong>. Tap an option to switch the clothing.
+            Looks for <strong>{personKey}</strong>
           </p>
         )}
       </div>
 
-      {personKey && labels.length === 0 ? (
+      {personKey && !hasAnyOptions ? (
         <div className={styles.section}>
-          <p style={{ color: "#6B7FA8" }}>
-            No outfit options found for this presenter.
-          </p>
+          <p style={{ color: "#6B7FA8" }}>No look options found for this presenter.</p>
         </div>
       ) : null}
 
-      {labels.length > 0 ? (
+      {personKey && hasAnyOptions ? (
         <div className={styles.section}>
-          <h4>Looks</h4>
           <div className={styles.styleOptions}>
             {labels.map((label) => {
               const chosen = pickVariantForPose(byLabel.get(label) ?? [], currentPose);
               const isActive = currentLabel === label;
               return (
                 <button
-                  key={label}
+                  key={`outfit-${label}`}
                   type="button"
                   onClick={() => chosen && onSelectAvatarId(chosen.id)}
                   disabled={!chosen}
@@ -116,12 +147,21 @@ const Clothing: React.FC<{
                 </button>
               );
             })}
+            {poseLookVariants.map(({ v, label }) => {
+              const isActive = selectedAvatarId === v.id;
+              return (
+                <button
+                  key={`pose-${v.id}`}
+                  type="button"
+                  onClick={() => onSelectAvatarId(v.id)}
+                  className={`${styles.styleOption} ${isActive ? styles.selected : ""}`}
+                  title={v.name}
+                >
+                  {label}
+                </button>
+              );
+            })}
           </div>
-          {currentPose ? (
-            <p style={{ marginTop: "12px", color: "#6B7FA8", fontSize: "0.9rem" }}>
-              Pose preserved when possible: <strong>{currentPose}</strong>
-            </p>
-          ) : null}
         </div>
       ) : null}
     </div>
