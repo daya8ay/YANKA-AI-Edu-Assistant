@@ -215,14 +215,14 @@ const NavBar: React.FC = () => {
               </Link>
             </li>
             <li>
-              <Image
-                src="/pics/globe.jpeg"
-                alt={t.languageSelector}
-                width={28}
-                height={28}
-                className={styles.globeIcon}
+              <button
+                type="button"
+                className={styles.languageButton}
                 onClick={() => setIsLanguageModalOpen(true)}
-              />
+                aria-label={t.languageSelector}
+              >
+                EN <span className={styles.divider}>|</span> FR
+              </button>
             </li>
           </ul>
         </nav>
