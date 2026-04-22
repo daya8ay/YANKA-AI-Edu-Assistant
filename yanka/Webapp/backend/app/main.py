@@ -2,7 +2,7 @@ import asyncio
 from contextlib import asynccontextmanager
 import os
 import re
-from typing import Any, Dict, List, Optional
+from typing import Any, Dict, List, Optional, Tuple
 from pathlib import Path
 
 import httpx
@@ -224,7 +224,9 @@ async def create_avatar_session():
     }
 
 
-async def _start_session(client: httpx.AsyncClient) -> tuple[dict | None, str | None, str | None]:
+async def _start_session(
+    client: httpx.AsyncClient,
+) -> Tuple[Optional[Dict[str, Any]], Optional[str], Optional[str]]:
     """
     Creates a LiveAvatar token then starts the session.
     Returns (start_data, session_token, session_id) on success, or (None, None, None)
@@ -277,7 +279,7 @@ async def stop_avatar_session(session_id: str):
 
 class VideoHelpRequest(BaseModel):
     timestamp: float
-    lookback: float | None = None
+    lookback: Optional[float] = None
 
 
 def load_transcript_context(timestamp: float, lookback: float = 180.0) -> str:
