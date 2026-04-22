@@ -1,6 +1,6 @@
 # YANKA Backend (FastAPI)
 
-Minimal FastAPI backend, ready for video generation and other AI features. The support chatbot remains implemented in the Next.js frontend (`/api/chat`).
+Python FastAPI backend for the YANKA Webapp. Connects to the frontend and handles sending/receiving data.
 
 ## Run with Docker (recommended)
 
@@ -19,9 +19,9 @@ docker compose up --build
 ```bash
 cd yanka/Webapp/backend
 python -m venv .venv
-source .venv/bin/activate   # or .venv\Scripts\activate on Windows
+source .venv/bin/activate   # Windows: .venv\Scripts\activate
 pip install -r requirements.txt
-uvicorn app.main:app --reload --port 8000
+cp .env.example .env       # optional: set PORT and FRONTEND_URL
 ```
 
 Start the database with `docker compose -f database/docker-compose.yml up -d` if needed.
@@ -112,3 +112,30 @@ What each test checks:
 - **test_duplicate_email** — same email twice returns 400 (server refuses the duplicate)
 - **test_missing_required_field** — missing `role` returns 422 (request is malformed)
 - **test_invalid_email_format** — non-email string returns 422 (validation failure)
+
+## Run
+
+```bash
+python main.py
+```
+
+Or with uvicorn directly:
+
+```bash
+uvicorn app.main:app --reload --port 8000
+```
+
+Server runs at **http://localhost:8000** by default (same as Docker).
+
+## API
+
+| Method | Path                          | Description                         |
+|--------|-------------------------------|-------------------------------------|
+| GET    | /api/health                   | Health check                        |
+| GET    | /api/data                     | Get data (sent to frontend)         |
+| POST   | /api/data                     | Receive JSON body from frontend     |
+| POST   | /api/video-analytics/predict  | Run ML model on video metrics       |
+
+## Frontend connection
+
+In the frontend, set `NEXT_PUBLIC_API_URL` in `.env.local` if your API is not on `http://localhost:8000` (see `src/lib/api.ts`) and use the `api` client to call these endpoints.

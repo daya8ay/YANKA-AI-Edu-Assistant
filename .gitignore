@@ -30,3 +30,6 @@ yarn-error.log*
 **/.DS_Store
 Thumbs.db
 .env
+*.pkl
+*.mp4
+!yanka/Webapp/frontend/public/video/test.mp4
