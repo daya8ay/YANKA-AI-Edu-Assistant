@@ -105,7 +105,7 @@ const SupportContent: React.FC = () => {
       const session = await fetchAuthSession();
       const token = session.tokens?.idToken?.toString();
 
-      const res = await fetch("http://localhost:8000/chat", {
+      const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/chat`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
