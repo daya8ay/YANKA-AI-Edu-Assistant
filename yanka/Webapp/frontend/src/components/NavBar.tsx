@@ -204,10 +204,10 @@ const NavBar: React.FC = () => {
               <Link href="/#marketplace">{t.marketplace}</Link>
             </li>
             <li>
-              <Link href="/support">{t.support}</Link>
+              <Link href="/research">{t.research}</Link>
             </li>
             <li>
-              <Link href="/research">{t.research}</Link>
+              <Link href="/support">{t.support}</Link>
             </li>
             <li>
               <Link href="/login" className={styles.btnLogin}>
