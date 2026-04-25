@@ -12,3 +12,13 @@ psycopg2-binary>=2.9.0
 pypdf
 python-docx
 boto3>=1.34.0
+joblib>=1.3.0
+pandas>=2.0.0
+# NumPy 1.26 has no binary wheels for Python 3.13+; use NumPy 2.x there (wheels install without a compiler).
+# Legacy random_forest / one_hot_encoder pickles in git history needed numpy<2 + sklearn 1.2; current XGBoost pipeline does not.
+numpy>=1.26.0
+# CPU-only build avoids pulling large NVIDIA/CUDA wheels (e.g. nvidia-nccl-cu12) on small EC2 disks.
+xgboost-cpu>=2.0.0,<3.0.0
+PyJWT
+cryptography
+scikit-learn>=1.5.0

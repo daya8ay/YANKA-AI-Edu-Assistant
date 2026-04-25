@@ -1,0 +1,157 @@
+.pageWrapper {
+  min-height: 100vh;
+  background: linear-gradient(180deg, #f7f9fd 0%, #eef3fb 100%);
+}
+
+.page {
+  max-width: 1120px;
+  margin: 0 auto;
+  padding: 3rem 1.2rem 4rem;
+}
+
+.hero {
+  background: #ffffff;
+  border: 1px solid #d8e2f2;
+  border-radius: 16px;
+  padding: 2rem;
+  box-shadow: 0 10px 24px rgba(15, 43, 91, 0.08);
+  margin-bottom: 1.5rem;
+}
+
+.eyebrow {
+  color: #1e4386;
+  font-weight: 700;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+  margin: 0 0 0.4rem;
+}
+
+.hero h1 {
+  color: #0e2f66;
+  font-size: clamp(1.7rem, 2.8vw, 2.3rem);
+  margin: 0 0 0.7rem;
+}
+
+.hero p {
+  color: #304b74;
+  line-height: 1.6;
+  margin: 0;
+}
+
+.contributionsSection {
+  display: grid;
+  gap: 1.25rem;
+}
+
+.card {
+  background: #ffffff;
+  border: 1px solid #d8e2f2;
+  border-radius: 14px;
+  padding: 1.35rem;
+  box-shadow: 0 8px 20px rgba(15, 43, 91, 0.06);
+}
+
+.cardHeader h2 {
+  margin: 0;
+  color: #0f2d5b;
+  font-size: 1.3rem;
+}
+
+.cardHeader p {
+  margin: 0.45rem 0 0;
+  color: #446089;
+  font-weight: 600;
+}
+
+.metaGrid {
+  margin-top: 1rem;
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+  gap: 0.9rem;
+}
+
+.metaGrid div {
+  background: #f5f8ff;
+  border: 1px solid #dce6f6;
+  border-radius: 10px;
+  padding: 0.8rem;
+}
+
+.metaGrid span {
+  display: block;
+  font-size: 0.8rem;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  color: #5a7295;
+  margin-bottom: 0.2rem;
+}
+
+.metaGrid p {
+  margin: 0;
+  color: #183c71;
+  font-weight: 600;
+}
+
+.block {
+  margin-top: 1rem;
+}
+
+.detailsGrid {
+  margin-top: 1rem;
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+  gap: 0.9rem;
+}
+
+.detailCard {
+  margin-top: 0;
+  background: #f5f8ff;
+  border: 1px solid #dce6f6;
+  border-radius: 10px;
+  padding: 0.8rem;
+}
+
+.block h3 {
+  margin: 0 0 0.55rem;
+  color: #12386d;
+  font-size: 1.02rem;
+}
+
+.block p,
+.block li {
+  color: #2e4d79;
+  line-height: 1.6;
+}
+
+.block ul {
+  margin: 0;
+  padding-left: 1.2rem;
+}
+
+.textGroup p {
+  margin: 0 0 0.55rem;
+}
+
+.textGroup p:last-child {
+  margin-bottom: 0;
+}
+
+.linksRow {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.6rem;
+}
+
+.linkChip {
+  text-decoration: none;
+  color: #124394;
+  border: 1px solid #c5d8fb;
+  background: #f2f7ff;
+  border-radius: 999px;
+  padding: 0.4rem 0.8rem;
+  font-weight: 600;
+}
+
+.linkChip:hover {
+  background: #e4efff;
+}

@@ -5,7 +5,7 @@ import styles from "./avatar.module.css";
 
 const AVATARS_PER_PAGE = 12;
 
-export type PresenterGender = "male" | "female";
+export type PresenterGender = "male" | "female" | "other";
 
 export type HeygenAvatarRow = {
   id: string;
@@ -16,7 +16,7 @@ export type HeygenAvatarRow = {
   kind: "avatar" | "talking_photo" | "avatar_group";
 };
 
-function getPersonKey(a: Pick<HeygenAvatarRow, "id" | "name">): string {
+function getPersonKey(a: Pick<HeygenAvatarRow, "id" | "name" | "kind">): string {
   const name = (a.name ?? "").trim();
   const inIdx = name.toLowerCase().indexOf(" in ");
   if (inIdx > 0) return name.slice(0, inIdx).trim();
@@ -24,6 +24,20 @@ function getPersonKey(a: Pick<HeygenAvatarRow, "id" | "name">): string {
   const id = (a.id ?? "").trim();
   const usIdx = id.indexOf("_");
   if (usIdx > 0) return id.slice(0, usIdx).trim();
+
+  const firstWord = name.match(/^([A-Za-z][A-Za-z'-]*)\b/);
+  if (firstWord) {
+    const lead = firstWord[1];
+    const rest = name.slice(firstWord[0].length).trim().toLowerCase();
+    const looksLikePoseOrScene =
+      /^(\d+\b|\(|in\b|on\b|at\b|with\b|without\b|riding\b|standing\b|sitting\b|smiling\b|laughing\b|front\b|side\b|left\b|right\b)/.test(rest);
+    if (rest && looksLikePoseOrScene) return lead;
+  }
+
+  if (a.kind !== "avatar") {
+    const firstToken = name.match(/^([A-Za-z][A-Za-z'-]*)\b/);
+    if (firstToken) return firstToken[1];
+  }
 
   return name || id;
 }
@@ -153,6 +167,7 @@ const StudioAvatar: React.FC<{
         >
           <option value="male">Male</option>
           <option value="female">Female</option>
+          <option value="other">Other</option>
         </select>
         <p
           style={{
@@ -162,8 +177,15 @@ const StudioAvatar: React.FC<{
             marginBottom: "16px",
           }}
         >
-          Choose your Avatar. Showing only {" "}
-          <strong>{presenterGender === "male" ? "male" : "female"}</strong> presenters.
+          Choose your Avatar. Showing only{" "}
+          <strong>
+            {presenterGender === "male"
+              ? "male"
+              : presenterGender === "female"
+                ? "female"
+                : "other / unspecified"}
+          </strong>{" "}
+          presenters.
         </p>
 
         {loading ? <p style={{ color: "#6B7FA8" }}>Loading avatars...</p> : null}

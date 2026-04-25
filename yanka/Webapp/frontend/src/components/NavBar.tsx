@@ -34,6 +34,7 @@ const translations = {
     pricing: "Pricing",
     marketplace: "Marketplace",
     support: "Support",
+    research: "Research",
     login: "Login",
     signup: "Sign Up",
     languageSelector: "Language Selector",
@@ -60,6 +61,7 @@ const translations = {
     pricing: "Tarifs",
     marketplace: "Marketplace",
     support: "Support",
+    research: "Recherche",
     login: "Connexion",
     signup: "S’inscrire",
     languageSelector: "Sélecteur de langue",
@@ -200,6 +202,9 @@ const NavBar: React.FC = () => {
             </li>
             <li>
               <Link href="/#marketplace">{t.marketplace}</Link>
+            </li>
+            <li>
+              <Link href="/research">{t.research}</Link>
             </li>
             <li>
               <Link href="/support">{t.support}</Link>

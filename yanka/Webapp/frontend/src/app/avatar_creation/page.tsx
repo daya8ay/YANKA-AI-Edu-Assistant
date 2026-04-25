@@ -31,7 +31,7 @@ function mergeAvatarsByKindId(base: HeygenAvatar[], extra: HeygenAvatar[]): Heyg
   return out;
 }
 
-function getPersonKey(a: Pick<HeygenAvatar, "id" | "name">): string {
+function getPersonKey(a: Pick<HeygenAvatar, "id" | "name" | "kind">): string {
   // Prefer the name prefix before " in " (e.g. "Aditya in Blue shirt" => "Aditya")
   const name = (a.name ?? "").trim();
   const inIdx = name.toLowerCase().indexOf(" in ");
@@ -42,6 +42,25 @@ function getPersonKey(a: Pick<HeygenAvatar, "id" | "name">): string {
   const usIdx = id.indexOf("_");
   if (usIdx > 0) return id.slice(0, usIdx).trim();
 
+  // For many talking-photo / other rows, names are like:
+  // "Tiana smiling 2", "Tiana riding a horse", "Tiana front of castle 3".
+  // Treat the leading token as the person when followed by scene/pose words.
+  const firstWord = name.match(/^([A-Za-z][A-Za-z'-]*)\b/);
+  if (firstWord) {
+    const lead = firstWord[1];
+    const rest = name.slice(firstWord[0].length).trim().toLowerCase();
+    const looksLikePoseOrScene =
+      /^(\d+\b|\(|in\b|on\b|at\b|with\b|without\b|riding\b|standing\b|sitting\b|smiling\b|laughing\b|front\b|side\b|left\b|right\b)/.test(rest);
+    if (rest && looksLikePoseOrScene) return lead;
+  }
+
+  // For talking-photo/group entries, be more aggressive so variant names collapse
+  // into one presenter card (e.g. "Tiana smiling 2", "Tiana riding a horse").
+  if (a.kind !== "avatar") {
+    const firstToken = name.match(/^([A-Za-z][A-Za-z'-]*)\b/);
+    if (firstToken) return firstToken[1];
+  }
+
   return name || id;
 }
 
@@ -50,10 +69,12 @@ function avatarMatchesPresenterGender(
   filter: PresenterGender,
 ): boolean {
   const g = (avatar.gender ?? "").toLowerCase().trim();
-  if (!g) return true;
-  if (g === "male" || g === "man" || g === "m") return filter === "male";
-  if (g === "female" || g === "woman" || g === "f") return filter === "female";
-  return true;
+  const isMale = g === "male" || g === "man" || g === "m";
+  const isFemale = g === "female" || g === "woman" || g === "f";
+
+  if (filter === "male") return isMale;
+  if (filter === "female") return isFemale;
+  return !isMale && !isFemale;
 }
 
 /** Must match initial `presenterGender` state (used to pick first avatar after fetch). */
@@ -219,14 +240,15 @@ const AvatarCreation = () => {
     setSelectedPersonKey(getPersonKey(fallback));
   }, [filteredAvatars, selectedAvatarId, voices]);
 
+  // Keep look switching comprehensive for a presenter across all gender buckets.
   const selectedPersonVariants = useMemo(() => {
     if (!selectedPersonKey) return [];
-    return filteredAvatars.filter((a) => getPersonKey(a) === selectedPersonKey);
-  }, [filteredAvatars, selectedPersonKey]);
+    return avatars.filter((a) => getPersonKey(a) === selectedPersonKey);
+  }, [avatars, selectedPersonKey]);
 
-  /** Looks tab: studio rigged avatars only (outfit / "in …" variants), not photo or group looks. */
+  /** Looks tab: include studio + talking photos for the person; exclude group catalog rows. */
   const looksTabVariants = useMemo(
-    () => selectedPersonVariants.filter((a) => a.kind === "avatar"),
+    () => selectedPersonVariants.filter((a) => a.kind !== "avatar_group"),
     [selectedPersonVariants],
   );
 
