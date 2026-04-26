@@ -313,11 +313,19 @@
   padding: 20px;
 }
 
+.formSection {
+  padding: 2px 0 0;
+}
+
+.formSection + .formSection {
+  margin-top: 10px;
+}
+
 .bottomGrid {
   display: grid;
   grid-template-columns: 1fr 1fr;
   gap: 20px;
-  align-items: start;
+  align-items: stretch;
 }
 
 .smallCard {
@@ -329,10 +337,11 @@
 }
 
 .cardHeading {
-  margin: 0 0 16px 0;
+  margin: 0;
   font-family: 'Poppins', sans-serif;
   font-size: 1.15rem;
   font-weight: 700;
+  line-height: 1;
   color: #2D3553;
 }
 
@@ -506,7 +515,7 @@
   display: flex;
   align-items: center;
   gap: 10px;
-  margin-bottom: 14px;
+  margin-bottom: 12px;
 }
 
 .iconBadge {
@@ -534,7 +543,7 @@
   margin-bottom: 8px;
 }
 
-.smallCard .textAreaInput {
+.formSection .textAreaInput {
   margin-bottom: 12px;
 }
 
@@ -792,4 +801,11 @@
 
 .statusFailed {
   color: #dc2626;
+}
+
+.sectionDivider {
+  height: 1px;
+  width: 100%;
+  background: #d7def5;
+  margin: 18px 0 18px;
 }
