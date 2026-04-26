@@ -1120,3 +1120,121 @@
     width: 90%;
   }
 }
+
+/* ---------- HERO RESPONSIVE FIX ---------- */
+
+@media (max-width: 900px) {
+  .hero {
+    flex-direction: column; /* stack content + video */
+    text-align: center;
+    padding: 60px 30px;
+  }
+
+  .heroContent {
+    max-width: 100%;
+  }
+
+  .heroContent h1 {
+    font-size: 2.2rem;
+  }
+
+  .heroContent p {
+    font-size: 1rem;
+  }
+
+  .heroButtons {
+    justify-content: center;
+    flex-wrap: wrap;
+  }
+
+  .heroVideoContainer {
+    margin-left: 0;
+    margin-top: 30px;
+    max-width: 100%;
+    width: 100%;
+  }
+}
+
+@media (max-width: 600px) {
+  .hero {
+    padding: 50px 20px;
+  }
+
+  .heroContent h1 {
+    font-size: 1.9rem;
+  }
+
+  .heroContent p {
+    font-size: 0.95rem;
+  }
+
+  .btnPrimary,
+  .btnSecondary {
+    width: 100%;
+    text-align: center;
+  }
+
+  .heroButtons {
+    flex-direction: column;
+    gap: 12px;
+  }
+
+  .heroVideo {
+    border-radius: 10px;
+  }
+}
+
+/* ---------- SPONSORS / PARTNERS RESPONSIVE FIX ---------- */
+
+@media (max-width: 900px) {
+  .sponsorSection {
+    padding: 35px 24px;
+  }
+
+  .sponsorSection h2 {
+    font-size: 1.6rem;
+  }
+
+  .sponsorLogo {
+    min-width: 140px;
+    margin: 0 24px;
+  }
+
+  .sponsorLogo img {
+    height: 50px;
+    max-width: 130px;
+  }
+
+  .sponsorTrack {
+    animation-duration: 15s;
+  }
+}
+
+@media (max-width: 600px) {
+  .sponsorSection {
+    padding: 30px 18px;
+  }
+
+  .sponsorSection h2 {
+    font-size: 1.4rem;
+    margin-bottom: 18px;
+  }
+
+  .sponsorSlider {
+    padding: 6px 0;
+  }
+
+  .sponsorLogo {
+    min-width: 110px;
+    margin: 0 14px;
+  }
+
+  .sponsorLogo img {
+    height: 42px;
+    max-width: 105px;
+  }
+
+  .sponsorTrack {
+    animation-duration: 12s;
+  }
+}
