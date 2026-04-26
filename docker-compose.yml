@@ -39,7 +39,7 @@ services:
     ports:
       - "3000:3000"
     environment:
-      NEXT_PUBLIC_API_URL: http://localhost:8000
+      NEXT_PUBLIC_API_URL: http://52.15.181.243:8000
     volumes:
       - ./yanka/Webapp/frontend:/app
       - /app/node_modules
