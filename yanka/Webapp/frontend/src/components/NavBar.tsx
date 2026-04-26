@@ -34,9 +34,11 @@ const translations = {
     pricing: "Pricing",
     marketplace: "Marketplace",
     support: "Support",
+    research: "Research",
     login: "Login",
     signup: "Sign Up",
     languageSelector: "Language Selector",
+    menu: "Menu",
   },
   fr: {
     chooseLanguage: "Choisissez une langue",
@@ -60,9 +62,11 @@ const translations = {
     pricing: "Tarifs",
     marketplace: "Marketplace",
     support: "Support",
+    research: "Recherche",
     login: "Connexion",
     signup: "S’inscrire",
     languageSelector: "Sélecteur de langue",
+    menu: "Menu",
   },
 };
 
@@ -96,6 +100,8 @@ const LanguageModal: React.FC<LanguageModalProps> = ({ isOpen, onClose }) => {
 const NavBar: React.FC = () => {
   const [isScrolled, setIsScrolled] = useState(false);
   const [isLanguageModalOpen, setIsLanguageModalOpen] = useState(false);
+  const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
+  const [openDropdown, setOpenDropdown] = useState<string | null>(null);
   const [lastScroll, setLastScroll] = useState(0);
 
   const { language } = useLanguage();
@@ -104,6 +110,7 @@ const NavBar: React.FC = () => {
   useEffect(() => {
     const handleScroll = () => {
       const currentScroll = window.pageYOffset;
+
       if (currentScroll <= 0) {
         setIsScrolled(false);
       } else if (currentScroll > lastScroll) {
@@ -111,6 +118,7 @@ const NavBar: React.FC = () => {
       } else {
         setIsScrolled(false);
       }
+
       setLastScroll(currentScroll);
     };
 
@@ -118,10 +126,19 @@ const NavBar: React.FC = () => {
     return () => window.removeEventListener("scroll", handleScroll);
   }, [lastScroll]);
 
+  const closeMobileMenu = () => {
+    setIsMobileMenuOpen(false);
+    setOpenDropdown(null);
+  };
+
+  const toggleDropdown = (dropdownName: string) => {
+    setOpenDropdown(openDropdown === dropdownName ? null : dropdownName);
+  };
+
   return (
     <>
       <header className={`${styles.navbar} ${isScrolled ? styles.scrollDown : ""}`}>
-        <Link href="/" className={styles.logoContainer}>
+        <Link href="/" className={styles.logoContainer} onClick={closeMobileMenu}>
           <div className={styles.logoWrapper}>
             <Image
               src="/pics/Y_Logo.jpeg"
@@ -133,96 +150,183 @@ const NavBar: React.FC = () => {
           </div>
         </Link>
 
-        <nav>
+        <button
+          type="button"
+          className={`${styles.hamburger} ${isMobileMenuOpen ? styles.hamburgerActive : ""}`}
+          onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
+          aria-label={t.menu}
+          aria-expanded={isMobileMenuOpen}
+        >
+          <span></span>
+          <span></span>
+          <span></span>
+        </button>
+
+        <nav className={`${styles.navMenu} ${isMobileMenuOpen ? styles.showMenu : ""}`}>
           <ul>
             <li className={styles.dropdown}>
-              <Link href="/about" className={styles.dropdownTitle}>
+              <button
+                type="button"
+                className={styles.dropdownTitle}
+                onClick={() => toggleDropdown("about")}
+              >
                 {t.about}
-              </Link>
-              <ul className={styles.dropdownMenu}>
+                <span className={styles.dropdownArrow}>
+                  {openDropdown === "about" ? "−" : "+"}
+                </span>
+              </button>
+
+              <ul
+                className={`${styles.dropdownMenu} ${
+                  openDropdown === "about" ? styles.dropdownOpen : ""
+                }`}
+              >
                 <li>
-                  <Link href="/about#promise">{t.promise}</Link>
+                  <Link href="/about#promise" onClick={closeMobileMenu}>
+                    {t.promise}
+                  </Link>
                 </li>
                 <li>
-                  <Link href="/about#mission">{t.mission}</Link>
+                  <Link href="/about#mission" onClick={closeMobileMenu}>
+                    {t.mission}
+                  </Link>
                 </li>
                 <li>
-                  <Link href="/about#vision">{t.vision}</Link>
+                  <Link href="/about#vision" onClick={closeMobileMenu}>
+                    {t.vision}
+                  </Link>
                 </li>
               </ul>
             </li>
 
             <li className={styles.dropdown}>
-              <Link href="/#features" className={styles.dropdownTitle}>
+              <button
+                type="button"
+                className={styles.dropdownTitle}
+                onClick={() => toggleDropdown("features")}
+              >
                 {t.features}
-              </Link>
-              <ul className={styles.dropdownMenu}>
+                <span className={styles.dropdownArrow}>
+                  {openDropdown === "features" ? "−" : "+"}
+                </span>
+              </button>
+
+              <ul
+                className={`${styles.dropdownMenu} ${
+                  openDropdown === "features" ? styles.dropdownOpen : ""
+                }`}
+              >
                 <li>
-                  <Link href="/features#video">{t.aiVideo}</Link>
+                  <Link href="/features#video" onClick={closeMobileMenu}>
+                    {t.aiVideo}
+                  </Link>
                 </li>
                 <li>
-                  <Link href="/features#avatar">{t.realTimeAI}</Link>
+                  <Link href="/features#avatar" onClick={closeMobileMenu}>
+                    {t.realTimeAI}
+                  </Link>
                 </li>
                 <li>
-                  <Link href="/features#training">{t.training}</Link>
+                  <Link href="/features#training" onClick={closeMobileMenu}>
+                    {t.training}
+                  </Link>
                 </li>
                 <li>
-                  <Link href="/features#courses">{t.academic}</Link>
+                  <Link href="/features#courses" onClick={closeMobileMenu}>
+                    {t.academic}
+                  </Link>
                 </li>
               </ul>
             </li>
 
             <li className={styles.dropdown}>
-              <Link href="/#institutions" className={styles.dropdownTitle}>
+              <button
+                type="button"
+                className={styles.dropdownTitle}
+                onClick={() => toggleDropdown("institutions")}
+              >
                 {t.institutions}
-              </Link>
-              <ul className={styles.dropdownMenu}>
+                <span className={styles.dropdownArrow}>
+                  {openDropdown === "institutions" ? "−" : "+"}
+                </span>
+              </button>
+
+              <ul
+                className={`${styles.dropdownMenu} ${
+                  openDropdown === "institutions" ? styles.dropdownOpen : ""
+                }`}
+              >
                 <li>
-                  <Link href="/solutions#students">{t.students}</Link>
+                  <Link href="/solutions#students" onClick={closeMobileMenu}>
+                    {t.students}
+                  </Link>
                 </li>
                 <li>
-                  <Link href="/solutions#researchers">{t.researchers}</Link>
+                  <Link href="/solutions#researchers" onClick={closeMobileMenu}>
+                    {t.researchers}
+                  </Link>
                 </li>
                 <li>
-                  <Link href="/solutions#teachers">{t.teachers}</Link>
+                  <Link href="/solutions#teachers" onClick={closeMobileMenu}>
+                    {t.teachers}
+                  </Link>
                 </li>
                 <li>
-                  <Link href="/solutions#creators">{t.creators}</Link>
+                  <Link href="/solutions#creators" onClick={closeMobileMenu}>
+                    {t.creators}
+                  </Link>
                 </li>
                 <li>
-                  <Link href="/solutions#universities">{t.universities}</Link>
+                  <Link href="/solutions#universities" onClick={closeMobileMenu}>
+                    {t.universities}
+                  </Link>
                 </li>
               </ul>
             </li>
 
             <li>
-              <Link href="/#pricing">{t.pricing}</Link>
+              <Link href="/#pricing" onClick={closeMobileMenu}>
+                {t.pricing}
+              </Link>
             </li>
             <li>
-              <Link href="/#marketplace">{t.marketplace}</Link>
+              <Link href="/#marketplace" onClick={closeMobileMenu}>
+                {t.marketplace}
+              </Link>
             </li>
             <li>
-              <Link href="/support">{t.support}</Link>
+              <Link href="/research" onClick={closeMobileMenu}>
+                {t.research}
+              </Link>
             </li>
             <li>
-              <Link href="/login" className={styles.btnLogin}>
+              <Link href="/support" onClick={closeMobileMenu}>
+                {t.support}
+              </Link>
+            </li>
+            <li>
+              <Link href="/login" className={styles.btnLogin} onClick={closeMobileMenu}>
                 {t.login}
               </Link>
             </li>
             <li>
-              <Link href="/signup" className={styles.btnSignup}>
+              <Link href="/signup" className={styles.btnSignup} onClick={closeMobileMenu}>
                 {t.signup}
               </Link>
             </li>
             <li>
-              <Image
-                src="/pics/globe.jpeg"
-                alt={t.languageSelector}
-                width={28}
-                height={28}
-                className={styles.globeIcon}
-                onClick={() => setIsLanguageModalOpen(true)}
-              />
+              <button
+                type="button"
+                className={styles.languageButton}
+                onClick={() => {
+                  setIsLanguageModalOpen(true);
+                  setIsMobileMenuOpen(false);
+                  setOpenDropdown(null);
+                }}
+                aria-label={t.languageSelector}
+              >
+                EN <span className={styles.divider}>|</span> FR
+              </button>
             </li>
           </ul>
         </nav>

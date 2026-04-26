@@ -31,7 +31,7 @@ function mergeAvatarsByKindId(base: HeygenAvatar[], extra: HeygenAvatar[]): Heyg
   return out;
 }
 
-function getPersonKey(a: Pick<HeygenAvatar, "id" | "name">): string {
+function getPersonKey(a: Pick<HeygenAvatar, "id" | "name" | "kind">): string {
   // Prefer the name prefix before " in " (e.g. "Aditya in Blue shirt" => "Aditya")
   const name = (a.name ?? "").trim();
   const inIdx = name.toLowerCase().indexOf(" in ");
@@ -42,6 +42,25 @@ function getPersonKey(a: Pick<HeygenAvatar, "id" | "name">): string {
   const usIdx = id.indexOf("_");
   if (usIdx > 0) return id.slice(0, usIdx).trim();
 
+  // For many talking-photo / other rows, names are like:
+  // "Tiana smiling 2", "Tiana riding a horse", "Tiana front of castle 3".
+  // Treat the leading token as the person when followed by scene/pose words.
+  const firstWord = name.match(/^([A-Za-z][A-Za-z'-]*)\b/);
+  if (firstWord) {
+    const lead = firstWord[1];
+    const rest = name.slice(firstWord[0].length).trim().toLowerCase();
+    const looksLikePoseOrScene =
+      /^(\d+\b|\(|in\b|on\b|at\b|with\b|without\b|riding\b|standing\b|sitting\b|smiling\b|laughing\b|front\b|side\b|left\b|right\b)/.test(rest);
+    if (rest && looksLikePoseOrScene) return lead;
+  }
+
+  // For talking-photo/group entries, be more aggressive so variant names collapse
+  // into one presenter card (e.g. "Tiana smiling 2", "Tiana riding a horse").
+  if (a.kind !== "avatar") {
+    const firstToken = name.match(/^([A-Za-z][A-Za-z'-]*)\b/);
+    if (firstToken) return firstToken[1];
+  }
+
   return name || id;
 }
 
@@ -50,10 +69,12 @@ function avatarMatchesPresenterGender(
   filter: PresenterGender,
 ): boolean {
   const g = (avatar.gender ?? "").toLowerCase().trim();
-  if (!g) return true;
-  if (g === "male" || g === "man" || g === "m") return filter === "male";
-  if (g === "female" || g === "woman" || g === "f") return filter === "female";
-  return true;
+  const isMale = g === "male" || g === "man" || g === "m";
+  const isFemale = g === "female" || g === "woman" || g === "f";
+
+  if (filter === "male") return isMale;
+  if (filter === "female") return isFemale;
+  return !isMale && !isFemale;
 }
 
 /** Must match initial `presenterGender` state (used to pick first avatar after fetch). */
@@ -85,11 +106,14 @@ const AvatarCreation = () => {
   // Avatar saving state
   const [isSaving, setIsSaving] = useState(false);
   const [saveMessage, setSaveMessage] = useState<{ type: 'success' | 'error'; text: string } | null>(null);
+  const [customAvatarName, setCustomAvatarName] = useState<string>("");
 
   // Saved avatars state
   const [savedAvatars, setSavedAvatars] = useState<SavedAvatar[]>([]);
   const [loadingSavedAvatars, setLoadingSavedAvatars] = useState(false);
   const [deletingAvatarId, setDeletingAvatarId] = useState<number | null>(null);
+  const [renamingAvatarId, setRenamingAvatarId] = useState<number | null>(null);
+  const [renameValue, setRenameValue] = useState<string>("");
 
   // Auth hook
   const { authStatus, authFetch } = useAuth();
@@ -194,6 +218,7 @@ const AvatarCreation = () => {
     // Keep selected person in sync with selected variant.
     if (!selectedAvatar) return;
     setSelectedPersonKey(getPersonKey(selectedAvatar));
+    setCustomAvatarName(selectedAvatar.name ?? "");
   }, [selectedAvatar?.id]);
 
   useEffect(() => {
@@ -215,14 +240,15 @@ const AvatarCreation = () => {
     setSelectedPersonKey(getPersonKey(fallback));
   }, [filteredAvatars, selectedAvatarId, voices]);
 
+  // Keep look switching comprehensive for a presenter across all gender buckets.
   const selectedPersonVariants = useMemo(() => {
     if (!selectedPersonKey) return [];
-    return filteredAvatars.filter((a) => getPersonKey(a) === selectedPersonKey);
-  }, [filteredAvatars, selectedPersonKey]);
+    return avatars.filter((a) => getPersonKey(a) === selectedPersonKey);
+  }, [avatars, selectedPersonKey]);
 
-  /** Looks tab: studio rigged avatars only (outfit / "in …" variants), not photo or group looks. */
+  /** Looks tab: include studio + talking photos for the person; exclude group catalog rows. */
   const looksTabVariants = useMemo(
-    () => selectedPersonVariants.filter((a) => a.kind === "avatar"),
+    () => selectedPersonVariants.filter((a) => a.kind !== "avatar_group"),
     [selectedPersonVariants],
   );
 
@@ -258,7 +284,7 @@ const AvatarCreation = () => {
         type: selectedAvatar.kind,
       };
 
-      await avatarService.saveUserAvatar(heygenData, authFetch);
+      await avatarService.saveUserAvatar(heygenData, authFetch, customAvatarName.trim() || undefined);
 
       setSaveMessage({
         type: 'success',
@@ -332,6 +358,27 @@ const AvatarCreation = () => {
       window.alert(error instanceof Error ? error.message : "Failed to delete avatar");
     } finally {
       setDeletingAvatarId(null);
+    }
+  };
+
+  const handleRenameStart = (savedAvatar: SavedAvatar) => {
+    setRenamingAvatarId(savedAvatar.avatar_id);
+    setRenameValue(savedAvatar.name || savedAvatar.heygen_data?.avatar_name || "");
+  };
+
+  const handleRenameConfirm = async (avatarId: number) => {
+    const trimmed = renameValue.trim();
+    if (!trimmed) return;
+    try {
+      await avatarService.renameUserAvatar(avatarId, trimmed, authFetch);
+      setSavedAvatars((prev) =>
+        prev.map((a) => (a.avatar_id === avatarId ? { ...a, name: trimmed } : a))
+      );
+    } catch (error) {
+      window.alert(error instanceof Error ? error.message : "Failed to rename avatar");
+    } finally {
+      setRenamingAvatarId(null);
+      setRenameValue("");
     }
   };
 
@@ -487,6 +534,51 @@ const AvatarCreation = () => {
                         >
                           {deletingAvatarId === savedAvatar.avatar_id ? "Removing..." : "Remove"}
                         </button>
+
+                        {renamingAvatarId === savedAvatar.avatar_id ? (
+                          <div style={{ display: "flex", gap: "4px", marginTop: "6px" }}>
+                            <input
+                              type="text"
+                              value={renameValue}
+                              onChange={(e) => setRenameValue(e.target.value)}
+                              onKeyDown={(e) => {
+                                if (e.key === "Enter") handleRenameConfirm(savedAvatar.avatar_id);
+                                if (e.key === "Escape") setRenamingAvatarId(null);
+                              }}
+                              maxLength={100}
+                              autoFocus
+                              style={{
+                                flex: 1,
+                                padding: "4px 8px",
+                                borderRadius: "4px",
+                                border: "1px solid #c0cbe0",
+                                fontSize: "0.78rem",
+                              }}
+                            />
+                            <button
+                              type="button"
+                              onClick={() => handleRenameConfirm(savedAvatar.avatar_id)}
+                              style={{ fontSize: "0.78rem", padding: "4px 8px", borderRadius: "4px", border: "none", background: "#3B4F8E", color: "white", cursor: "pointer" }}
+                            >
+                              Save
+                            </button>
+                            <button
+                              type="button"
+                              onClick={() => setRenamingAvatarId(null)}
+                              style={{ fontSize: "0.78rem", padding: "4px 8px", borderRadius: "4px", border: "1px solid #c0cbe0", background: "white", cursor: "pointer" }}
+                            >
+                              Cancel
+                            </button>
+                          </div>
+                        ) : (
+                          <button
+                            type="button"
+                            onClick={() => handleRenameStart(savedAvatar)}
+                            style={{ fontSize: "0.75rem", marginTop: "4px", background: "none", border: "none", color: "#3B4F8E", cursor: "pointer", textDecoration: "underline" }}
+                          >
+                            Rename
+                          </button>
+                        )}
                       </div>
                     );
                   })}
@@ -550,8 +642,28 @@ const AvatarCreation = () => {
                         : ""}
                   </p>
 
+                  {/* Custom name input */}
+                  <div style={{ marginTop: "12px" }}>
+                    <input
+                      type="text"
+                      value={customAvatarName}
+                      onChange={(e) => setCustomAvatarName(e.target.value)}
+                      placeholder="Name your avatar"
+                      maxLength={100}
+                      style={{
+                        width: "100%",
+                        padding: "8px 10px",
+                        borderRadius: "6px",
+                        border: "1px solid #c0cbe0",
+                        fontSize: "0.85rem",
+                        color: "#2d3a5a",
+                        boxSizing: "border-box",
+                      }}
+                    />
+                  </div>
+
                   {/* Save Avatar Button */}
-                  <div style={{ marginTop: "16px", textAlign: "center" }}>
+                  <div style={{ marginTop: "10px", textAlign: "center" }}>
                     <button
                       onClick={handleSaveAvatar}
                       disabled={isSaving || authStatus !== 'authenticated'}

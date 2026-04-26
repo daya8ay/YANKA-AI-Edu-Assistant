@@ -15,8 +15,8 @@ services:
 
   backend:
     build:
-      context: ./yanka/Webapp/backend
-      dockerfile: Dockerfile
+      context: .
+      dockerfile: yanka/Webapp/backend/Dockerfile
     restart: unless-stopped
     container_name: yanka_backend
     ports:
@@ -38,6 +38,8 @@ services:
     container_name: yanka_frontend
     ports:
       - "3000:3000"
+    environment:
+      NEXT_PUBLIC_API_URL: http://localhost:8000
     volumes:
       - ./yanka/Webapp/frontend:/app
       - /app/node_modules

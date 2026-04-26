@@ -1,6 +1,8 @@
 node_modules
 .next
 .git
+# Large MP4s (~100MB+); compose bind-mounts the repo over /app at runtime, so they do not need to be in the image.
+public/video
 .env*
 !.env.local.example
 *.md

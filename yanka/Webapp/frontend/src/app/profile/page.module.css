@@ -1,0 +1,198 @@
+.profilePage {
+  min-height: 100vh;
+  background: #f6f8fc;
+  padding: 40px 60px 80px;
+}
+
+.heroSection {
+  background: #dfe8fb;
+  border-radius: 28px;
+  padding: 50px 60px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 40px;
+  margin-bottom: 40px;
+  flex-wrap: wrap;
+}
+
+.heroText {
+  flex: 1;
+  min-width: 280px;
+}
+
+.breadcrumb {
+  color: #5f6f94;
+  font-size: 0.95rem;
+  margin-bottom: 12px;
+}
+
+.heroText h1 {
+  font-size: 3rem;
+  color: #0041ad;
+  margin-bottom: 12px;
+  font-weight: 700;
+}
+
+.heroText p {
+  font-size: 1.1rem;
+  color: #394867;
+  max-width: 620px;
+  line-height: 1.6;
+}
+
+.avatarCard {
+  background: white;
+  border-radius: 24px;
+  padding: 30px;
+  text-align: center;
+  min-width: 260px;
+  box-shadow: 0 10px 30px rgba(30, 67, 134, 0.08);
+}
+
+.avatar {
+  width: 160px;              /* ⬅️ bigger */
+  height: 160px;
+  border-radius: 50%;
+  padding: 6px;              /* ⬅️ KEY: adds breathing space */
+  background: white;         /* creates inner gap */
+  border: 4px solid #1e4386;
+  object-fit: cover;         /* prevents squishing */
+  margin-bottom: 18px;
+}
+
+.avatarWrapper {
+  padding: 6px;
+  border-radius: 50%;
+  background: linear-gradient(135deg, #1e4386, #6fa4ff);
+  display: inline-block;
+  margin-bottom: 18px;
+}
+
+.avatarCard h2 {
+  color: #0041ad;
+  font-size: 1.5rem;
+  margin-bottom: 8px;
+}
+
+.avatarCard p {
+  color: #5f6f94;
+  font-size: 0.98rem;
+  word-break: break-word;
+}
+
+.profileGrid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(280px, 1fr));
+  gap: 24px;
+}
+
+.infoCard {
+  background: white;
+  border-radius: 24px;
+  padding: 28px;
+  box-shadow: 0 8px 24px rgba(30, 67, 134, 0.06);
+}
+
+.infoCard h3 {
+  color: #0041ad;
+  font-size: 1.4rem;
+  margin-bottom: 22px;
+}
+
+.infoRow {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: 16px;
+  padding: 14px 0;
+  border-bottom: 1px solid #e7edf8;
+}
+
+.infoRow:last-child {
+  border-bottom: none;
+}
+
+.label {
+  color: #60708f;
+  font-weight: 500;
+  min-width: 140px;
+}
+
+.value {
+  color: #243457;
+  font-weight: 600;
+  text-align: right;
+}
+
+.actionSection {
+  display: flex;
+  gap: 16px;
+  margin-top: 32px;
+  flex-wrap: wrap;
+}
+
+.primaryBtn {
+  background: #0041ad;
+  color: white;
+  border: none;
+  padding: 14px 24px;
+  border-radius: 10px;
+  font-size: 1rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: 0.3s ease;
+}
+
+.primaryBtn:hover {
+  background: #1e4386;
+}
+
+.secondaryBtn {
+  background: transparent;
+  color: #0041ad;
+  border: 1.5px solid #0041ad;
+  padding: 14px 24px;
+  border-radius: 10px;
+  font-size: 1rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: 0.3s ease;
+}
+
+.secondaryBtn:hover {
+  background: #eef4ff;
+}
+
+@media (max-width: 992px) {
+  .profileGrid {
+    grid-template-columns: 1fr;
+  }
+
+  .heroText h1 {
+    font-size: 2.4rem;
+  }
+}
+
+@media (max-width: 768px) {
+  .profilePage {
+    padding: 24px 20px 60px;
+  }
+
+  .heroSection {
+    padding: 32px 24px;
+  }
+
+  .heroText h1 {
+    font-size: 2rem;
+  }
+
+  .infoRow {
+    flex-direction: column;
+    gap: 6px;
+  }
+
+  .value {
+    text-align: left;
+  }
+}

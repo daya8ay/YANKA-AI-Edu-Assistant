@@ -33,6 +33,12 @@ export interface DeleteAvatarResponse {
   message: string;
 }
 
+export interface RenameAvatarResponse {
+  success: boolean;
+  message: string;
+  name: string;
+}
+
 /**
  * Avatar persistence service for saving and retrieving user avatars
  */
@@ -48,10 +54,12 @@ export class AvatarService {
    */
   async saveUserAvatar(
     avatarData: HeyGenAvatarData,
-    authFetch: (url: string, options?: RequestInit) => Promise<Response>
+    authFetch: (url: string, options?: RequestInit) => Promise<Response>,
+    customName?: string
   ): Promise<SaveAvatarResponse> {
-    const payload: SaveAvatarRequest = {
-      heygen_data: avatarData
+    const payload: SaveAvatarRequest & { custom_name?: string } = {
+      heygen_data: avatarData,
+      ...(customName ? { custom_name: customName } : {}),
     };
 
     const response = await authFetch(`${this.baseUrl}/users/me/avatars`, {
@@ -99,6 +107,27 @@ export class AvatarService {
     if (!response.ok) {
       const errorText = await response.text();
       throw new Error(`Failed to delete avatar: ${response.status} - ${errorText}`);
+    }
+
+    return await response.json();
+  }
+
+  /**
+   * Rename a saved avatar
+   */
+  async renameUserAvatar(
+    avatarId: number,
+    name: string,
+    authFetch: (url: string, options?: RequestInit) => Promise<Response>
+  ): Promise<RenameAvatarResponse> {
+    const response = await authFetch(`${this.baseUrl}/users/me/avatars/${avatarId}`, {
+      method: 'PATCH',
+      body: JSON.stringify({ name }),
+    });
+
+    if (!response.ok) {
+      const errorText = await response.text();
+      throw new Error(`Failed to rename avatar: ${response.status} - ${errorText}`);
     }
 
     return await response.json();

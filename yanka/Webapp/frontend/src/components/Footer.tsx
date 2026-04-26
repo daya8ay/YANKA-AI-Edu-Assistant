@@ -137,7 +137,7 @@ const Footer: React.FC = () => {
             </a>
 
             <a
-              href="https://www.facebook.com/yankaai"
+              href="https://www.facebook.com/yankaai?ref=1"
               target="_blank"
               rel="noopener noreferrer"
             >

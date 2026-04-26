@@ -27,6 +27,7 @@ const translations = {
     logout: "Logout",
     languageSelector: "Language Selector",
     userAvatar: "User Avatar",
+    menu: "Menu",
   },
   fr: {
     chooseLanguage: "Choisissez une langue",
@@ -41,6 +42,7 @@ const translations = {
     logout: "Déconnexion",
     languageSelector: "Sélecteur de langue",
     userAvatar: "Avatar utilisateur",
+    menu: "Menu",
   },
 };
 
@@ -75,13 +77,19 @@ const DashboardNavBar: React.FC = () => {
   const [isScrolled, setIsScrolled] = useState(false);
   const [lastScroll, setLastScroll] = useState(0);
   const [isLanguageModalOpen, setIsLanguageModalOpen] = useState(false);
+  const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
 
   const router = useRouter();
   const { language } = useLanguage();
   const t = translations[language];
 
+  const closeMobileMenu = () => {
+    setIsMobileMenuOpen(false);
+  };
+
   const handleLogout = async () => {
     await signOut();
+    setIsMobileMenuOpen(false);
     router.push("/login");
   };
 
@@ -106,10 +114,8 @@ const DashboardNavBar: React.FC = () => {
 
   return (
     <>
-      <header
-        className={`${styles.navbar} ${isScrolled ? styles.scrollDown : ""}`}
-      >
-        <Link href="/dashboard" className={styles.logoContainer}>
+      <header className={`${styles.navbar} ${isScrolled ? styles.scrollDown : ""}`}>
+        <Link href="/dashboard" className={styles.logoContainer} onClick={closeMobileMenu}>
           <div className={styles.logoWrapper}>
             <Image
               src="/pics/Y_Logo.jpeg"
@@ -122,19 +128,44 @@ const DashboardNavBar: React.FC = () => {
           </div>
         </Link>
 
-        <nav>
+        <button
+          type="button"
+          className={`${styles.hamburger} ${isMobileMenuOpen ? styles.hamburgerActive : ""}`}
+          onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
+          aria-label={t.menu}
+          aria-expanded={isMobileMenuOpen}
+        >
+          <span></span>
+          <span></span>
+          <span></span>
+        </button>
+
+        <nav className={`${styles.navMenu} ${isMobileMenuOpen ? styles.showMenu : ""}`}>
           <ul>
             <li>
-              <Link href="/courses">{t.courses}</Link>
+              <Link href="/courses" onClick={closeMobileMenu}>
+                {t.courses}
+              </Link>
             </li>
             <li>
-              <Link href="/avatar_creation">{t.avatarCreation}</Link>
+              <Link href="/avatar_creation" onClick={closeMobileMenu}>
+                {t.avatarCreation}
+              </Link>
             </li>
             <li>
-              <Link href="/video">{t.video}</Link>
+              <Link href="/video" onClick={closeMobileMenu}>
+                {t.video}
+              </Link>
             </li>
             <li>
-              <Link href="/support">{t.support}</Link>
+              <Link href="/video_simulator" onClick={closeMobileMenu}>
+                {t.videoSimulator}
+              </Link>
+            </li>
+            <li>
+              <Link href="/support" onClick={closeMobileMenu}>
+                {t.support}
+              </Link>
             </li>
             <li>
               <button onClick={handleLogout} className={styles.logoutBtn}>
@@ -142,23 +173,34 @@ const DashboardNavBar: React.FC = () => {
               </button>
             </li>
             <li>
-              <Image
-                src="/pics/globe.jpeg"
-                alt={t.languageSelector}
-                width={28}
-                height={28}
-                className={styles.globeIcon}
-                onClick={() => setIsLanguageModalOpen(true)}
-              />
+              <button
+                type="button"
+                className={styles.languageButton}
+                onClick={() => {
+                  setIsLanguageModalOpen(true);
+                  setIsMobileMenuOpen(false);
+                }}
+                aria-label={t.languageSelector}
+              >
+                <span className={language === "en" ? styles.activeLang : ""}>
+                  EN
+                </span>
+                <span className={styles.divider}>|</span>
+                <span className={language === "fr" ? styles.activeLang : ""}>
+                  FR
+                </span>
+              </button>
             </li>
             <li>
-              <Image
-                src="/pics/user_avatar.jpeg"
-                alt={t.userAvatar}
-                width={36}
-                height={36}
-                className={styles.userAvatar}
-              />
+              <Link href="/profile" className={styles.avatarLink} onClick={closeMobileMenu}>
+                <Image
+                  src="/pics/user_avatar.jpeg"
+                  alt={t.userAvatar}
+                  width={36}
+                  height={36}
+                  className={styles.userAvatar}
+                />
+              </Link>
             </li>
           </ul>
         </nav>
