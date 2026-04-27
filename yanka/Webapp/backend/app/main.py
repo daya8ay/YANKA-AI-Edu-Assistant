@@ -95,8 +95,6 @@ app.add_middleware(
 
 # HeyGen Route
 HEYGEN_VIDEO_API_URL = "https://api.heygen.com/v2/video/generate"
-DEFAULT_HEYGEN_AVATAR_ID = "Vemon_sitting_office_front"
-DEFAULT_HEYGEN_VOICE_ID = "cc5fb6c924064712ba9f690852aa4646"
 
 app.include_router(users.router)
 app.include_router(progress.router)
@@ -860,6 +858,7 @@ async def extract_lesson_content_from_upload(file: UploadFile) -> str:
 async def generate_video(
     title: str = Form(...),
     avatar: str = Form(""),
+    voice_id: str = Form(""),
     language: str = Form("english"),
     subtitle: str = Form("none"),
     video_type: str = Form(""),
@@ -950,13 +949,24 @@ async def generate_video(
     if not heygen_api_key:
         raise HTTPException(status_code=500, detail="HEYGEN_API_KEY not found.")
 
-    selected_avatar_id = DEFAULT_HEYGEN_AVATAR_ID
+    selected_avatar_id = avatar.strip()
+    selected_voice_id = voice_id.strip()
+
+    if not selected_avatar_id:
+        raise HTTPException(status_code=400, detail="Avatar is required.")
+
+    if not selected_voice_id:
+        raise HTTPException(status_code=400, detail="Voice ID is required.")
 
     headers = {
         "X-Api-Key": heygen_api_key,
         "Content-Type": "application/json",
         "Accept": "application/json",
     }
+
+    enable_captions = subtitle.strip().lower() != "none"
+    print("DEBUG SUBTITLES:", subtitle)
+    print("DEBUG CAPTIONS ENABLED:", enable_captions)
 
     payload = {
         "video_inputs": [
@@ -969,11 +979,14 @@ async def generate_video(
                 "voice": {
                     "type": "text",
                     "input_text": spoken_script,
-                    "voice_id": DEFAULT_HEYGEN_VOICE_ID,
-                }
+                    "voice_id": selected_voice_id,
+                },
             }
-        ]
+        ],
+        "caption": enable_captions
     }
+    print("DEBUG AVATAR:", selected_avatar_id)
+    print("DEBUG VOICE:", selected_voice_id)
 
     async with httpx.AsyncClient() as client:
         response = await client.post(
@@ -1001,6 +1014,7 @@ async def generate_video(
         "data": {
             "title": title,
             "avatar": selected_avatar_id,
+            "voice_id": selected_voice_id,
             "language": language,
             "subtitle": subtitle,
             "video_type": video_type,
@@ -1095,18 +1109,9 @@ async def save_user_avatar(
 ):
     """Save a user's selected HeyGen avatar to their collection."""
 
-    print(f"DEBUG: === save_user_avatar ENDPOINT CALLED ===")
-    print(f"DEBUG: avatar_data type: {type(avatar_data)}")
-    print(f"DEBUG: current_user type: {type(current_user)}")
-    print(f"DEBUG: current_user value: {current_user}")
-    print(f"DEBUG: db type: {type(db)}")
-
     if current_user is None:
         print(f"DEBUG: ERROR - current_user is None!")
         raise HTTPException(status_code=401, detail="Authentication failed - current_user is None")
-
-    print(f"DEBUG: current_user.user_id: {current_user.user_id}")
-    print(f"DEBUG: avatar_data.heygen_data: {avatar_data.heygen_data}")
 
     try:
         # Create new avatar record
@@ -1186,7 +1191,7 @@ async def delete_user_avatar(
     if avatar.owner_id != current_user.user_id:
         raise HTTPException(status_code=403, detail="Not allowed to delete this avatar")
 
-    # Preserve generated videos by unlinking avatar_id before avatar delete.
+    # preserve generated videos
     db.query(GeneratedVideo).filter(GeneratedVideo.avatar_id == avatar_id).update(
         {GeneratedVideo.avatar_id: None},
         synchronize_session=False,

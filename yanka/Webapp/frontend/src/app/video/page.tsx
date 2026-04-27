@@ -1,10 +1,12 @@
 "use client";
 
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import DashboardNavBar from "../../components/DashboardNavBar";
 import Footer from "@/components/Footer";
 import VideoChat from "./VideoChat";
 import styles from "./video.module.css";
+import { useAuth } from "@/hooks/useAuth";
+import { avatarService, type SavedAvatar } from "@/services/avatarService";
 
 import {
   Camera,
@@ -35,8 +37,43 @@ const VideoCreation = () => {
   const [videoUrl, setVideoUrl] = useState("");
   const [videoStatus, setVideoStatus] = useState("");
   const [isCheckingStatus, setIsCheckingStatus] = useState(false);
+  const [savedAvatars, setSavedAvatars] = useState<SavedAvatar[]>([]);
+  const [loadingSavedAvatars, setLoadingSavedAvatars] = useState(false);
+  const { authStatus, authFetch } = useAuth();
   const [lessonVisualNotes, setLessonVisualNotes] = useState("");
   const API_URL = process.env.NEXT_PUBLIC_API_URL ?? "http://localhost:8000";
+
+  const selectedSavedAvatar = savedAvatars.find(
+    (saved) => String(saved.avatar_id) === avatar
+  );
+  
+  const selectedAvatarName =
+    selectedSavedAvatar?.name ||
+    selectedSavedAvatar?.heygen_data?.avatar_name ||
+    "Not selected";
+
+  useEffect(() => {
+    async function loadSavedAvatars() {
+      if (authStatus !== "authenticated") {
+        setSavedAvatars([]);
+        return;
+      }
+  
+      setLoadingSavedAvatars(true);
+  
+      try {
+        const avatars = await avatarService.getUserAvatars(authFetch);
+        setSavedAvatars(avatars);
+      } catch (err) {
+        console.error("Failed to load saved avatars on video page:", err);
+        setSavedAvatars([]);
+      } finally {
+        setLoadingSavedAvatars(false);
+      }
+    }
+  
+    loadSavedAvatars();
+  }, [authStatus]);
 
   const handleSubmit = async () => {
     if (!title.trim()) {
@@ -55,15 +92,18 @@ const VideoCreation = () => {
 
     try {
       const formData = new FormData();
-      let avatarId = "";
+      let avatarId = avatar;
 
-      if (avatar === "damian") {
-        avatarId = "damian";
-      }
+      if (selectedSavedAvatar?.heygen_data?.avatar_id) {
+        avatarId = selectedSavedAvatar.heygen_data.avatar_id;
 
-      if (avatar === "aditya") {
-        avatarId = "Aditya_public_4";
-        formData.append("voice_id", "5d8c378ba8c3434586081a52ac368738");
+        const savedVoiceId =
+          selectedSavedAvatar.heygen_data.default_voice_id ||
+          selectedSavedAvatar.voice_id;
+
+        if (savedVoiceId) {
+          formData.append("voice_id", savedVoiceId);
+        }
       }
 
       formData.append("title", title);
@@ -78,7 +118,7 @@ const VideoCreation = () => {
       if (file) {
         formData.append("file", file);
       }
-      
+
       const response = await fetch(`${API_URL}/video/generate`, {
         method: "POST",
         body: formData,
@@ -90,7 +130,6 @@ const VideoCreation = () => {
         throw new Error(data.detail || data.error || "Failed to submit video request.");
       }
 
-      console.log("Video generation response:", data);
       setVideoId(data.video_id || "");
       setVideoUrl("");
       setVideoStatus(data.status || "processing");
@@ -119,12 +158,6 @@ const VideoCreation = () => {
     try {
       const response = await fetch(`${API_URL}/video/status/${videoId}`);
       const data = await response.json();
-
-      console.log("Video status response:", data);
-      console.log("Video status error:", data?.data?.error);
-      console.log("Video status message:", data?.message);
-      console.log("Video full data:", JSON.stringify(data, null, 2));
-
       const status = data?.data?.status || "";
       const url = data?.data?.video_url || "";
 
@@ -275,13 +308,7 @@ const VideoCreation = () => {
                   <div className={`${styles.innerInfoCard} ${styles.summaryBox}`}>
                     <h3 className={styles.smallCardTitle}>Video Settings Summary</h3>
                     <p className={styles.summaryText}>
-                      Avatar: <strong>
-                        {avatar === "aditya"
-                          ? "Aditya (Mark Voice)"
-                          : avatar === "damian"
-                          ? "Damian"
-                          : "Not selected"}
-                      </strong>
+                      Avatar: <strong>{selectedAvatarName}</strong>
                       <br />
                       Subtitles: <strong>{subtitle}</strong>
                       <br />
@@ -371,8 +398,17 @@ const VideoCreation = () => {
                     className={styles.selectInput}
                   >
                     <option value="">Select an avatar...</option>
-                    <option value="damian">Damian (Default)</option>
-                    <option value="aditya">Aditya</option>
+                    {loadingSavedAvatars ? (
+                      <option disabled>Loading saved avatars...</option>
+                    ) : (
+                      savedAvatars.map((savedAvatar) => (
+                        <option key={savedAvatar.avatar_id} value={String(savedAvatar.avatar_id)}>
+                          {savedAvatar.name ||
+                            savedAvatar.heygen_data?.avatar_name ||
+                            "Saved Avatar"}
+                        </option>
+                      ))
+                    )}
                   </select>
 
                   {avatar === "aditya" && (
