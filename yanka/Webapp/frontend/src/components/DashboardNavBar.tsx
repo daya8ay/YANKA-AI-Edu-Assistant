@@ -18,11 +18,15 @@ const translations = {
     chooseLanguage: "Choose a language",
     english: "English",
     french: "Français",
-    courses: "Courses",
+    dashboard: "Dashboard",
+    about: "About",
+    promise: "Promise",
+    mission: "Mission",
+    vision: "Vision",
+    courses: "Marketplace",
     avatarCreation: "Avatar Creation",
-    video: "Video",
+    video: "Video Generation",
     videoSimulator: "Video Simulator",
-    videoAnalytics: "Video Analytics",
     support: "Support",
     logout: "Logout",
     languageSelector: "Language Selector",
@@ -33,11 +37,15 @@ const translations = {
     chooseLanguage: "Choisissez une langue",
     english: "English",
     french: "Français",
-    courses: "Cours",
+    dashboard: "Tableau de bord",
+    about: "À propos",
+    promise: "Promesse",
+    mission: "Mission",
+    vision: "Vision",
+    courses: "Marché",
     avatarCreation: "Création d’avatar",
-    video: "Vidéo",
+    video: "Génération de vidéos",
     videoSimulator: "Simulateur vidéo",
-    videoAnalytics: "Analyse vidéo",
     support: "Support",
     logout: "Déconnexion",
     languageSelector: "Sélecteur de langue",
@@ -78,6 +86,7 @@ const DashboardNavBar: React.FC = () => {
   const [lastScroll, setLastScroll] = useState(0);
   const [isLanguageModalOpen, setIsLanguageModalOpen] = useState(false);
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
+  const [openDropdown, setOpenDropdown] = useState<string | null>(null);
 
   const router = useRouter();
   const { language } = useLanguage();
@@ -85,11 +94,16 @@ const DashboardNavBar: React.FC = () => {
 
   const closeMobileMenu = () => {
     setIsMobileMenuOpen(false);
+    setOpenDropdown(null);
+  };
+
+  const toggleDropdown = (dropdownName: string) => {
+    setOpenDropdown(openDropdown === dropdownName ? null : dropdownName);
   };
 
   const handleLogout = async () => {
     await signOut();
-    setIsMobileMenuOpen(false);
+    closeMobileMenu();
     router.push("/login");
   };
 
@@ -120,8 +134,8 @@ const DashboardNavBar: React.FC = () => {
             <Image
               src="/pics/Y_Logo.jpeg"
               alt="YANKA Logo"
-              width={72}
-              height={72}
+              width={110}
+              height={90}
               className={styles.logoImg}
               priority
             />
@@ -143,61 +157,105 @@ const DashboardNavBar: React.FC = () => {
         <nav className={`${styles.navMenu} ${isMobileMenuOpen ? styles.showMenu : ""}`}>
           <ul>
             <li>
+              <Link href="/dashboard" onClick={closeMobileMenu}>
+                {t.dashboard}
+              </Link>
+            </li>
+
+            <li className={styles.dropdown}>
+              <button
+                type="button"
+                className={styles.dropdownTitle}
+                onClick={() => toggleDropdown("about")}
+              >
+                {t.about}
+                <span className={styles.dropdownArrow}>
+                  {openDropdown === "about" ? "−" : "+"}
+                </span>
+              </button>
+
+              <ul
+                className={`${styles.dropdownMenu} ${
+                  openDropdown === "about" ? styles.dropdownOpen : ""
+                }`}
+              >
+                <li>
+                  <Link href="/about#promise" onClick={closeMobileMenu}>
+                    {t.promise}
+                  </Link>
+                </li>
+                <li>
+                  <Link href="/about#mission" onClick={closeMobileMenu}>
+                    {t.mission}
+                  </Link>
+                </li>
+                <li>
+                  <Link href="/about#vision" onClick={closeMobileMenu}>
+                    {t.vision}
+                  </Link>
+                </li>
+              </ul>
+            </li>
+
+            <li>
               <Link href="/courses" onClick={closeMobileMenu}>
                 {t.courses}
               </Link>
             </li>
+
             <li>
               <Link href="/avatar_creation" onClick={closeMobileMenu}>
                 {t.avatarCreation}
               </Link>
             </li>
+
             <li>
               <Link href="/video" onClick={closeMobileMenu}>
                 {t.video}
               </Link>
             </li>
+
             <li>
               <Link href="/video_simulator" onClick={closeMobileMenu}>
                 {t.videoSimulator}
               </Link>
             </li>
+
             <li>
               <Link href="/support" onClick={closeMobileMenu}>
                 {t.support}
               </Link>
             </li>
+
             <li>
               <button onClick={handleLogout} className={styles.logoutBtn}>
                 {t.logout}
               </button>
             </li>
+
             <li>
               <button
                 type="button"
                 className={styles.languageButton}
                 onClick={() => {
                   setIsLanguageModalOpen(true);
-                  setIsMobileMenuOpen(false);
+                  closeMobileMenu();
                 }}
                 aria-label={t.languageSelector}
               >
-                <span className={language === "en" ? styles.activeLang : ""}>
-                  EN
-                </span>
+                <span className={language === "en" ? styles.activeLang : ""}>EN</span>
                 <span className={styles.divider}>|</span>
-                <span className={language === "fr" ? styles.activeLang : ""}>
-                  FR
-                </span>
+                <span className={language === "fr" ? styles.activeLang : ""}>FR</span>
               </button>
             </li>
+
             <li>
               <Link href="/profile" className={styles.avatarLink} onClick={closeMobileMenu}>
                 <Image
                   src="/pics/user_avatar.jpeg"
                   alt={t.userAvatar}
-                  width={36}
-                  height={36}
+                  width={42}
+                  height={42}
                   className={styles.userAvatar}
                 />
               </Link>

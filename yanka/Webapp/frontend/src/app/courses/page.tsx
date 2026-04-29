@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState } from "react";
+import React, { useRef, useState } from "react";
 import Link from "next/link";
 import DashboardNavBar from "@/components/DashboardNavBar";
 import Footer from "@/components/Footer";
@@ -25,6 +25,7 @@ interface CourseItem {
 export default function Courses() {
   const { language } = useLanguage();
   const [activeFilter, setActiveFilter] = useState<"All" | "Courses" | "Training">("All");
+  const carouselRef = useRef<HTMLDivElement | null>(null);
 
   const translations = {
     en: {
@@ -42,6 +43,8 @@ export default function Courses() {
       ctaButton: "Get Started Today",
       courseTypeCourse: "Course",
       courseTypeTraining: "Training",
+      previous: "‹",
+      next: "›",
       coursesData: [
         {
           title: "AI for Everyone",
@@ -132,6 +135,8 @@ export default function Courses() {
       ctaButton: "Commencer aujourd’hui",
       courseTypeCourse: "Cours",
       courseTypeTraining: "Formation",
+      previous: "‹",
+      next: "›",
       coursesData: [
         {
           title: "L’IA pour tous",
@@ -219,6 +224,15 @@ export default function Courses() {
           activeFilter === "Courses" ? course.type === "Course" : course.type === "Training"
         );
 
+  const scrollCarousel = (direction: "left" | "right") => {
+    if (!carouselRef.current) return;
+
+    carouselRef.current.scrollBy({
+      left: direction === "left" ? -380 : 380,
+      behavior: "smooth",
+    });
+  };
+
   return (
     <>
       <DashboardNavBar />
@@ -251,57 +265,78 @@ export default function Courses() {
         </section>
 
         <section className={styles.marketplacePreview}>
-          <div className={styles.courseGrid}>
-            {filteredCourses.map((course, index) => (
-              <div
-                key={index}
-                className={styles.courseCard}
-                onClick={() => (window.location.href = "/signup")}
-              >
-                <div style={{ position: "relative", width: "100%", height: "250px" }}>
-                  <Image
-                    src={course.img}
-                    alt={course.title}
-                    className={styles.courseImage}
-                    fill
-                    style={{ objectFit: "cover" }}
-                  />
-                </div>
+          <div className={styles.carouselWrapper}>
+            <button
+              type="button"
+              className={`${styles.carouselBtn} ${styles.leftBtn}`}
+              onClick={() => scrollCarousel("left")}
+              aria-label="Previous courses"
+            >
+              {t.previous}
+            </button>
 
-                <div className={styles.courseInfo}>
-                  <div className={styles.courseContentTop}>
-                    <div className={styles.topRow}>
-                      <span className={styles.courseType}>
-                        {course.type === "Course" ? t.courseTypeCourse : t.courseTypeTraining}
-                      </span>
-                    </div>
-
-                    <h3>{course.title}</h3>
-                    <p className={styles.teacher}>{course.teacher}</p>
-                    <p className={styles.courseSummary}>{course.summary}</p>
-
-                    <div className={styles.courseMeta}>
-                      <span className={styles.courseTag}>{course.tag}</span>
-                      <span className={styles.ratingBox}>⭐ {course.rating}</span>
-                      <span className={styles.reviewBox}>{course.reviews}</span>
-                    </div>
+            <div className={styles.courseCarousel} ref={carouselRef}>
+              {filteredCourses.map((course, index) => (
+                <div
+                  key={index}
+                  className={styles.courseCard}
+                  onClick={() => (window.location.href = "/signup")}
+                >
+                  <div className={styles.imageWrapper}>
+                    <Image
+                      src={course.img}
+                      alt={course.title}
+                      className={styles.courseImage}
+                      fill
+                      style={{ objectFit: "cover" }}
+                    />
                   </div>
 
-                  <div className={styles.priceRow}>
-                    <p className={styles.price}>{course.price}</p>
-                    <Link href="/signup" className={styles.viewCourseBtn}>
-                      {t.viewDetails}
-                    </Link>
+                  <div className={styles.courseInfo}>
+                    <div className={styles.courseContentTop}>
+                      <div className={styles.topRow}>
+                        <span className={styles.courseType}>
+                          {course.type === "Course" ? t.courseTypeCourse : t.courseTypeTraining}
+                        </span>
+                      </div>
+
+                      <h3>{course.title}</h3>
+                      <p className={styles.teacher}>{course.teacher}</p>
+                      <p className={styles.courseSummary}>{course.summary}</p>
+
+                      <div className={styles.courseMeta}>
+                        <span className={styles.courseTag}>{course.tag}</span>
+                        <span className={styles.ratingBox}>⭐ {course.rating}</span>
+                        <span className={styles.reviewBox}>{course.reviews}</span>
+                      </div>
+                    </div>
+
+                    <div className={styles.priceRow}>
+                      <p className={styles.price}>{course.price}</p>
+                      <Link
+                        href="/signup"
+                        className={styles.viewCourseBtn}
+                        onClick={(e) => e.stopPropagation()}
+                      >
+                        {t.viewDetails}
+                      </Link>
+                    </div>
                   </div>
                 </div>
-              </div>
-            ))}
+              ))}
+            </div>
+
+            <button
+              type="button"
+              className={`${styles.carouselBtn} ${styles.rightBtn}`}
+              onClick={() => scrollCarousel("right")}
+              aria-label="Next courses"
+            >
+              {t.next}
+            </button>
           </div>
 
-          <button
-            className={styles.viewAllBtn}
-            onClick={() => (window.location.href = "/signup")}
-          >
+          <button className={styles.viewAllBtn}>
             {t.viewAll}
           </button>
         </section>

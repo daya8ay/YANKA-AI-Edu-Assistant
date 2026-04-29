@@ -34,6 +34,11 @@
     height: 100px;
 }
 
+.logoLink {
+  display: inline-block;
+  cursor: pointer;
+}
+
 .subtitle {
     color: #555;
     margin-bottom: 1.5rem;
