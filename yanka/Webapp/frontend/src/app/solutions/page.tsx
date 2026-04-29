@@ -31,7 +31,7 @@ const translations = {
     teachersText2:
       "Seamless LMS integration ensures smooth adoption across schools, helping institutions modernize without disrupting existing systems.",
 
-    creatorsTitle: "Course Creators",
+    creatorsTitle: "Content & Course Creators",
     creatorsText1:
       "Yanka AI allows creators to build and monetize AI-powered courses globally. With avatar-based video generation and automated translation, courses can reach multilingual audiences instantly.",
     creatorsText2:

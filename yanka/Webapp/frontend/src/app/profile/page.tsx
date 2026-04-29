@@ -40,6 +40,7 @@ export default function ProfilePage() {
       <DashboardNavBar />
 
       <main className={styles.profilePage}>
+        {/* HERO SECTION */}
         <section className={styles.heroSection}>
           <div className={styles.heroText}>
             <p className={styles.breadcrumb}>Dashboard / Profile</p>
@@ -63,7 +64,9 @@ export default function ProfilePage() {
           </div>
         </section>
 
+        {/* PROFILE GRID */}
         <section className={styles.profileGrid}>
+          {/* PERSONAL */}
           <div className={styles.infoCard}>
             <h3>Personal Information</h3>
 
@@ -93,6 +96,7 @@ export default function ProfilePage() {
             </div>
           </div>
 
+          {/* ACADEMIC */}
           <div className={styles.infoCard}>
             <h3>Academic Details</h3>
 
@@ -122,6 +126,7 @@ export default function ProfilePage() {
             </div>
           </div>
 
+          {/* ADDRESS */}
           <div className={styles.infoCard}>
             <h3>Address Details</h3>
 
@@ -146,6 +151,7 @@ export default function ProfilePage() {
             </div>
           </div>
 
+          {/* ACCOUNT */}
           <div className={styles.infoCard}>
             <h3>Account Settings</h3>
 
@@ -169,11 +175,48 @@ export default function ProfilePage() {
               <span className={styles.value}>Student</span>
             </div>
           </div>
+
+          {/* 💳 PAYMENT DETAILS (NEW) */}
+          <div className={styles.infoCard}>
+            <h3>Payment Details</h3>
+
+            <div className={styles.infoRow}>
+              <span className={styles.label}>Pricing Plan</span>
+              <span className={styles.value}>Premium Monthly</span>
+            </div>
+
+            <div className={styles.infoRow}>
+              <span className={styles.label}>Card Type</span>
+              <span className={styles.value}>Visa</span>
+            </div>
+
+            <div className={styles.infoRow}>
+              <span className={styles.label}>Card Number</span>
+              <span className={styles.value}>•••• •••• •••• 4242</span>
+            </div>
+
+            <div className={styles.infoRow}>
+              <span className={styles.label}>Billing Cycle</span>
+              <span className={styles.value}>Monthly</span>
+            </div>
+
+            <div className={styles.infoRow}>
+              <span className={styles.label}>Next Payment</span>
+              <span className={styles.value}>May 28, 2026</span>
+            </div>
+
+            <div className={styles.infoRow}>
+              <span className={styles.label}>Payment Status</span>
+              <span className={styles.value}>Active</span>
+            </div>
+          </div>
         </section>
 
+        {/* ACTION BUTTONS */}
         <section className={styles.actionSection}>
           <button className={styles.primaryBtn}>Edit Profile</button>
           <button className={styles.secondaryBtn}>Change Password</button>
+          <button className={styles.secondaryBtn}>Manage Payment</button>
         </section>
       </main>
 

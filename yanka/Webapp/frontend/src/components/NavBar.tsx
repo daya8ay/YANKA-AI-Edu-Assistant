@@ -29,7 +29,7 @@ const translations = {
     students: "Students",
     researchers: "Researchers",
     teachers: "Teachers & Institutions",
-    creators: "Course Creators",
+    creators: "Content & Course Creators",
     universities: "Universities",
     pricing: "Pricing",
     marketplace: "Marketplace",

@@ -34,6 +34,11 @@
     height: 100px;
 }
 
+.logoLink {
+  display: inline-block;
+  cursor: pointer;
+}
+
 .loginBox h1 {
     font-weight: 700;
     color: #0041ad;

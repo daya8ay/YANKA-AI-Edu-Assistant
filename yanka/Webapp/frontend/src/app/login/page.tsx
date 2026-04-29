@@ -88,13 +88,15 @@ export default function Login() {
   return (
     <div className={styles.loginContainer}>
       <div className={styles.loginBox}>
-        <Image
-          src="/pics/Y_Logo.jpeg"
-          alt="YANKA Logo"
-          width={100}
-          height={100}
-          className={styles.logo}
-        />
+        <Link href="/" className={styles.logoLink}>
+          <Image
+            src="/pics/Y_Logo.jpeg"
+            alt="YANKA Logo"
+            width={100}
+            height={100}
+            className={styles.logo}
+          />
+        </Link>
 
         <h1>{t.welcome}</h1>
         <p className={styles.subtitle}>{t.subtitle}</p>

@@ -24,14 +24,12 @@
   line-height: 1.7;
 }
 
-/* ---------- Marketplace Preview ---------- */
 .marketplacePreview {
   padding: 70px 60px 90px;
   background: #c4d8f7;
   text-align: center;
 }
 
-/* ---------- Filter Buttons ---------- */
 .filterButtons {
   display: flex;
   justify-content: center;
@@ -64,17 +62,64 @@
   box-shadow: 0 8px 20px rgba(0, 62, 153, 0.2);
 }
 
-/* ---------- GRID ---------- */
-.courseGrid {
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
-  gap: 28px;
+/* Carousel */
+.carouselWrapper {
+  position: relative;
   max-width: 1320px;
   margin: 0 auto;
 }
 
-/* ---------- COURSE CARD ---------- */
+.courseCarousel {
+  display: flex;
+  gap: 28px;
+  overflow-x: auto;
+  scroll-behavior: smooth;
+  scroll-snap-type: x mandatory;
+  padding: 12px 8px 24px;
+  scrollbar-width: none;
+}
+
+.courseCarousel::-webkit-scrollbar {
+  display: none;
+}
+
+.carouselBtn {
+  position: absolute;
+  top: 50%;
+  transform: translateY(-50%);
+  z-index: 20;
+  width: 46px;
+  height: 46px;
+  border-radius: 50%;
+  border: none;
+  background: #003e99;
+  color: white;
+  font-size: 2rem;
+  font-weight: 700;
+  cursor: pointer;
+  box-shadow: 0 10px 25px rgba(0, 62, 153, 0.25);
+  transition: all 0.25s ease;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.carouselBtn:hover {
+  background: #002f75;
+  transform: translateY(-50%) scale(1.08);
+}
+
+.leftBtn {
+  left: -22px;
+}
+
+.rightBtn {
+  right: -22px;
+}
+
+/* Course Card */
 .courseCard {
+  flex: 0 0 380px;
   background: #ffffff;
   border-radius: 18px;
   overflow: hidden;
@@ -85,11 +130,18 @@
   text-align: left;
   display: flex;
   flex-direction: column;
+  scroll-snap-align: start;
 }
 
 .courseCard:hover {
   transform: translateY(-6px);
   box-shadow: 0 14px 28px rgba(0, 41, 112, 0.14);
+}
+
+.imageWrapper {
+  position: relative;
+  width: 100%;
+  height: 250px;
 }
 
 .courseImage {
@@ -220,7 +272,6 @@
   transform: translateY(-2px);
 }
 
-/* ---------- Bottom Button ---------- */
 .viewAllBtn {
   margin-top: 50px;
   padding: 14px 34px;
@@ -239,7 +290,6 @@
   transform: translateY(-2px);
 }
 
-/* ---------- CTA ---------- */
 .ctaSection {
   text-align: center;
   padding: 86px 24px;
@@ -275,22 +325,18 @@
   background: #2e5aa8;
 }
 
-/* ---------- RESPONSIVE ---------- */
+/* Responsive */
 @media (max-width: 900px) {
   .marketplacePreview {
     padding: 70px 24px;
   }
 
-  .marketplaceTitle {
-    font-size: 2.2rem;
+  .courseCard {
+    flex: 0 0 320px;
   }
 
-  .courseGrid {
-    grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
-  }
-
-  .courseImage {
-    height: 190px;
+  .imageWrapper {
+    height: 210px;
   }
 
   .courseInfo {
@@ -303,6 +349,14 @@
 
   .price {
     font-size: 1.8rem;
+  }
+
+  .leftBtn {
+    left: -8px;
+  }
+
+  .rightBtn {
+    right: -8px;
   }
 }
 
@@ -329,14 +383,6 @@
     padding: 60px 18px;
   }
 
-  .marketplaceTitle {
-    font-size: 2rem;
-  }
-
-  .marketplaceDescription {
-    font-size: 0.95rem;
-  }
-
   .filterButtons {
     gap: 10px;
   }
@@ -346,11 +392,11 @@
     max-width: 220px;
   }
 
-  .courseGrid {
-    grid-template-columns: 1fr;
+  .courseCard {
+    flex: 0 0 88%;
   }
 
-  .courseImage {
+  .imageWrapper {
     height: 175px;
   }
 
@@ -379,5 +425,19 @@
 
   .price {
     font-size: 1.65rem;
+  }
+
+  .carouselBtn {
+    width: 38px;
+    height: 38px;
+    font-size: 1.6rem;
+  }
+
+  .leftBtn {
+    left: -4px;
+  }
+
+  .rightBtn {
+    right: -4px;
   }
 }

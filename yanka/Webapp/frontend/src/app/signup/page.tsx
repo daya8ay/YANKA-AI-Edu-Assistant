@@ -135,13 +135,15 @@ export default function SignUp() {
   return (
     <div className={styles.signupContainer}>
       <div className={styles.signupBox}>
-        <Image
-          src="/pics/Y_Logo.jpeg"
-          alt="YANKA Logo"
-          width={100}
-          height={100}
-          className={styles.logo}
-        />
+        <Link href="/" className={styles.logoLink}>
+          <Image
+            src="/pics/Y_Logo.jpeg"
+            alt="YANKA Logo"
+            width={100}
+            height={100}
+            className={styles.logo}
+          />
+        </Link>
 
         <p className={styles.subtitle}>{t.subtitle}</p>
 
