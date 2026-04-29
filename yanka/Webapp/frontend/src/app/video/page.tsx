@@ -1,10 +1,13 @@
 "use client";
 
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import DashboardNavBar from "../../components/DashboardNavBar";
 import Footer from "@/components/Footer";
 import VideoChat from "./VideoChat";
 import styles from "./video.module.css";
+import { useAuth } from "@/hooks/useAuth";
+import { avatarService, type SavedAvatar } from "@/services/avatarService";
+
 import {
   Camera,
   UploadCloud,
@@ -28,14 +31,49 @@ const VideoCreation = () => {
   const [videoType, setVideoType] = useState("");
   const [customVideoType, setCustomVideoType] = useState("");
   const [showSummary, setShowSummary] = useState(false);
-  const [language, setLanguage] = useState("english");
   const [subtitle, setSubtitle] = useState("none");
   const [avatar, setAvatar] = useState("");
   const [videoId, setVideoId] = useState("");
   const [videoUrl, setVideoUrl] = useState("");
   const [videoStatus, setVideoStatus] = useState("");
   const [isCheckingStatus, setIsCheckingStatus] = useState(false);
+  const [savedAvatars, setSavedAvatars] = useState<SavedAvatar[]>([]);
+  const [loadingSavedAvatars, setLoadingSavedAvatars] = useState(false);
+  const { authStatus, authFetch } = useAuth();
   const [lessonVisualNotes, setLessonVisualNotes] = useState("");
+  const API_URL = process.env.NEXT_PUBLIC_API_URL ?? "http://localhost:8000";
+
+  const selectedSavedAvatar = savedAvatars.find(
+    (saved) => String(saved.avatar_id) === avatar
+  );
+  
+  const selectedAvatarName =
+    selectedSavedAvatar?.name ||
+    selectedSavedAvatar?.heygen_data?.avatar_name ||
+    "Not selected";
+
+  useEffect(() => {
+    async function loadSavedAvatars() {
+      if (authStatus !== "authenticated") {
+        setSavedAvatars([]);
+        return;
+      }
+  
+      setLoadingSavedAvatars(true);
+  
+      try {
+        const avatars = await avatarService.getUserAvatars(authFetch);
+        setSavedAvatars(avatars);
+      } catch (err) {
+        console.error("Failed to load saved avatars on video page:", err);
+        setSavedAvatars([]);
+      } finally {
+        setLoadingSavedAvatars(false);
+      }
+    }
+  
+    loadSavedAvatars();
+  }, [authStatus]);
 
   const handleSubmit = async () => {
     if (!title.trim()) {
@@ -54,9 +92,23 @@ const VideoCreation = () => {
 
     try {
       const formData = new FormData();
+      let avatarId = avatar;
+
+      if (selectedSavedAvatar?.heygen_data?.avatar_id) {
+        avatarId = selectedSavedAvatar.heygen_data.avatar_id;
+
+        const savedVoiceId =
+          selectedSavedAvatar.heygen_data.default_voice_id ||
+          selectedSavedAvatar.voice_id;
+
+        if (savedVoiceId) {
+          formData.append("voice_id", savedVoiceId);
+        }
+      }
+
       formData.append("title", title);
-      formData.append("avatar", avatar);
-      formData.append("language", language);
+
+      formData.append("avatar", avatarId);
       formData.append("subtitle", subtitle);
       formData.append("video_type", videoType);
       formData.append("custom_video_type", customVideoType);
@@ -67,7 +119,7 @@ const VideoCreation = () => {
         formData.append("file", file);
       }
 
-      const response = await fetch("http://localhost:8000/video/generate", {
+      const response = await fetch(`${API_URL}/video/generate`, {
         method: "POST",
         body: formData,
       });
@@ -78,7 +130,6 @@ const VideoCreation = () => {
         throw new Error(data.detail || data.error || "Failed to submit video request.");
       }
 
-      console.log("Video generation response:", data);
       setVideoId(data.video_id || "");
       setVideoUrl("");
       setVideoStatus(data.status || "processing");
@@ -105,11 +156,8 @@ const VideoCreation = () => {
     setError("");
 
     try {
-      const response = await fetch(`http://localhost:8000/video/status/${videoId}`);
+      const response = await fetch(`${API_URL}/video/status/${videoId}`);
       const data = await response.json();
-
-      console.log("Video status response:", data);
-
       const status = data?.data?.status || "";
       const url = data?.data?.video_url || "";
 
@@ -121,7 +169,12 @@ const VideoCreation = () => {
       } else if (status === "processing") {
         alert("Your lesson video is still being generated.");
       } else if (status === "failed") {
-        setError("Video generation failed. Please try again.");
+        const backendError =
+          data?.data?.error?.message ||
+          data?.data?.error ||
+          "Video generation failed. Please try again.";
+
+        setError(String(backendError));
       }
     } catch (err: unknown) {
       if (err instanceof Error) {
@@ -245,7 +298,7 @@ const VideoCreation = () => {
                 <div className={styles.innerInfoCard}>
                   <ul className={styles.tipList}>
                     <li>Upload or write your lesson content</li>
-                    <li>Choose your avatar and languages</li>
+                    <li>Choose your avatar and subtitle preferences</li>
                     <li>Select the video type you want</li>
                     <li>Generate a multilingual AI-powered lesson</li>
                   </ul>
@@ -255,9 +308,7 @@ const VideoCreation = () => {
                   <div className={`${styles.innerInfoCard} ${styles.summaryBox}`}>
                     <h3 className={styles.smallCardTitle}>Video Settings Summary</h3>
                     <p className={styles.summaryText}>
-                      Avatar: <strong>{avatar || "Not selected"}</strong>
-                      <br />
-                      Language: <strong>{language}</strong>
+                      Avatar: <strong>{selectedAvatarName}</strong>
                       <br />
                       Subtitles: <strong>{subtitle}</strong>
                       <br />
@@ -309,7 +360,7 @@ const VideoCreation = () => {
 
                 {error && <p className={styles.errorText}>{error}</p>}
 
-                <div className={styles.formCard}>
+                <div className={styles.formSection}>
                   <label className={styles.formLabel}>Video Title</label>
                   <input
                     type="text"
@@ -320,7 +371,7 @@ const VideoCreation = () => {
                   />
                 </div>
 
-                <div className={styles.formCard}>
+                <div className={styles.formSection}>
                   <label className={styles.formLabel}>Prompt</label>
                   <textarea
                     placeholder="Describe what you want the AI video to say or teach..."
@@ -331,14 +382,14 @@ const VideoCreation = () => {
                   />
                 </div>
 
-                <div className={styles.formCard}>
+                <div className={styles.sectionDivider}></div>
+
+                <div className={styles.formSection}>
                   <div className={styles.cardHeadingRow} style={{ marginBottom: "10px" }}>
                     <div className={styles.iconBadge}>
                       <UserCircle2 size={18} />
                     </div>
-                    <label className={styles.formLabel} style={{ marginBottom: 0 }}>
-                      Avatar
-                    </label>
+                    <h3 className={styles.cardHeading}>Avatar</h3>
                   </div>
 
                   <select
@@ -347,9 +398,24 @@ const VideoCreation = () => {
                     className={styles.selectInput}
                   >
                     <option value="">Select an avatar...</option>
-                    <option value="avatar1">My Avatar 1</option>
-                    <option value="avatar2">My Avatar 2</option>
+                    {loadingSavedAvatars ? (
+                      <option disabled>Loading saved avatars...</option>
+                    ) : (
+                      savedAvatars.map((savedAvatar) => (
+                        <option key={savedAvatar.avatar_id} value={String(savedAvatar.avatar_id)}>
+                          {savedAvatar.name ||
+                            savedAvatar.heygen_data?.avatar_name ||
+                            "Saved Avatar"}
+                        </option>
+                      ))
+                    )}
                   </select>
+
+                  {avatar === "aditya" && (
+                    <p className={styles.summaryText}>
+                      Voice: Mark (Male, English)
+                    </p>
+                  )}
 
                   <p className={styles.helperLinkRow}>
                     No avatar yet?{" "}
@@ -358,36 +424,17 @@ const VideoCreation = () => {
                     </a>
                   </p>
                 </div>
+                
+                <div className={styles.sectionDivider}></div>
 
-                <div className={styles.bottomGrid}>
-                  <div className={styles.smallCard}>
+                <div className={styles.bottomGrid} style={{ paddingTop: "4px" }}>
+                  <div className={styles.formSection}>
                     <div className={styles.cardHeadingRow}>
                       <div className={styles.iconBadge}>
                         <Languages size={18} />
                       </div>
-                      <h3 className={styles.cardHeading}>Language & Subtitles</h3>
+                      <h3 className={styles.cardHeading}>Subtitles</h3>
                     </div>
-
-                    <select
-                      value={language}
-                      onChange={(e) => setLanguage(e.target.value)}
-                      className={styles.selectInput}
-                    >
-                      <option value="english">English</option>
-                      <option value="spanish">Spanish</option>
-                      <option value="french">French</option>
-                      <option value="lingala">Lingala</option>
-                      <option value="swahili">Swahili</option>
-                      <option value="arabic">Arabic</option>
-                      <option value="portuguese">Portuguese</option>
-                      <option value="mandarin">Mandarin Chinese</option>
-                      <option value="hindi">Hindi</option>
-                      <option value="tagalog">Tagalog</option>
-                      <option value="somali">Somali</option>
-                      <option value="amharic">Amharic</option>
-                      <option value="kinyarwanda">Kinyarwanda</option>
-                      <option value="yoruba">Yoruba</option>
-                    </select>
 
                     <select
                       value={subtitle}
@@ -395,20 +442,33 @@ const VideoCreation = () => {
                       className={styles.selectInput}
                     >
                       <option value="none">No Subtitles</option>
-                      <option value="english">English</option>
-                      <option value="spanish">Spanish</option>
-                      <option value="french">French</option>
-                      <option value="lingala">Lingala</option>
-                      <option value="swahili">Swahili</option>
                       <option value="arabic">Arabic</option>
-                      <option value="portuguese">Portuguese</option>
-                      <option value="mandarin">Mandarin Chinese</option>
+                      <option value="bulgarian">Bulgarian</option>
+                      <option value="chinese">Chinese</option>
+                      <option value="croatian">Croatian</option>
+                      <option value="czech">Czech</option>
+                      <option value="danish">Danish</option>
+                      <option value="dutch">Dutch</option>
+                      <option value="english">English</option>
+                      <option value="filipino">Filipino</option>
+                      <option value="french">French</option>
+                      <option value="german">German</option>
+                      <option value="greek">Greek</option>
                       <option value="hindi">Hindi</option>
-                      <option value="tagalog">Tagalog</option>
-                      <option value="somali">Somali</option>
-                      <option value="amharic">Amharic</option>
-                      <option value="kinyarwanda">Kinyarwanda</option>
-                      <option value="yoruba">Yoruba</option>
+                      <option value="hungarian">Hungarian</option>
+                      <option value="indonesian">Indonesian</option>
+                      <option value="italian">Italian</option>
+                      <option value="japanese">Japanese</option>
+                      <option value="persian">Persian</option>
+                      <option value="polish">Polish</option>
+                      <option value="portuguese">Portuguese</option>
+                      <option value="russian">Russian</option>
+                      <option value="slovak">Slovak</option>
+                      <option value="spanish">Spanish</option>
+                      <option value="telugu">Telugu</option>
+                      <option value="turkish">Turkish</option>
+                      <option value="ukrainian">Ukrainian</option>
+                      <option value="vietnamese">Vietnamese</option>
                     </select>
 
                     <div className={styles.uploadDropZone}>
@@ -433,7 +493,7 @@ const VideoCreation = () => {
                     </div>
                   </div>
 
-                  <div className={styles.smallCard}>
+                  <div className={styles.formSection}>
                     <div className={styles.cardHeadingRow}>
                       <div className={styles.iconBadge}>
                         <Clapperboard size={18} />
