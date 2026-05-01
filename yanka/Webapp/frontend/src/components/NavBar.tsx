@@ -196,6 +196,11 @@ const NavBar: React.FC = () => {
                     {t.vision}
                   </Link>
                 </li>
+                <li>
+                  <Link href="/research" onClick={closeMobileMenu}>
+                    {t.research}
+                  </Link>
+                </li>
               </ul>
             </li>
 
@@ -292,11 +297,6 @@ const NavBar: React.FC = () => {
             <li>
               <Link href="/#marketplace" onClick={closeMobileMenu}>
                 {t.marketplace}
-              </Link>
-            </li>
-            <li>
-              <Link href="/research" onClick={closeMobileMenu}>
-                {t.research}
               </Link>
             </li>
             <li>

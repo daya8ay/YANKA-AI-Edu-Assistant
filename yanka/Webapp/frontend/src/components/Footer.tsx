@@ -33,6 +33,7 @@ const translations = {
     resources: "Resources",
     resourceLinks: {
       pricing: "Pricing",
+      research: "Research",
       integration: "Integration",
       community: "Community & Blog",
       integrity: "Academic Integrity",
@@ -82,6 +83,7 @@ const translations = {
     resources: "Ressources",
     resourceLinks: {
       pricing: "Tarifs",
+      research: "Recherche",
       integration: "Intégration",
       community: "Communauté et blog",
       integrity: "Intégrité académique",
@@ -194,6 +196,7 @@ const Footer: React.FC = () => {
             <h4>{t.resources}</h4>
             <ul>
               <li><Link href="/#pricing">{t.resourceLinks.pricing}</Link></li>
+              <li><Link href="/research">{t.resourceLinks.research}</Link></li>
               <li><Link href="#">{t.resourceLinks.integration}</Link></li>
               <li><Link href="#">{t.resourceLinks.community}</Link></li>
               <li><Link href="#">{t.resourceLinks.integrity}</Link></li>
