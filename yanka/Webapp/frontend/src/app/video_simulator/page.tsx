@@ -528,6 +528,18 @@ const VideoSimulator = () => {
                 Your browser does not support the video tag.
               </video>
 
+              <div className={styles.videoReference}>
+                <span className={styles.videoReferenceLabel}>Reference:</span>{" "}
+                <a
+                  className={styles.videoReferenceLink}
+                  href="https://www.youtube.com/watch?v=OyddY7DlV58"
+                  target="_blank"
+                  rel="noreferrer"
+                >
+                  CrashCourse. (2018). Probability Part 1: Rules and Patterns: Crash Course Statistics #13. YouTube.
+                </a>
+              </div>
+
               <div className={styles.controlsBar}>
                 <div className={styles.progressRow}>
                   <div
