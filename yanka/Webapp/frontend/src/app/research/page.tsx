@@ -55,7 +55,10 @@ const contentByLanguage: Record<"en" | "fr", ResearchPageContent> = {
         ],
         impact:
           "By developing a system that predicts learner confusion within video lessons and integrates an adaptive support and explanation system to help learners, this project has created a viable solution to address the lack of support in online learning. The positive results from the user study demonstrate the overall effectiveness and usefulness of this workflow in a student's learning process. Ultimately, this work demonstrates that the integration of real-time support within online video lessons can significantly reduce the issue of unaddressed confusion leading to dropout.",
-        supportingMaterials: [{ label: "Project Report (Placeholder)", href: "#" }],
+        supportingMaterials: [
+          { label: "Project Report (Placeholder)", href: "#" },
+          { label: "Video Simulator (Demo)", href: "/video_simulator" },
+        ],
       },
     ],
   },
@@ -82,7 +85,10 @@ const contentByLanguage: Record<"en" | "fr", ResearchPageContent> = {
         ],
         impact:
           "En developpant un systeme qui predit la confusion des apprenants dans les lecons video et integre un systeme adaptatif de soutien et d'explication, ce projet propose une solution viable au manque d'accompagnement dans l'apprentissage en ligne. Les resultats positifs de l'etude utilisateur demontrent l'efficacite et l'utilite de ce flux de travail dans le processus d'apprentissage des etudiants. En definitive, ce travail montre que l'integration d'un soutien en temps reel dans les lecons video en ligne peut reduire de maniere significative la confusion non prise en charge qui conduit a l'abandon.",
-        supportingMaterials: [{ label: "Rapport du projet (Espace reserve)", href: "#" }],
+        supportingMaterials: [
+          { label: "Rapport du projet (Espace reserve)", href: "#" },
+          { label: "Simulateur video (Demo)", href: "/video_simulator" },
+        ],
       },
     ],
   },
@@ -167,9 +173,13 @@ export default function ResearchPage() {
                 <h3>{t.supportingMaterialsLabel}</h3>
                 <div className={styles.linksRow}>
                   {item.supportingMaterials.map((material, materialIndex) => (
-                    <Link key={materialIndex} href={material.href} className={styles.linkChip}>
-                      {material.label}
-                    </Link>
+                      <Link
+                        key={materialIndex}
+                        href={material.href}
+                        className={`${styles.linkChip} ${material.href === "/video_simulator" ? styles.linkChipUnderline : ""}`}
+                      >
+                        {material.label}
+                      </Link>
                   ))}
                 </div>
               </section>

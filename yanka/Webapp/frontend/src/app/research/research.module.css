@@ -152,6 +152,11 @@
   font-weight: 600;
 }
 
+.linkChipUnderline {
+  text-decoration: underline;
+  text-underline-offset: 2px;
+}
+
 .linkChip:hover {
   background: #e4efff;
 }
