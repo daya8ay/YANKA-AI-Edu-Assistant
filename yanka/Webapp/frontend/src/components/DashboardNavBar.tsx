@@ -23,6 +23,7 @@ const translations = {
     promise: "Promise",
     mission: "Mission",
     vision: "Vision",
+    research: "Research",
     courses: "Marketplace",
     avatarCreation: "Avatar Creation",
     video: "Video Generation",
@@ -42,6 +43,7 @@ const translations = {
     promise: "Promesse",
     mission: "Mission",
     vision: "Vision",
+    research: "Recherche",
     courses: "Marché",
     avatarCreation: "Création d’avatar",
     video: "Génération de vidéos",
@@ -194,6 +196,11 @@ const DashboardNavBar: React.FC = () => {
                     {t.vision}
                   </Link>
                 </li>
+                <li>
+                  <Link href="/research" onClick={closeMobileMenu}>
+                    {t.research}
+                  </Link>
+                </li>
               </ul>
             </li>
 
@@ -215,11 +222,11 @@ const DashboardNavBar: React.FC = () => {
               </Link>
             </li>
 
-            <li>
+            {/* <li>
               <Link href="/video_simulator" onClick={closeMobileMenu}>
                 {t.videoSimulator}
               </Link>
-            </li>
+            </li> */}
 
             <li>
               <Link href="/support" onClick={closeMobileMenu}>
