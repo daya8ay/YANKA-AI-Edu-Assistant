@@ -38,6 +38,36 @@
   box-shadow: 0 8px 40px rgba(0, 0, 0, 0.6);
 }
 
+.videoReference {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 10px 16px;
+  background: rgba(0, 0, 0, 0.72);
+  border-top: 1px solid rgba(255, 255, 255, 0.08);
+  font-size: 0.78rem;
+  color: rgba(229, 231, 235, 0.9);
+}
+
+.videoReferenceLabel {
+  font-weight: 600;
+  color: rgba(229, 231, 235, 0.95);
+  flex-shrink: 0;
+}
+
+.videoReferenceLink {
+  color: rgba(147, 197, 253, 0.95);
+  text-decoration: underline;
+  text-underline-offset: 2px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.videoReferenceLink:hover {
+  color: #ffffff;
+}
+
 .video {
   width: 100%;
   display: block;
