@@ -494,10 +494,24 @@ const VideoSimulator = () => {
     openHelpPanel(timestamp, clampedLookback);
   };
   const watchedSoFar = Math.max(1, Math.round(pendingHelpTimestamp || currentTime));
-  const lookback50 = Math.max(1, Math.round(watchedSoFar * 0.5));
-  const lookback25 = Math.max(1, Math.round(watchedSoFar * 0.25));
-  const lookback50Mins = Math.max(1, Math.round(lookback50 / 60));
-  const lookback25Mins = Math.max(1, Math.round(lookback25 / 60));
+
+  const roundToNearest30Seconds = (seconds: number) => {
+    const rounded = Math.round(seconds / 30) * 30;
+    return Math.max(30, rounded);
+  };
+
+  const formatShortDuration = (seconds: number) => {
+    const mins = Math.floor(seconds / 60);
+    const rem = seconds % 60;
+    if (mins === 0) return `${rem}s`;
+    if (rem === 0) return `${mins}m`;
+    return `${mins}m ${rem}s`;
+  };
+
+  const lookback50 = roundToNearest30Seconds(watchedSoFar * 0.5);
+  const lookback25 = roundToNearest30Seconds(watchedSoFar * 0.25);
+  const lookback50Label = formatShortDuration(lookback50);
+  const lookback25Label = formatShortDuration(lookback25);
 
   return (
     <>
@@ -988,18 +1002,17 @@ const VideoSimulator = () => {
               Select how much recent content you want help with.
             </p>
             <div className={styles.modalActions}>
-              
               <button
                 className={`${styles.modalBtn} ${styles.modalBtnSecondary}`}
                 onClick={() => handleLookbackSelection(lookback25)}
               >
-                Last {lookback25Mins} minute{lookback25Mins === 1 ? "" : "s"}
+                Last {lookback25Label}
               </button>
               <button
                 className={`${styles.modalBtn} ${styles.modalBtnSecondary}`}
                 onClick={() => handleLookbackSelection(lookback50)}
               >
-                Last {lookback50Mins} minute{lookback50Mins === 1 ? "" : "s"}
+                Last {lookback50Label}
               </button>
               <button
                 className={`${styles.modalBtn} ${styles.modalBtnPrimary}`}
